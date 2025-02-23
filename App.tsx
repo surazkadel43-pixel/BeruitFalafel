@@ -1,20 +1,31 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { dispose, snatch, store } from "./api/store";
+import { validateAuthCookie } from "./api/user";
+import { buttonBuilder } from "./components/button";
+import { recycledStyles, toastManagerProps } from "./components/recycled-style";
+import { parseError } from "./components/toasts";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ToastManager, { Toast } from "toastify-react-native";
 
-export default function App() {
+import MainNavigation from "./routes/MainNagigation";
+
+export default function Index() {
+  
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+   
+      <MainNavigation />
+   
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  subTitle: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
+    margin: 10,
   },
 });
