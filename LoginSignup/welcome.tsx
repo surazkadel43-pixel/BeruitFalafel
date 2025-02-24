@@ -22,8 +22,10 @@ export default function Welcome({ navigation }: any) {
 
   async function prepare() {
   
+    
 
     const savedCookie = await snatch("authCookie");
+   
     if (!savedCookie) {
       
       setApiInUse(false);
@@ -31,14 +33,19 @@ export default function Welcome({ navigation }: any) {
     }
 
     const checkCookieRes = await validateAuthCookie(savedCookie);
+  
     if (checkCookieRes.status !== 200) {
+      
       await dispose("authCookie");
       setApiInUse(false);
       Toast.error(parseError(checkCookieRes));
       return;
     }
 
+
     setApiInUse(false);
+
+   
 
     myNavigation.reset({
       index: 0,
