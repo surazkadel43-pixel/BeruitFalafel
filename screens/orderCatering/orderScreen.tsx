@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
-import { groupSearch } from "../api/validations";
-import { recycledStyles, toastManagerProps } from "../components/recycled-style";
-import searchContainer from "../components/searchContainer";
+import { groupSearch } from "../../api/validations";
+import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
+import searchContainer from "../../components/searchContainer";
 import { Ionicons } from "@expo/vector-icons";
-export default function Home() {
+import NoResultsCard from "../../components/searchNotFound";
+export default function Order() {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -54,14 +55,21 @@ export default function Home() {
           <Ionicons name="add" size={40} color="white" />
         </TouchableOpacity>
         
-        <View style={styles.content}>
-          <Text style={styles.title}>Welcome to Anno</Text>
-          <Text style={styles.subtitle}>A space for humor, light-hearted conversations, and anonymous fun.</Text>
+        <ScrollView>
+          {orders.length > 0 ? (
+            orders.map((order) => (
+              <View key={order.id}>
+                <Text>{order.id}</Text>
+              </View>
+            ))
+          ) : (
+            <NoResultsCard
+              message={"Sorry, No Order History For now."}
 
-          <TouchableOpacity style={styles.button} onPress={() => {}}>
-            <Text style={styles.buttonText}>Go to Feed</Text>
-          </TouchableOpacity>
-        </View>
+              />
+          )}
+        </ScrollView>
+        
         </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>

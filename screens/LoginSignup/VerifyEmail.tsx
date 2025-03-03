@@ -4,14 +4,14 @@ import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Keyboard, SafeAreaView, StyleSheet, Text, TouchableWithoutFeedback } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
-import { store } from "../api/store";
-import { verifyEmail } from "../api/user";
-import { authenticationEmail } from "../api/validations";
-import { buttonBuilder } from "../components/button";
-import { inputBuilder } from "../components/input";
-import { recycledStyles, toastManagerProps } from "../components/recycled-style";
-import showAlert from "../components/showAlert";
-import { parseError } from "../components/toasts";
+import { store } from "../../api/store";
+import { verifyEmail } from "../../api/user";
+import { authenticationEmail } from "../../api/validations";
+import { buttonBuilder } from "../../components/button";
+import { inputBuilder } from "../../components/input";
+import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
+import showAlert from "../../components/showAlert";
+import { parseError } from "../../components/toasts";
 
 export default function VerifyEmail({ navigation }: any) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -47,18 +47,16 @@ export default function VerifyEmail({ navigation }: any) {
       }
 
       setApiInUse(false);
-      
+
       showAlert("Sucess", `"Email Vertified SucessFully \n Account found in Database  `, async () => {
         try {
           await store("userEmail", email);
         } catch (error) {
           showAlert("Alert", `"Somme error happen when adding the "userEmail" key to Expo Secure Storage `);
         } finally {
-          navigation.push("VerifyResetCode")
+          navigation.push("VerifyResetCode");
         }
       });
-
-      
     },
   });
 

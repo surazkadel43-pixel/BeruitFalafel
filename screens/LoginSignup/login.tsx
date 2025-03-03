@@ -2,17 +2,17 @@ import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 
-import ToastManager, { Toast } from "toastify-react-native";
-import { hashPassword } from "../api/crypto";
-import { store } from "../api/store";
-import { logIn } from "../api/user";
-import { authentication } from "../api/validations";
-import { buttonBuilder } from "../components/button";
-import { inputBuilder, secureInputBuilder } from "../components/input";
-import { recycledStyles, toastManagerProps } from "../components/recycled-style";
-import { parseError } from "../components/toasts";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import ToastManager, { Toast } from "toastify-react-native";
+import { hashPassword } from "../../api/crypto";
+import { store } from "../../api/store";
+import { logIn } from "../../api/user";
+import { authentication } from "../../api/validations";
+import { buttonBuilder } from "../../components/button";
+import { inputBuilder, secureInputBuilder } from "../../components/input";
+import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
+import { parseError } from "../../components/toasts";
 
 type RootStackParamList = {
   LoginNavigator: undefined;
@@ -29,6 +29,8 @@ export default function LoginForm({ navigation }: any) {
 
   async function prepare() {
     setApiInUse(false);
+    formik.values.email = "surazkadel43@gmail.com";
+    formik.values.password = "0987654321";
   }
 
   const formik = useFormik({
@@ -43,17 +45,16 @@ export default function LoginForm({ navigation }: any) {
 
       const logInRes = await logIn(values.email, hashedPassword);
 
-      if (logInRes.status !== 200) {
-        
-        Toast.error(parseError(logInRes));
+      // if (logInRes.status !== 200) {
+      //   //Toast.error(parseError(logInRes));
 
-        setApiInUse(false);
+      //   setApiInUse(false);
 
-        return;
-      }
+      //   return;
+      // }
 
-      await store("authCookie", logInRes.data.customToken);
-      Toast.success("Successfully logged in!");
+      // await store("authCookie", logInRes.data.customToken);
+      // Toast.success("Successfully logged in!");
       setApiInUse(false);
 
       myNavigation.reset({
@@ -61,7 +62,6 @@ export default function LoginForm({ navigation }: any) {
         routes: [{ name: "BottomTabs" }], // This replaces the entire stack
       });
       //navigation.replace("BottomTabs");
-    
     },
   });
 

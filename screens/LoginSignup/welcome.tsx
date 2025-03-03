@@ -1,16 +1,14 @@
-import { StackActions } from "@react-navigation/native";
-import { Axios } from "axios";
+import { StackActions, useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { dispose, snatch } from "../api/store";
-import { validateAuthCookie } from "../api/user";
-import { buttonBuilder } from "../components/button";
-import { recycledStyles, toastManagerProps } from "../components/recycled-style";
-import { parseError } from "../components/toasts";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { dispose, snatch } from "../../api/store";
+import { validateAuthCookie } from "../../api/user";
+import { buttonBuilder } from "../../components/button";
+import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
+import { parseError } from "../../components/toasts";
 
 type RootStackParamList = {
   LoginNavigator: undefined;
@@ -21,37 +19,28 @@ export default function Welcome({ navigation }: any) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
 
   async function prepare() {
-  
-    
-
     const savedCookie = await snatch("authCookie");
-   
+
     if (!savedCookie) {
-      
       setApiInUse(false);
       return;
     }
 
     const checkCookieRes = await validateAuthCookie(savedCookie);
-  
+
     if (checkCookieRes.status !== 200) {
-      
       await dispose("authCookie");
       setApiInUse(false);
       Toast.error(parseError(checkCookieRes));
       return;
     }
 
-
     setApiInUse(false);
-
-   
 
     myNavigation.reset({
       index: 0,
       routes: [{ name: "BottomTabs" }], // This replaces the entire stack
     });
-
   }
 
   useEffect(() => {

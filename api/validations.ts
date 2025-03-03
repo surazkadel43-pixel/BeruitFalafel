@@ -34,3 +34,10 @@ export const validationCode = Yup.object({
     .matches(/^\d{6}$/, "Code must be exactly 6 digits")  // Regex for exactly 6 digits
     .required("Code is required"),  // Ensures the field is not empty
 });
+
+export const groupSearch = Yup.object({
+  orderId: Yup.string()
+    .min(3, "Group name must be at least 3 characters")
+    .max(25, "Group name must be at most 25 characters")
+    .required("Group name is required"),
+});

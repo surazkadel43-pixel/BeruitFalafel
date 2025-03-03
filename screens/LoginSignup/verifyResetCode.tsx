@@ -4,33 +4,31 @@ import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
-import { dispose, snatch } from "../api/store";
-import { sendVertificationCode, verifyVertificationCode } from "../api/user";
-import { validationCode } from "../api/validations";
-import { buttonBuilder } from "../components/button";
-import { inputBuilder } from "../components/input";
-import { recycledStyles, toastManagerProps } from "../components/recycled-style";
-import showAlert from "../components/showAlert";
-import { parseError } from "../components/toasts";
+import { snatch } from "../../api/store";
+import { sendVertificationCode, verify6DigitCode } from "../../api/user";
+import { validationCode } from "../../api/validations";
+import { buttonBuilder } from "../../components/button";
+import { inputBuilder } from "../../components/input";
+import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
+import showAlert from "../../components/showAlert";
+import { parseError } from "../../components/toasts";
 
-export default function VerifyCode({ navigation }: any) {
+export default function VerifyResetCode({ navigation }: any) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const [code, setCode] = useState("");
-  const [userDetail, setuserDetails] = useState<{ [key: string]: string }>({});
+  const [email, setEmail] = useState("");
   async function prepare() {
     setApiInUse(false);
+    const userEmail = await snatch("userEmail"); // assuming snatch returns a string
 
-    const users = await snatch("userDetails"); // assuming snatch returns a string
-
-    let userDetails: { [key: string]: string } = {};
-
-    if (users) {
-      // Parse the string if it exists
-      userDetails = JSON.parse(users);
-      setuserDetails(userDetails);
+    if (userEmail) {
+      showAlert("Alert", `"We have sent an Vertification Code to your email  "   ${userEmail} \n Please Check Your Gmail`, () => {
+        setApiInUse(false);
+      });
+      setEmail(userEmail);
     } else {
       setApiInUse(true);
-      showAlert("Alert", `"Sign up Process failed \n Plese try again"  ${userDetail.email}`, () => {
+      showAlert("Alert", `"Reset Password Process failed \n Plese try again" `, () => {
         navigation.goBack();
       });
     }
@@ -55,7 +53,7 @@ export default function VerifyCode({ navigation }: any) {
         return;
       }
 
-      const verifyRes = await verifyVertificationCode(userDetail, verificationCode);
+      const verifyRes = await verify6DigitCode(email, verificationCode);
       if (verifyRes.status !== 200) {
         (values.code = ""), Toast.error(parseError(verifyRes));
         setApiInUse(false);
@@ -65,14 +63,9 @@ export default function VerifyCode({ navigation }: any) {
 
       setApiInUse(false);
 
-      showAlert("Alert", `"Vertification Code authenticated SucessFully \n Account careted Sucessfully `, async () => {
-        try {
-          await dispose("userDetails");
-        } catch (error) {
-          showAlert("Alert", `"Somme error happen when deleting the "userDetails" key from Expo Secure Storage `);
-        } finally {
-          navigation.replace("Login");
-        }
+      showAlert("Alert", `"Vertification Code authenticated SucessFully \n User Vertified Sucessfully `, async () => {
+        setApiInUse(false);
+        navigation.push("ResetPassword");
       });
     },
   });
@@ -80,7 +73,7 @@ export default function VerifyCode({ navigation }: any) {
   const handleResendCode = async () => {
     setApiInUse(true);
 
-    const vertificatioRes = await sendVertificationCode(userDetail.email);
+    const vertificatioRes = await sendVertificationCode(email);
 
     if (vertificatioRes.status !== 200) {
       Toast.error(parseError(vertificatioRes));
@@ -89,18 +82,17 @@ export default function VerifyCode({ navigation }: any) {
     }
 
     setApiInUse(false);
-    showAlert("Alert", `"New Vertification Code has been  SucessFully sent to the email${userDetail.email} \n Please Check Your Gmail `, () => {
+
+    showAlert("Alert", `"New Vertification Code has been  SucessFully sent to the email${email} \n Please Check Your Gmail `, () => {
       setApiInUse(false);
     });
-
-  
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView style={recycledStyles.safeAreaView}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
-          <Text style={recycledStyles.title}> Verify Code</Text>
+          <Text style={recycledStyles.title}> Verify Reset Code</Text>
           <ToastManager {...toastManagerProps} />
           {inputBuilder("Enter your code", "code", formik, {
             keyboardType: "numeric", // Only numeric input

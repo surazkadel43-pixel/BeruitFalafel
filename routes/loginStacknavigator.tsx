@@ -1,12 +1,12 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import LoginForm from "../LoginSignup/login";
-import ResetPassword from "../LoginSignup/resetPassword";
-import SignUpForm from "../LoginSignup/signup";
-import VerifyEmail from "../LoginSignup/VerifyEmail";
-import Welcome from "../LoginSignup/welcome";
-import VerifyCode from "../LoginSignup/veriFyCode";
-import VerifyResetCode from "../LoginSignup/verifyResetCode";
+import LoginForm from "../screens/LoginSignup/login";
+import ResetPassword from "../screens/LoginSignup/resetPassword";
+import SignUpForm from "../screens/LoginSignup/signup";
+import VerifyCode from "../screens/LoginSignup/veriFyCode";
+import VerifyEmail from "../screens/LoginSignup/VerifyEmail";
+import VerifyResetCode from "../screens/LoginSignup/verifyResetCode";
+import Welcome from "../screens/LoginSignup/welcome";
 
 const Stack = createStackNavigator();
 
@@ -29,7 +29,7 @@ export default function LoginStackNavigator({ navigation }: any) {
       <Stack.Screen name="SignUp" component={SignUpForm} options={{ title: "SignUp", headerShown: true }} />
 
       {/* Verify Email Screen */}
-      <Stack.Screen name="ForgotPassword" component={VerifyEmail} options={{ title: "Forgot Password", headerShown: true  }} />
+      <Stack.Screen name="ForgotPassword" component={VerifyEmail} options={{ title: "Forgot Password", headerShown: true }} />
 
       {/* Verify Email Screen */}
       <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ title: "Reset Password" }} />
@@ -37,10 +37,8 @@ export default function LoginStackNavigator({ navigation }: any) {
       {/* Verify Email Screen */}
       <Stack.Screen name="VerifyCode" component={VerifyCode} options={{ title: "Veritification", headerShown: true }} />
 
-
       {/* Verify Email Screen */}
       <Stack.Screen name="VerifyResetCode" component={VerifyResetCode} options={{ title: "Veritification", headerShown: true }} />
-
     </Stack.Navigator>
   );
 }

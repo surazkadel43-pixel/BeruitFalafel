@@ -1,12 +1,12 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { recycledStyles } from "../components/recycled-style";
 export default function Search() {
  
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={recycledStyles.safeAreaView}>
       <View style={styles.content}>
         <Text style={styles.title}>Welcome to Anno</Text>
         <Text style={styles.subtitle}>

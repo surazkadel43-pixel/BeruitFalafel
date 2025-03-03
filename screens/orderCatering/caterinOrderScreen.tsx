@@ -3,15 +3,16 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
-import { groupSearch } from "../api/validations";
-import { recycledStyles, toastManagerProps } from "../components/recycled-style";
-import searchContainer from "../components/searchContainer";
+import { groupSearch } from "../../api/validations";
+import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
+import searchContainer from "../../components/searchContainer";
 import { Ionicons } from "@expo/vector-icons";
-export default function Home() {
+import NoResultsCard from "../../components/searchNotFound";
+export default function CateringOrder() {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [cateringOrders, setCateringOrders] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   
     const onRefresh = () => {
@@ -23,12 +24,12 @@ export default function Home() {
     };
   const formik = useFormik({
     initialValues: {
-      orderId: "",
+      cateringId: "",
     },
     validationSchema: null,
     onSubmit: async (values) => {
       //setApiInUse(true);
-      values.orderId = "";
+      values.cateringId = "";
       //setApiInUse(false);
     },
   });
@@ -39,7 +40,7 @@ export default function Home() {
     const delayDebounce = setTimeout(() => {}, 500); // Delay search by 500ms after user stops typing
 
     return () => clearTimeout(delayDebounce); // Cleanup function
-  }, [formik.values.orderId]);
+  }, [formik.values.cateringId]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -48,20 +49,27 @@ export default function Home() {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
         <ToastManager {...toastManagerProps} />
         <View style={{marginBottom: 10}}>
-        {searchContainer(formik, buttonVisible, apiInUse, "orderId")}
+        {searchContainer(formik, buttonVisible, apiInUse, "cateringId")}
         </View>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />
         </TouchableOpacity>
         
-        <View style={styles.content}>
-          <Text style={styles.title}>Welcome to Anno</Text>
-          <Text style={styles.subtitle}>A space for humor, light-hearted conversations, and anonymous fun.</Text>
+        <ScrollView>
+          {cateringOrders.length > 0 ? (
+            cateringOrders.map((cateringOrder) => (
+              <View key={cateringOrder.id}>
+                <Text>{cateringOrder.id}</Text>
+              </View>
+            ))
+          ) : (
+            
+            <NoResultsCard
+              message={"Sorry, No Catering Order History For now."}
 
-          <TouchableOpacity style={styles.button} onPress={() => {}}>
-            <Text style={styles.buttonText}>Go to Feed</Text>
-          </TouchableOpacity>
-        </View>
+              />
+          )}
+        </ScrollView>
         </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>

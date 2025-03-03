@@ -3,15 +3,15 @@ import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
-import { hashPassword } from "../api/crypto";
-import { dispose, snatch } from "../api/store";
-import { resetPassword } from "../api/user";
-import { resetpassword } from "../api/validations";
-import { buttonBuilder } from "../components/button";
-import { secureInputBuilder } from "../components/input";
-import { recycledStyles, toastManagerProps } from "../components/recycled-style";
-import showAlert from "../components/showAlert";
-import { parseError } from "../components/toasts";
+import { hashPassword } from "../../api/crypto";
+import { dispose, snatch } from "../../api/store";
+import { resetPassword } from "../../api/user";
+import { resetpassword } from "../../api/validations";
+import { buttonBuilder } from "../../components/button";
+import { secureInputBuilder } from "../../components/input";
+import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
+import showAlert from "../../components/showAlert";
+import { parseError } from "../../components/toasts";
 
 export default function ResetPassword({ navigation }: any) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -49,11 +49,11 @@ export default function ResetPassword({ navigation }: any) {
 
       if (response.status !== 200) {
         setApiInUse(false);
-        data.password="";
-        data.confirmPassword ="";
+        data.password = "";
+        data.confirmPassword = "";
 
         Toast.error(parseError(response));
-        
+
         return;
       }
       setApiInUse(false);

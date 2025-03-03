@@ -14,15 +14,15 @@ export default function Profile({navigation} : {navigation: any}) {
     setApiInUse(false);
     const authCookie = await snatch("authCookie"); // assuming snatch returns a string
 
-    if (authCookie) {
-      setAuthCookie(authCookie);
+    // if (authCookie) {
+    //   setAuthCookie(authCookie);
       
-    } else {
-      setApiInUse(true);
-      showAlert("Alert", `"Logging out " `, () => {
-        navigation.replace("LoginNavigator");
-      });
-    }
+    // } else {
+    //   setApiInUse(true);
+    //   showAlert("Alert", `"Logging out " `, () => {
+    //     navigation.replace("LoginNavigator");
+    //   });
+    // }
     setApiInUse(false);
   }
 
