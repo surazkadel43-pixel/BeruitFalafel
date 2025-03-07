@@ -4,13 +4,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import NavigationHeader from "../components/navigationHeader";
 import { recycledStyles } from "../components/recycled-style";
-import BevrageScreens from "../screens/Menu/bevragesScreens";
-import CateringProductScreens from "../screens/Menu/cateringMenu";
-import ItemScreens from "../screens/Menu/itemScreens";
-import MeatScreens from "../screens/Menu/meatScreens";
-import ProductScreens from "../screens/Menu/productScreens";
-import SauceScreens from "../screens/Menu/sauceScreens";
-import SidesScreens from "../screens/Menu/sidesScreens";
+import BevrageScreens from "../screens/Menu/BevragesScreens/bevragesScreens";
+import CateringProductScreens from "../screens/Menu/cateringProductScrrens/cateringMenu";
+import ItemScreens from "../screens/Menu/itemScreens/itemScreens";
+import MeatScreens from "../screens/Menu/meatScreens/meatScreens";
+import ProductScreens from "../screens/Menu/ProductScreens/productScreens";
+import SauceScreens from "../screens/Menu/createSauceScreens/sauceScreens";
+import SidesScreens from "../screens/Menu/SidesScreens/sidesScreens";
 
 const RootDrawerNavigator = createDrawerNavigator();
 export default function MenuDrawer(navigation: any) {

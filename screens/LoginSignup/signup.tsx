@@ -1,5 +1,4 @@
 import { useFormik } from "formik";
-
 import React, { useEffect, useState } from "react";
 import { Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";

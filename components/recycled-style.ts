@@ -1,7 +1,6 @@
 import { Dimensions, StyleSheet } from "react-native";
-import Search from "../screens/searchpage";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 export const recycledStyles = StyleSheet.create({
   safeAreaView: {
@@ -30,7 +29,7 @@ export const recycledStyles = StyleSheet.create({
     fontWeight: "300",
     textAlign: "center",
   },
-    mainBackGroundColor: {
+  mainBackGroundColor: {
     backgroundColor: "#12193D",
   },
   tabBarBackGroundColor: {
@@ -71,6 +70,10 @@ export const recycledStyles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5, // For Android shadow
   },
+  modal: {
+    justifyContent: "flex-end",
+    margin: 0,
+  },
 });
 
 export const toastManagerProps = {
@@ -91,3 +94,66 @@ export const toastManagerProps = {
     height: "auto",
   },
 };
+
+export const createModalStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#12193D",
+  },
+  modalContent: {
+    flex: 1,
+    padding: 5,
+    justifyContent: "flex-start",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    borderBottomColor: "#D1D5DB",
+    borderBottomWidth: 1,
+  },
+  closeButton: {
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "white",
+  },
+  title: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "white",
+    alignSelf: "center",
+  },
+  card: { backgroundColor: "#1e2124", padding: 16, borderRadius: 8, borderWidth: 1, borderColor: "white", gap: 10 },
+});
+
+export const imagePickerStyles = StyleSheet.create({
+  imageContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap", // Ensures images move to the next line
+    justifyContent: "flex-start",
+    marginVertical: 10,
+  },
+  imageWrapper: {
+    position: "relative",
+    margin: 5,
+  },
+  selectedImage: {
+    width: width * 0.25, // Adjusts to screen width
+    height: width * 0.25,
+    borderRadius: 8,
+  },
+  removeButton: {
+    position: "absolute",
+    top: 2,
+    right: 2,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 50,
+    padding: 5,
+  },
+  chooseImage: { flexDirection: "row", justifyContent: "space-between", marginTop: 10, gap: 5 },
+});

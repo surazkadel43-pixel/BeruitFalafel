@@ -1,12 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Keyboard, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
-import { buttonBuilder } from "../../components/button";
-import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
-import searchContainer from "../../components/searchContainer";
+import { buttonBuilder } from "../../../components/button";
+import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
+import searchContainer from "../../../components/searchContainer";
+import CreateGroupModal from "./createGroupModal";
+import NoResultsCard from "../../../components/searchNotFound";
 export default function BevrageScreens() {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
@@ -52,17 +54,28 @@ export default function BevrageScreens() {
             <Ionicons name="add" size={40} color="white" />
           </TouchableOpacity>
 
-          <View style={styles.content}>
-            <Text style={styles.title}>Welcome to Anno Menu </Text>
-            <Text style={styles.subtitle}>This is for Bevrages Screens</Text>
-
-            {buttonBuilder("Go to Feed", () => {}, apiInUse, undefined, true, {
-              styles: styles.button,
-              buttonText: styles.buttonText,
-              hitSlop: { top: 10, left: 10, right: 10, bottom: 10 },
-            })}
-          </View>
+          <ScrollView>
+            {bevrages.length > 0 ? (
+              bevrages.map((bevrages) => (
+                <View key={bevrages.id}>
+                  <Text>{bevrages.id}</Text>
+                </View>
+              ))
+            ) : (
+              <NoResultsCard message={"Sorry, No Bevrages found In the Menu."} />
+            )}
+          </ScrollView>
         </ScrollView>
+        {/* Modal */}
+        <Modal
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+          animationType="slide"
+          transparent={true} // ✅ Keeps background transparent
+          style={recycledStyles.modal}
+        >
+          <CreateGroupModal onClose={() => setModalVisible(false)} />
+        </Modal>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

@@ -1,17 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Keyboard, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
-import { buttonBuilder } from "../../components/button";
-import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
-import searchContainer from "../../components/searchContainer";
+import { buttonBuilder } from "../../../components/button";
+import CreateGroupModal from "./createGroupModal";
+import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
+import searchContainer from "../../../components/searchContainer";
 export default function MeatScreens() {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [meat, setMeat] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = () => {
@@ -23,12 +24,12 @@ export default function MeatScreens() {
   };
   const formik = useFormik({
     initialValues: {
-      meatName: "",
+      itemName: "",
     },
     validationSchema: null,
     onSubmit: async (values) => {
       //setApiInUse(true);
-      values.meatName = "";
+      values.itemName = "";
       //setApiInUse(false);
     },
   });
@@ -39,14 +40,14 @@ export default function MeatScreens() {
     const delayDebounce = setTimeout(() => {}, 500); // Delay search by 500ms after user stops typing
 
     return () => clearTimeout(delayDebounce); // Cleanup function
-  }, [formik.values.meatName]);
+  }, [formik.values.itemName]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.safeAreaView}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <ToastManager {...toastManagerProps} />
-          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "meatName")}</View>
+          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "itemName")}</View>
 
           <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
             <Ionicons name="add" size={40} color="white" />
@@ -54,7 +55,7 @@ export default function MeatScreens() {
 
           <View style={styles.content}>
             <Text style={styles.title}>Welcome to Anno Menu </Text>
-            <Text style={styles.subtitle}>This is for Meat Screens</Text>
+            <Text style={styles.subtitle}>This is for Item menu Screens</Text>
 
             {buttonBuilder("Go to Feed", () => {}, apiInUse, undefined, true, {
               styles: styles.button,
@@ -63,6 +64,16 @@ export default function MeatScreens() {
             })}
           </View>
         </ScrollView>
+        {/* Modal */}
+        <Modal
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+          animationType="slide"
+          transparent={true} // ✅ Keeps background transparent
+          style={styles.modal}
+        >
+          <CreateGroupModal onClose={() => setModalVisible(false)} />
+        </Modal>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
@@ -97,5 +108,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "600",
+  },
+  modal: {
+    justifyContent: "flex-end",
+    margin: 0,
   },
 });
