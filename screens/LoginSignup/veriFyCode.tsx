@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
 import { dispose, snatch } from "../../api/store";
-import { sendVertificationCode, verifyVertificationCode } from "../../api/user";
+import { register, reSendVertificationCode, sendVertificationCode, verifyVertificationCode } from "../../api/user";
 import { validationCode } from "../../api/validations";
 import { buttonBuilder } from "../../components/button";
 import { inputBuilder } from "../../components/input";
@@ -55,14 +55,29 @@ export default function VerifyCode({ navigation }: any) {
         return;
       }
 
-      const verifyRes = await verifyVertificationCode(userDetail, verificationCode);
+      const verifyRes = await verifyVertificationCode(userDetail.email, verificationCode);
       if (verifyRes.status !== 200) {
         (values.code = ""), Toast.error(parseError(verifyRes));
         setApiInUse(false);
-
         return;
       }
 
+      const registerUser = await register(
+        userDetail.email,
+        userDetail.password,
+        userDetail.phoneNumber,
+        userDetail.firstName,
+        userDetail.lastName,
+        userDetail.confirmPassword,
+        verificationCode
+      );
+      if (registerUser.status !== 200) {
+        values.code = "";
+        setApiInUse(false);
+        Toast.error(parseError(registerUser));
+        return;
+      }
+      
       setApiInUse(false);
 
       showAlert("Alert", `"Vertification Code authenticated SucessFully \n Account careted Sucessfully `, async () => {
@@ -80,7 +95,7 @@ export default function VerifyCode({ navigation }: any) {
   const handleResendCode = async () => {
     setApiInUse(true);
 
-    const vertificatioRes = await sendVertificationCode(userDetail.email);
+    const vertificatioRes = await reSendVertificationCode(userDetail.email);
 
     if (vertificatioRes.status !== 200) {
       Toast.error(parseError(vertificatioRes));

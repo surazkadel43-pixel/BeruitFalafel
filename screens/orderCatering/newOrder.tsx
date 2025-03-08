@@ -1,27 +1,43 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Keyboard, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ToastManager from "toastify-react-native";
-import { groupSearch } from "../../api/validations";
+import ToastManager, { Toast } from "toastify-react-native";
 import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
 import searchContainer from "../../components/searchContainer";
-import { Ionicons } from "@expo/vector-icons";
 import NoResultsCard from "../../components/searchNotFound";
+import { getCurrentUser } from "../../api/user";
+import { snatch } from "../../api/store";
+import { parseError } from "../../components/toasts";
 export default function NewOrder() {
-  const [apiInUse, setApiInUse] = useState(false);
+  const [apiInUse, setApiInUse] = useState(true);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  
-    const onRefresh = () => {
-      setRefreshing(true);
-      // Simulate a data fetch or API call
-      setTimeout(() => {
-        setRefreshing(false);
-      }, 2000);
-    };
+  const [user, setUser] = useState<any>({});
+
+  async function  prepare() {
+    setApiInUse(false);
+    const currentUser = await getCurrentUser(); 
+ 
+    if (currentUser.status !== 200) {
+      Toast.error(parseError(currentUser));
+      setApiInUse(false);
+      return;
+    }
+    setUser(currentUser.data.user);
+   
+  }
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    // Simulate a data fetch or API call
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
   const formik = useFormik({
     initialValues: {
       orderId: "",
@@ -34,6 +50,10 @@ export default function NewOrder() {
     },
   });
 
+  useEffect(() => {
+    prepare();
+  }, []);
+
   // Debounced search to prevent excessive API calls
   useEffect(() => {
     setButtonVisible(true);
@@ -45,32 +65,24 @@ export default function NewOrder() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.safeAreaView}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1, }}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
-        <ToastManager {...toastManagerProps} />
-        <View style={{marginBottom: 10}}>
-        {searchContainer(formik, buttonVisible, apiInUse, "orderId")}
-        </View>
-        <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
-          <Ionicons name="add" size={40} color="white" />
-        </TouchableOpacity>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+          <ToastManager {...toastManagerProps} />
+          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "orderId")}</View>
+          <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
+            <Ionicons name="add" size={40} color="white" />
+          </TouchableOpacity>
 
-        <ScrollView>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <View key={order.id}>
-                <Text>{order.id}</Text>
-              </View>
-            ))
-          ) : (
-            <NoResultsCard
-              message={"Sorry, No New Order For now."}
-
-              />
-          )}
-        </ScrollView>
-        
-        
+          <ScrollView>
+            {orders.length > 0 ? (
+              orders.map((order) => (
+                <View key={order.id}>
+                  <Text>{order.id}</Text>
+                </View>
+              ))
+            ) : (
+              <NoResultsCard message={"Sorry, No New Order For now."} />
+            )}
+          </ScrollView>
         </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -107,5 +119,4 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
   },
-  
 });

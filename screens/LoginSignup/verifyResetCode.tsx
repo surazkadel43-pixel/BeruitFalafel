@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
 import { snatch } from "../../api/store";
-import { sendVertificationCode, verify6DigitCode } from "../../api/user";
+import { reSendVertificationCode, sendVertificationCode, verify6DigitCode, verifyVertificationCode } from "../../api/user";
 import { validationCode } from "../../api/validations";
 import { buttonBuilder } from "../../components/button";
 import { inputBuilder } from "../../components/input";
@@ -52,8 +52,8 @@ export default function VerifyResetCode({ navigation }: any) {
         Toast.success("Please enter a valid 6-digit code.");
         return;
       }
-
-      const verifyRes = await verify6DigitCode(email, verificationCode);
+      console.log(verificationCode, email);
+      const verifyRes = await verifyVertificationCode(email, verificationCode);
       if (verifyRes.status !== 200) {
         (values.code = ""), Toast.error(parseError(verifyRes));
         setApiInUse(false);
@@ -73,7 +73,7 @@ export default function VerifyResetCode({ navigation }: any) {
   const handleResendCode = async () => {
     setApiInUse(true);
 
-    const vertificatioRes = await sendVertificationCode(email);
+    const vertificatioRes = await reSendVertificationCode(email);
 
     if (vertificatioRes.status !== 200) {
       Toast.error(parseError(vertificatioRes));

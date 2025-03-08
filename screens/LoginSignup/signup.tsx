@@ -35,10 +35,9 @@ export default function SignUpForm({ navigation }: any) {
     onSubmit: async (data) => {
       setApiInUse(true);
 
-      const hashedPassword = await hashPassword(data.password);
-      const hashedConfirmPassword = await hashPassword(data.confirmPassword);
+     
 
-      const signUpResponse = await signUp(data.email, hashedPassword, data.phoneNumber, data.firstName, data.lastName, hashedConfirmPassword);
+      const signUpResponse = await signUp(data.email, data.password, data.phoneNumber, data.firstName, data.lastName, data.confirmPassword);
 
       if (signUpResponse.status !== 200) {
         Toast.error(parseError(signUpResponse));
@@ -47,16 +46,9 @@ export default function SignUpForm({ navigation }: any) {
         return;
       }
 
-      const vertificatioRes = await sendVertificationCode(data.email);
+      
 
-      if (vertificatioRes.status !== 200) {
-        Toast.error(parseError(vertificatioRes));
-        setApiInUse(false);
-        return;
-      }
-
-      data.confirmPassword = hashedConfirmPassword;
-      data.password = hashedPassword;
+     
 
       await storeJSON("userDetails", data);
 

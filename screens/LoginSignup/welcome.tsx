@@ -19,18 +19,22 @@ export default function Welcome({ navigation }: any) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
 
   async function prepare() {
+    
     const savedCookie = await snatch("authCookie");
+   
 
-  
-    if (!savedCookie) {
+    
+    if (!savedCookie ) {
+      Toast.error("No cookies found.");
       setApiInUse(false);
       return;
     }
 
-    const checkCookieRes = await validateAuthCookie(savedCookie);
+    const checkCookieRes = await validateAuthCookie(savedCookie || "");
 
-    if (checkCookieRes.status !== 200) {
+    if (checkCookieRes.data.success === false) {
       await dispose("authCookie");
+      
       setApiInUse(false);
       Toast.error(parseError(checkCookieRes));
       return;
@@ -42,7 +46,6 @@ export default function Welcome({ navigation }: any) {
       index: 0,
       routes: [{ name: "BottomTabs" }], // This replaces the entire stack
     });
-    
   }
 
   useEffect(() => {

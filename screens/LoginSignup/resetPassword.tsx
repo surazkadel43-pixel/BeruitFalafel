@@ -43,9 +43,8 @@ export default function ResetPassword({ navigation }: any) {
     onSubmit: async (data) => {
       setApiInUse(true);
 
-      const hashedPassword = await hashPassword(data.password);
-      const hashedConfirmPassword = await hashPassword(data.confirmPassword);
-      const response = await resetPassword(email, hashedPassword, hashedConfirmPassword);
+     
+      const response = await resetPassword(email, data.password, data.confirmPassword);
 
       if (response.status !== 200) {
         setApiInUse(false);

@@ -3,7 +3,7 @@ import { get, post } from "./communications";
 const endpoint = "api/v1/auth/";
 export async function signUp(email: string, password: string, phoneNumber: string = "", firstName: string = "", lastName: string = "", confirmPassword: string) {
   
-  const response = await post(`${endpoint}register`, {
+  const response = await post(`${endpoint}validateUserEntries`, {
     email: email,
     password: password,
     phoneNumber: phoneNumber,
@@ -14,9 +14,22 @@ export async function signUp(email: string, password: string, phoneNumber: strin
 
   return response;
 }
+export async function register(email: string, password: string, phoneNumber: string = "", firstName: string = "", lastName: string = "", confirmPassword: string, otp: string) {
+  
+  const response = await post(`${endpoint}register`, {
+    email: email,
+    password: password,
+    phoneNumber: phoneNumber,
+    firstName: firstName,
+    lastName: lastName,
+    confirmPassword: confirmPassword,
+    otp: otp
+  });
+
+  return response;
+}
 
 export async function logIn(email: string, password: string) {
- 
   const response = await post(`${endpoint}login`, {
     email: email,
     password: password,
@@ -26,7 +39,7 @@ export async function logIn(email: string, password: string) {
 }
 
 export async function validateAuthCookie(authCookie: string) {
-  const response = await post(`${endpoint}auth/validate`, {
+  const response = await post(`${endpoint}authValidate`, {
     authCookie: authCookie,
   });
 
@@ -42,13 +55,20 @@ export async function invalidateAuthCookie(authCookie: string) {
 }
 
 export async function getCurrentUser() {
-  const response = await get(`${endpoint}auth/currentUser`)
+  const response = await get(`${endpoint}currentUser`);
 
   return response;
 }
 
 export async function sendVertificationCode(email : any) {
-  const response = await post(`${endpoint}sendVerificationCode`, {
+  const response = await post(`${endpoint}sendVertifaicationCode`, {
+    email: email
+  })
+
+  return response;
+}
+export async function reSendVertificationCode(email : any) {
+  const response = await post(`${endpoint}reSendVertifaicationCode`, {
     email: email
   })
 
@@ -72,7 +92,7 @@ export async function verifyEmail(email: any) {
 }
 
 export async function verify6DigitCode(email: any, code: any) {
-  const response = await post(`verifyResetCode`, {
+  const response = await post(`${endpoint}verifyResetCode`, {
     email: email,
     code: code
   })
@@ -81,7 +101,7 @@ export async function verify6DigitCode(email: any, code: any) {
 }
 
 export async function resetPassword(email: any, newPassword: any, confirmPassword: any, ) {
-  const response = await post(`resetPassword`, {
+  const response = await post(`${endpoint}resetPassword`, {
     email: email,
     newPassword: newPassword,
     confirmPassword: confirmPassword
