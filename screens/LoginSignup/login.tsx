@@ -5,7 +5,6 @@ import { Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutF
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import ToastManager, { Toast } from "toastify-react-native";
-import { hashPassword } from "../../api/crypto";
 import { store } from "../../api/store";
 import { logIn } from "../../api/user";
 import { authentication } from "../../api/validations";
@@ -29,8 +28,6 @@ export default function LoginForm({ navigation }: any) {
 
   async function prepare() {
     setApiInUse(false);
-    formik.values.email = "surazkadel43@gmail.com";
-    formik.values.password = "0987654321";
   }
 
   const formik = useFormik({
@@ -41,20 +38,29 @@ export default function LoginForm({ navigation }: any) {
     validationSchema: authentication,
     onSubmit: async (values) => {
       setApiInUse(true);
-      const hashedPassword = await hashPassword(values.password);
 
-      const logInRes = await logIn(values.email, hashedPassword);
+      const logInRes = await logIn(values.email, values.password);
 
-      // if (logInRes.status !== 200) {
-      //   //Toast.error(parseError(logInRes));
+      if (logInRes.status !== 200) {
+        Toast.error(parseError(logInRes));
 
-      //   setApiInUse(false);
+        setApiInUse(false);
 
-      //   return;
-      // }
+        return;
+      }
+      const cookies = logInRes.headers["set-cookie"];
+      let authCookie = ""
+      if (cookies && cookies.length > 0) {
+         authCookie = cookies[0].split(";")[0].split("=")[1];
+        console.log(authCookie); // Outputs the token part
+      } else {
+        Toast.error("No cookies found.");
+       setApiInUse(false);
+      }
 
-      // await store("authCookie", logInRes.data.customToken);
-      // Toast.success("Successfully logged in!");
+      await store("authCookie", authCookie);
+
+      Toast.success("Successfully logged in!");
       setApiInUse(false);
 
       myNavigation.reset({

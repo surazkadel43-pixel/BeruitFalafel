@@ -21,6 +21,7 @@ export default function Welcome({ navigation }: any) {
   async function prepare() {
     const savedCookie = await snatch("authCookie");
 
+  
     if (!savedCookie) {
       setApiInUse(false);
       return;
@@ -41,6 +42,7 @@ export default function Welcome({ navigation }: any) {
       index: 0,
       routes: [{ name: "BottomTabs" }], // This replaces the entire stack
     });
+    
   }
 
   useEffect(() => {
