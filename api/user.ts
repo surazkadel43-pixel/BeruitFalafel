@@ -38,10 +38,8 @@ export async function logIn(email: string, password: string) {
   return response;
 }
 
-export async function validateAuthCookie(authCookie: string) {
-  const response = await post(`${endpoint}authValidate`, {
-    authCookie: authCookie,
-  });
+export async function validateAuthCookie() {
+  const response = await get(`${endpoint}authValidate`);
 
   return response;
 }

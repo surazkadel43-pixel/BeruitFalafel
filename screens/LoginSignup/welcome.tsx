@@ -30,7 +30,7 @@ export default function Welcome({ navigation }: any) {
       return;
     }
 
-    const checkCookieRes = await validateAuthCookie(savedCookie || "");
+    const checkCookieRes = await validateAuthCookie();
 
     if (checkCookieRes.data.success === false) {
       await dispose("authCookie");

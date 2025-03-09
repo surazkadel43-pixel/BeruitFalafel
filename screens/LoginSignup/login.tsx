@@ -48,18 +48,8 @@ export default function LoginForm({ navigation }: any) {
 
         return;
       }
-      const cookies = logInRes.headers["set-cookie"];
+      await store("authCookie", logInRes.data.customToken);
       
-      let authCookie = ""
-      if (cookies && cookies.length > 0) {
-         authCookie = cookies[0].split(";")[0].split("=")[1];
-        
-      } else {
-        Toast.error("No cookies found.");
-       setApiInUse(false);
-      }
-
-      await store("authCookie", authCookie);
      
 
       Toast.success("Successfully logged in!");
