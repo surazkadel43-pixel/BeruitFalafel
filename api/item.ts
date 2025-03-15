@@ -23,6 +23,7 @@ export async function getItems() {
 }
 
 export async function editItem(itemId: number, name: string, price: number, description: string, foodPreferences: string[]) {
+  console.log(itemId, name, price, description, foodPreferences);
   return await patch(`${endpoint}update/${itemId}`, {
     name,
     price,
@@ -32,6 +33,6 @@ export async function editItem(itemId: number, name: string, price: number, desc
 }
 
 
-export async function deleteItem(itemId: number) {
+export async function deleteItem(itemId: string) {
   return await del(`${endpoint}delete/${itemId}`);
 }

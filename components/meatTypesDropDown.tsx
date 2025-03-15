@@ -4,9 +4,9 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 export default function CheckBoxExample({ formik, valueName }: { formik: any; valueName: string }) {
   const foodOptions = [
-    { label: "Vegan", value: "VF" },
+    { label: "Vegan", value: "V" },
     { label: "Dairy-Free", value: "DF" },
-    { label: "Meat-Free", value: "MF" },
+    { label: "Meat", value: "M" },
     { label: "Gluten-Free", value: "GF" },
     { label: "Nuts-Free", value: "NF" },
   ];

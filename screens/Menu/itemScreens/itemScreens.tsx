@@ -11,7 +11,8 @@ import searchContainer from "../../../components/searchContainer";
 import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
-export default function ItemScreens() {
+
+export default function ItemScreens({navigation}: {navigation: any}) {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -22,35 +23,35 @@ export default function ItemScreens() {
       name: "Burger",
       description: "A delicious cheeseburger",
       price: 8.99,
-      foodPreferences: ["meat", "dairy_free"],
+      foodPreferences: ["V", "DF"],
     },
     {
       id: 2,
       name: "Vegan Salad",
       description: "A fresh green salad with avocado",
       price: 6.49,
-      foodPreferences: ["vegan", "gluten_free"],
+      foodPreferences: ["V", "GF"],
     },
     {
       id: 3,
       name: "Pasta",
       description: "Classic Italian pasta with tomato sauce",
       price: 10.99,
-      foodPreferences: ["vegetarian"],
+      foodPreferences: ["V"],
     },
     {
       id: 4,
       name: "Gluten-Free Pizza",
       description: "A crispy pizza with gluten-free crust",
       price: 12.99,
-      foodPreferences: ["gluten_free"],
+      foodPreferences: ["GF"],
     },
     {
       id: 5,
       name: "Nut-Free Cake",
       description: "Chocolate cake made without nuts",
       price: 5.99,
-      foodPreferences: ["nut_free"],
+      foodPreferences: ["NF"],
     },
   ]);
 
@@ -108,9 +109,9 @@ export default function ItemScreens() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.safeAreaView}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <ToastManager {...toastManagerProps} />
-          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "itemName")}</View>
+          <View style={{  }}>{searchContainer(formik, buttonVisible, apiInUse, "itemName")}</View>
 
           <ScrollView>
             {items.length > 0 ? (
@@ -123,6 +124,7 @@ export default function ItemScreens() {
                   foodTypes={item.foodPreferences}
                   onPress={() => {
                     console.log(`this is  ${item.id}`);
+                    navigation.navigate("ItemDetail", { itemDetails: item });
                   }}
                   icon="usd"
                   buttonName="manage"
@@ -157,7 +159,7 @@ export default function ItemScreens() {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10 },
+  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10,paddingBottom: 10 },
 
   content: {
     //flex: 1,

@@ -1,13 +1,19 @@
-import { useFormik } from "formik";
+import { useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ToastManager from "toastify-react-native";
+import ToastManager, { Toast } from "toastify-react-native";
+import { deleteItem } from "../../../api/item";
+import { buttonBuilder } from "../../../components/button";
+import { CustomeDetailsCard } from "../../../components/customeDetailsCard";
 import { toastManagerProps } from "../../../components/recycled-style";
-export default function ItemDetailsScreens({navigation, itemDetails}: {navigation: any, itemDetails: any}) {
+import showAlert from "../../../components/showAlert";
+import { parseError } from "../../../components/toasts";
+export default function ItemDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
-  
-  
+
+  const route = useRoute(); // ✅ Get the route object
+  const { itemDetails } = route.params as { itemDetails: any };
 
   async function prepare() {
     setApiInUse(false);
@@ -16,15 +22,45 @@ export default function ItemDetailsScreens({navigation, itemDetails}: {navigatio
   useEffect(() => {
     prepare();
   }, []);
-
- 
-  
+  const handelDeleteItem = async () => {
+    setApiInUse(true);
+    const deltedRes = await deleteItem(itemDetails.id);
+    if (deltedRes.data.success !== true) {
+      Toast.error(parseError(deltedRes));
+      setApiInUse(false);
+      return;
+    }
+    setApiInUse(false);
+    showAlert("Sucess", `Item deleted successfully  `, async () => {
+      navigation.goBack();
+    });
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.safeAreaView}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <ToastManager {...toastManagerProps} />
+          <CustomeDetailsCard
+            itemId={itemDetails.id}
+            title={itemDetails.name}
+            description={itemDetails.description}
+            price={itemDetails.price}
+            foodTypes={itemDetails.foodPreferences}
+            icon="usd"
+          />
+          <View style={styles.buttons}>
+            {buttonBuilder(
+              "Edit Item",
+              () => {
+                navigation.navigate("ItemEdit", { itemDetails });
+              },
+              false,
+              undefined,
+              true
+            )}
+            {buttonBuilder("Delete Item", handelDeleteItem, apiInUse)}
+          </View>
         </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -64,5 +100,10 @@ const styles = StyleSheet.create({
   modal: {
     justifyContent: "flex-end",
     margin: 0,
+  },
+  buttons: {
+    marginVertical: 10,
+    paddingHorizontal: 15,
+    rowGap: 5,
   },
 });
