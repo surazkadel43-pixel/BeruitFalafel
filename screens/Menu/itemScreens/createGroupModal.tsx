@@ -11,11 +11,14 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import ToastManager from "toastify-react-native";
+import ToastManager, { Toast } from "toastify-react-native";
+import { createItem } from "../../../api/item";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
+import CheckBoxExample from "../../../components/meatTypesDropDown";
 import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
+import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
 interface CreateItemModal {
   onClose: () => void;
@@ -37,17 +40,26 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
       name: "",
       price: "",
       description: "",
+      foodTypes: [],
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
+      console.log(values);
       setApiInUse(true);
-      // const groupCreateRes = await createGroup(values.name, values.description);
-      // if (groupCreateRes.status !== 200) {
-      //   Toast.error(parseError(groupCreateRes));
-      //   setApiInUse(false);
-      //   return;
-      // }
-      // props.onClose();
+      const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
+      const itemResponse = await createItem(
+        values.name,
+        numericPrice, // Ensure price is a number
+        values.description,
+        values.foodTypes
+      );
+      if (itemResponse.data.success !== true) {
+        Toast.error(parseError(itemResponse));
+        setApiInUse(false);
+        return;
+      }
+
+      Toast.success("Successfully Item created in!");
       setApiInUse(false);
     },
   });
@@ -100,6 +112,7 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
                   padding: 10,
                 },
               })}
+              <CheckBoxExample formik={formik} valueName="foodTypes" />
               {inputBuilder("Enter your Item Description", "description", formik, {
                 multiline: true,
                 style: {

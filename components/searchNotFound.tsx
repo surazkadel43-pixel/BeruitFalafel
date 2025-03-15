@@ -1,24 +1,29 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+const { width } = Dimensions.get("window");
 
-const NoResultsCard = ({message}: {message: string}) => {
+const NoResultsCard = ({ message, additionalProps }: { message: string; additionalProps?: any }) => {
+
   return (
     <TouchableOpacity style={styles.card} activeOpacity={1}>
-      <FontAwesome name="search" size={30} color="white" />
-      <Text style={styles.message}>{message} </Text>
+      
+      {additionalProps?.icon}
+      <Text style={styles.message}>{message}</Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
+    paddingHorizontal: 20,
     backgroundColor: "#1C2237",
     borderRadius: 12,
-    padding: 20,
+    padding: 15,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 15,
+    marginVertical: 10,
+    marginHorizontal: 10,
   },
   message: {
     color: "#fff",

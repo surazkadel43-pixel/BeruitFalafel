@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   searchBar: {
     backgroundColor: "#2A2F45",
     color: "#fff",
-    padding: 9,
+    padding: 12,
     borderRadius: 10,
     fontSize: 20,
     flex: 1, // Make the search bar take up available space

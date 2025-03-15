@@ -54,21 +54,21 @@ export const recycledStyles = StyleSheet.create({
     backgroundColor: "green",
   },
   addButton: {
-    width: 70, // Adjust size as needed
-    height: 70, // Same as width for a perfect circle
-    backgroundColor: "green", // Optional: Set a background color
+    width: 70, 
+    height: 70, 
+    backgroundColor: "#4C5BD4", 
     position: "absolute",
-    bottom: 10, // Adjust position
+    bottom: 10, 
     right: 30,
-    borderRadius: 35, // Half of width/height to make it circular
+    borderRadius: 35, 
     justifyContent: "center",
-    alignItems: "center", // Center the icon
+    alignItems: "center", 
     zIndex: 999,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 5, // For Android shadow
+    elevation: 5, 
   },
   modal: {
     justifyContent: "flex-end",

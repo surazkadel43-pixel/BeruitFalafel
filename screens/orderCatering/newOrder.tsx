@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Keyboard, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
@@ -44,9 +44,10 @@ export default function NewOrder() {
     },
     validationSchema: null,
     onSubmit: async (values) => {
-      //setApiInUse(true);
+      setApiInUse(true);
+      console.log(user);
       values.orderId = "";
-      //setApiInUse(false);
+      setApiInUse(false);
     },
   });
 
@@ -63,7 +64,7 @@ export default function NewOrder() {
   }, [formik.values.orderId]);
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <TouchableWithoutFeedback  accessible={false}> 
       <SafeAreaView style={styles.safeAreaView}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <ToastManager {...toastManagerProps} />
@@ -80,7 +81,9 @@ export default function NewOrder() {
                 </View>
               ))
             ) : (
-              <NoResultsCard message={"Sorry, No New Order For now."} />
+              <NoResultsCard message={"Sorry, No New Order For now."} 
+              additionalProps={{ icon: <FontAwesome name="bell" size={30} color="white" /> }}
+              />
             )}
           </ScrollView>
         </ScrollView>

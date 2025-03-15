@@ -1,26 +1,89 @@
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ToastManager from "toastify-react-native";
-import { buttonBuilder } from "../../../components/button";
-import CreateGroupModal from "./createGroupModal";
+import ToastManager, { Toast } from "toastify-react-native";
+import { getItems } from "../../../api/item";
+import { CustomeCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
+import NoResultsCard from "../../../components/searchNotFound";
+import { parseError } from "../../../components/toasts";
+import CreateGroupModal from "./createGroupModal";
 export default function ItemScreens() {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [items, setItems] = useState<any[]>([]);
+  //const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([
+    {
+      id: 1,
+      name: "Burger",
+      description: "A delicious cheeseburger",
+      price: 8.99,
+      foodPreferences: ["meat", "dairy_free"],
+    },
+    {
+      id: 2,
+      name: "Vegan Salad",
+      description: "A fresh green salad with avocado",
+      price: 6.49,
+      foodPreferences: ["vegan", "gluten_free"],
+    },
+    {
+      id: 3,
+      name: "Pasta",
+      description: "Classic Italian pasta with tomato sauce",
+      price: 10.99,
+      foodPreferences: ["vegetarian"],
+    },
+    {
+      id: 4,
+      name: "Gluten-Free Pizza",
+      description: "A crispy pizza with gluten-free crust",
+      price: 12.99,
+      foodPreferences: ["gluten_free"],
+    },
+    {
+      id: 5,
+      name: "Nut-Free Cake",
+      description: "Chocolate cake made without nuts",
+      price: 5.99,
+      foodPreferences: ["nut_free"],
+    },
+  ]);
+
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = () => {
+  async function prepare() {
+    setApiInUse(false);
+
+    const itemResponse = await getItems();
+
+    if (itemResponse.status !== 200) {
+      Toast.error(parseError(itemResponse));
+      setApiInUse(false);
+      return;
+    }
+
+    setItems(itemResponse.data.items);
+
+    setApiInUse(false);
+  }
+
+  useEffect(() => {
+    prepare();
+  }, []);
+
+  const onRefresh = async () => {
     setRefreshing(true);
-    // Simulate a data fetch or API call
-    setTimeout(() => {
+    try {
+      await prepare();
       setRefreshing(false);
-    }, 2000);
+    } catch (error) {
+      setRefreshing(false);
+    }
   };
   const formik = useFormik({
     initialValues: {
@@ -49,20 +112,31 @@ export default function ItemScreens() {
           <ToastManager {...toastManagerProps} />
           <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "itemName")}</View>
 
-          <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
-            <Ionicons name="add" size={40} color="white" />
-          </TouchableOpacity>
-
-          <View style={styles.content}>
-            <Text style={styles.title}>Welcome to Anno Menu </Text>
-            <Text style={styles.subtitle}>This is for Item menu Screens</Text>
-
-            {buttonBuilder("Go to Feed", () => {}, apiInUse, undefined, true, {
-              styles: styles.button,
-              buttonText: styles.buttonText,
-              hitSlop: { top: 10, left: 10, right: 10, bottom: 10 },
-            })}
-          </View>
+          <ScrollView>
+            {items.length > 0 ? (
+              items.map((item) => (
+                <CustomeCard
+                  key={item.id}
+                  itemId={item.id}
+                  title={item.name}
+                  description={item.description}
+                  foodTypes={item.foodPreferences}
+                  onPress={() => {
+                    console.log(`this is  ${item.id}`);
+                  }}
+                  icon="usd"
+                  buttonName="manage"
+                  buttonIsActive={true}
+                  price={item.price}
+                />
+              ))
+            ) : (
+              <NoResultsCard
+                message={"Sorry, No Item found In the Menu."}
+                additionalProps={{ icon: <FontAwesome name="cutlery" size={30} color="white" /> }}
+              />
+            )}
+          </ScrollView>
         </ScrollView>
         {/* Modal */}
         <Modal
@@ -74,6 +148,9 @@ export default function ItemScreens() {
         >
           <CreateGroupModal onClose={() => setModalVisible(false)} />
         </Modal>
+        <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
+          <Ionicons name="add" size={40} color="white" />
+        </TouchableOpacity>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

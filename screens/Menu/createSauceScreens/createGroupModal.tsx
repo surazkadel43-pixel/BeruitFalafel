@@ -17,6 +17,8 @@ import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
 import "../../../extension/extension";
+import CheckBoxExample from "../../../components/meatTypesDropDown";
+import { createItem } from "../../../api/item";
 interface CreateSauceModal {
   onClose: () => void;
 }
@@ -37,17 +39,23 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
       name: "",
       price: "",
       description: "",
+      foodPreferences: [],
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
-      // const groupCreateRes = await createGroup(values.name, values.description);
-      // if (groupCreateRes.status !== 200) {
-      //   Toast.error(parseError(groupCreateRes));
-      //   setApiInUse(false);
-      //   return;
-      // }
-      // props.onClose();
+      try {
+        const response = await createItem(
+          values.name,
+          parseFloat(values.price), // Ensure price is a number
+          values.description,
+          values.foodPreferences
+        );
+    
+        console.log("Item Created Successfully:", response);
+      } catch (error) {
+        console.error("Error creating item:", error);
+      }
       setApiInUse(false);
     },
   });
@@ -100,6 +108,7 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
                   padding: 10,
                 },
               })}
+              <CheckBoxExample formik={formik} valueName="foodPreferences" />
               {inputBuilder("Enter your Sauce Description", "description", formik, {
                 multiline: true,
                 style: {

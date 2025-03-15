@@ -51,6 +51,7 @@ export const createItemSchema = Yup.object().shape({
     .required("Price is required"),
 
   description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
+  foodTypes: Yup.array().min(1, "Please select at least one option"),
 });
 
 export const createSauceSchema = Yup.object().shape({
@@ -61,6 +62,7 @@ export const createSauceSchema = Yup.object().shape({
     .required("Price is required"),
 
   description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
+  foodTypes: Yup.array().min(1, "Please select at least one option"),
 });
 
 export const createBevrageSchema = Yup.object().shape({
