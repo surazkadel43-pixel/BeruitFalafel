@@ -5,11 +5,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
 import { deleteItem } from "../../../api/item";
 import { buttonBuilder } from "../../../components/button";
-import { CustomeDetailsCard } from "../../../components/customeDetailsCard";
+import { CustomeDetailsCard, CustomeSauceCard } from "../../../components/customeDetailsCard";
 import { toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-export default function ItemDetailsScreens({ navigation }: { navigation: any }) {
+import { deleteSauce } from "../../../api/sauce";
+export default function SauceDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
   const route = useRoute(); // ✅ Get the route object
@@ -22,13 +23,10 @@ export default function ItemDetailsScreens({ navigation }: { navigation: any }) 
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeleteItem = async () => {
+  const handelDeleteSauce = async () => {
     setApiInUse(true);
-   
-    const deltedRes = await deleteItem(itemDetails.id);
+    const deltedRes = await deleteSauce(itemDetails.id);
     if (deltedRes.data.success !== true) {
-     
-      Toast.error("deltedRes.data.error");
       Toast.error(parseError(deltedRes));
       setApiInUse(false);
       return;
@@ -44,7 +42,7 @@ export default function ItemDetailsScreens({ navigation }: { navigation: any }) 
       <SafeAreaView style={styles.safeAreaView}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <ToastManager {...toastManagerProps} />
-          <CustomeDetailsCard
+          <CustomeSauceCard
             itemId={itemDetails.id}
             title={itemDetails.name}
             description={itemDetails.description}
@@ -54,15 +52,15 @@ export default function ItemDetailsScreens({ navigation }: { navigation: any }) 
           />
           <View style={styles.buttons}>
             {buttonBuilder(
-              "Edit Item",
+              "Edit Sauce",
               () => {
-                navigation.navigate("ItemEdit", { itemDetails });
+                navigation.navigate("SauceEdit", { itemDetails });
               },
               apiInUse,
               undefined,
               true
             )}
-            {buttonBuilder("Delete Item", handelDeleteItem, apiInUse)}
+            {buttonBuilder("Delete Sauce", handelDeleteSauce, apiInUse)}
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -48,6 +48,11 @@ export const CustomeCard = ({
     </TouchableOpacity>
   );
 };
+
+
+
+
+
 const styles = StyleSheet.create({
   groupCard: { backgroundColor: "#191E2A", flexDirection: "row", borderRadius: 12, padding: 18, marginTop: 15, marginHorizontal: 10 }, //191E2A //1C2237
   groupInfo: { flex: 1, justifyContent: "center" },

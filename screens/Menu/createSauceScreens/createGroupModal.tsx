@@ -11,14 +11,15 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import ToastManager from "toastify-react-native";
+import ToastManager, { Toast } from "toastify-react-native";
+import { createSauce } from "../../../api/sauce";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
-import "../../../extension/extension";
 import CheckBoxExample from "../../../components/meatTypesDropDown";
-import { createItem } from "../../../api/item";
+import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
+import { parseError } from "../../../components/toasts";
+import "../../../extension/extension";
 interface CreateSauceModal {
   onClose: () => void;
 }
@@ -44,18 +45,22 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
-      try {
-        const response = await createItem(
-          values.name,
-          parseFloat(values.price), // Ensure price is a number
-          values.description,
-          values.foodPreferences
-        );
-    
-        console.log("Item Created Successfully:", response);
-      } catch (error) {
-        console.error("Error creating item:", error);
+
+      const response = await createSauce(
+        values.name,
+        parseFloat(values.price), // Ensure price is a number
+        values.description,
+        values.foodPreferences
+      );
+
+      if (response.data.success !== true) {
+        Toast.error(parseError(response));
+        setApiInUse(false);
+        return;
       }
+      props.onClose();
+      Toast.success("Successfully Item created in!");
+
       setApiInUse(false);
     },
   });
@@ -63,9 +68,9 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+        <ToastManager {...toastManagerProps} />
         <View style={createModalStyles.container}>
-          <ToastManager {...toastManagerProps} />
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
             {/* Header Section */}
             <View style={createModalStyles.header}>
               <Text style={createModalStyles.title}> Create Sauce</Text>

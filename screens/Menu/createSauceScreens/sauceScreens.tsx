@@ -1,26 +1,94 @@
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ToastManager from "toastify-react-native";
-import { buttonBuilder } from "../../../components/button";
+import ToastManager, { Toast } from "toastify-react-native";
+import { getSauce, searchSauce } from "../../../api/sauce";
+import { CustomeCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
+import NoResultsCard from "../../../components/searchNotFound";
+import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
-export default function SauceScreens() {
+export default function SauceScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [sauce, setSauce] = useState<any[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    // Simulate a data fetch or API call
-    setTimeout(() => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [sauces, setSauces] = useState<any[]>([
+    {
+      id: 6,
+      name: "Spicy Mango Sauce",
+      description: "A tangy and spicy mango-infused sauce with a hint of chili.",
+      price: 3.99,
+      foodPreferences: ["V", "GF"],
+    },
+    {
+      id: 7,
+      name: "Garlic Parmesan Sauce",
+      description: "A creamy garlic sauce with a rich Parmesan flavor.",
+      price: 4.49,
+      foodPreferences: ["GF"],
+    },
+    {
+      id: 8,
+      name: "Honey Mustard Sauce",
+      description: "A sweet and tangy blend of honey and mustard.",
+      price: 2.99,
+      foodPreferences: ["V", "NF"],
+    },
+    {
+      id: 9,
+      name: "Chipotle Mayo",
+      description: "A smoky and spicy mayonnaise infused with chipotle peppers.",
+      price: 3.49,
+      foodPreferences: ["DF"],
+    },
+    {
+      id: 10,
+      name: "Teriyaki Glaze",
+      description: "A sweet and savory Asian-style teriyaki sauce.",
+      price: 3.99,
+      foodPreferences: ["V", "GF"],
+    },
+  ]);
+  const [pages, setPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const [refreshes, setRefreshes] = useState<number>(0);
+
+  async function prepare(isRefreshing: boolean = false) {
+    if (isRefreshing) {
+      setSauces([]);
+      setCurrentPage(1);
+      setRefreshes(refreshes + 1);
+    }
+    setApiInUse(false);
+
+    const itemResponse = await getSauce();
+
+    if (itemResponse.data.success !== true) {
+      Toast.error(parseError(itemResponse));
       setRefreshing(false);
-    }, 2000);
+      setApiInUse(false);
+      return;
+    }
+    setPages(itemResponse.data.pages);
+    setSauces(itemResponse.data.items);
+
+    setApiInUse(false);
+    setRefreshing(false);
+  }
+
+  useEffect(() => {
+    prepare();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    prepare(true);
   };
   const formik = useFormik({
     initialValues: {
@@ -34,35 +102,102 @@ export default function SauceScreens() {
     },
   });
 
+  const fetchSauce = async (query: string) => {
+    if (query.trim() === "") {
+      setSauces([]);
+      return;
+    }
+
+    setApiInUse(true);
+    try {
+      const itemSearchRes = await searchSauce(query);
+      if (itemSearchRes.data.success === true) {
+        setSauces(itemSearchRes.data);
+      } else {
+        Toast.error(parseError(itemSearchRes));
+      }
+    } catch (error) {
+      Toast.error("Something went wrong.");
+    }
+    setApiInUse(false);
+  };
   // Debounced search to prevent excessive API calls
   useEffect(() => {
     setButtonVisible(true);
-    const delayDebounce = setTimeout(() => {}, 500); // Delay search by 500ms after user stops typing
+    const delayDebounce = setTimeout(() => {
+      console.log(formik.values.sauceName);
+      fetchSauce(formik.values.sauceName);
+    }, 500); // Delay search by 500ms after user stops typing
 
     return () => clearTimeout(delayDebounce); // Cleanup function
   }, [formik.values.sauceName]);
 
+  async function loadMore() {
+    if (apiInUse) {
+      return;
+    }
+
+    setApiInUse(true);
+
+    const postReq = await getSauce(currentPage + 1, sauces[sauces.length - 1].id);
+    if (postReq.data.success !== true) {
+      Toast.error(parseError(postReq));
+    } else {
+      setSauces([...sauces, ...postReq.data.results] as []);
+      setCurrentPage(currentPage + 1);
+    }
+
+    setApiInUse(false);
+  }
+  function onScroll(event: any) {
+    if (apiInUse || currentPage === pages) {
+      return;
+    }
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
+      loadMore();
+    }
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.safeAreaView}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-          <ToastManager {...toastManagerProps} />
+      <SafeAreaView key={refreshes} style={styles.safeAreaView}>
+        <ToastManager {...toastManagerProps} />
+        <ScrollView
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
           <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "sauceName")}</View>
 
-          <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
-            <Ionicons name="add" size={40} color="white" />
-          </TouchableOpacity>
-
-          <View style={styles.content}>
-            <Text style={styles.title}>Welcome to Anno Menu </Text>
-            <Text style={styles.subtitle}>This is for Sauce menu Screens</Text>
-
-            {buttonBuilder("Go to Feed", () => {}, apiInUse, undefined, true, {
-              styles: styles.button,
-              buttonText: styles.buttonText,
-              hitSlop: { top: 10, left: 10, right: 10, bottom: 10 },
-            })}
-          </View>
+          <ScrollView>
+            {sauces.length > 0 ? (
+              sauces.map((item) => (
+                <CustomeCard
+                  key={item.id}
+                  itemId={item.id}
+                  title={item.name}
+                  description={item.description}
+                  foodTypes={item.foodPreferences}
+                  onPress={() => {
+                    console.log(`this is  ${item.id}`);
+                    navigation.navigate("SauceDetails", { itemDetails: item });
+                  }}
+                  icon="usd"
+                  buttonName="manage"
+                  buttonIsActive={true}
+                  price={item.price}
+                />
+              ))
+            ) : (
+              <NoResultsCard
+                message={"Sorry, No Item found In the Menu."}
+                additionalProps={{ icon: <FontAwesome name="cutlery" size={30} color="white" /> }}
+              />
+            )}
+          </ScrollView>
         </ScrollView>
         {/* Modal */}
         <Modal
@@ -74,6 +209,9 @@ export default function SauceScreens() {
         >
           <CreateGroupModal onClose={() => setModalVisible(false)} />
         </Modal>
+        <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
+          <Ionicons name="add" size={40} color="white" />
+        </TouchableOpacity>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

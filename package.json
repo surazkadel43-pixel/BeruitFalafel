@@ -30,6 +30,7 @@
     "react-native-crypto": "^2.2.0",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-gesture-handler": "~2.20.2",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-pager-view": "^6.7.0",
     "react-native-reanimated": "~3.16.1",
     "react-native-root-siblings": "^5.0.1",

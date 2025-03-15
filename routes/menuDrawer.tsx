@@ -11,6 +11,7 @@ import MeatScreens from "../screens/Menu/meatScreens/meatScreens";
 import ProductScreens from "../screens/Menu/ProductScreens/productScreens";
 import SidesScreens from "../screens/Menu/SidesScreens/sidesScreens";
 import ItemStackNavigator from "./itemNavigation/itemStackNavigation";
+import SauceStackNavigator from "./sauceNavigation/sauceStackNavigation";
 
 const RootDrawerNavigator = createDrawerNavigator();
 export default function MenuDrawer(navigation: any) {
@@ -56,7 +57,6 @@ export default function MenuDrawer(navigation: any) {
         name="BevrageScreens"
         component={BevrageScreens}
         options={{
-          headerShown: false,
           drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
           headerTitle: () => <NavigationHeader title="Bevrages" navigation={navigation} />,
           headerStyle: { backgroundColor: "skyblue" },
@@ -82,7 +82,7 @@ export default function MenuDrawer(navigation: any) {
       />
       <RootDrawerNavigator.Screen
         name="SauceScreens"
-        component={SauceScreens}
+        component={SauceStackNavigator}
         options={{
           drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
           headerTitle: () => <NavigationHeader title="Sauce" navigation={navigation} />,

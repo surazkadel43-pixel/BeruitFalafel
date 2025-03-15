@@ -23,7 +23,6 @@ export async function getItems() {
 }
 
 export async function editItem(itemId: number, name: string, price: number, description: string, foodPreferences: string[]) {
-  console.log(itemId, name, price, description, foodPreferences);
   return await patch(`${endpoint}update/${itemId}`, {
     name,
     price,
@@ -32,7 +31,18 @@ export async function editItem(itemId: number, name: string, price: number, desc
   });
 }
 
-
 export async function deleteItem(itemId: string) {
-  return await del(`${endpoint}delete/${itemId}`);
+  const response = await del(`${endpoint}delete/${itemId}`);
+  return response;
+}
+
+export async function getItem(page: number = 0, initialId: number = 0) {
+  const response = await get(page === 0 && initialId === 0 ? `${endpoint}feed/item` : `${endpoint}feed/item?page=${page}&initId=${initialId}`);
+  return response;
+}
+
+export async function searchItem(name: string) {
+  const response = await get(`${endpoint}item?name=${name}`);
+
+  return response;
 }

@@ -1,18 +1,10 @@
+import { useRoute } from "@react-navigation/core";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import {
-  Dimensions,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Dimensions, Keyboard, ScrollView, TouchableWithoutFeedback, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createItem } from "../../../api/item";
+import { editSauce } from "../../../api/sauce";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
@@ -20,19 +12,25 @@ import CheckBoxExample from "../../../components/meatTypesDropDown";
 import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
-interface CreateItemModal {
-  onClose: () => void;
-}
 
-const CreateItemModal: React.FC<CreateItemModal> = (props) => {
+const EditSauce = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-  const [price, setPrice] = useState<string>("");
+
+  const route = useRoute(); // ✅ Get the route object
+  const { itemDetails } = route.params as { itemDetails: any };
+
   useEffect(() => {
     prepare();
   }, []);
 
   function prepare() {
     setApiInUse(false);
+    formik.setValues({
+      name: itemDetails.name,
+      price: itemDetails.price.toString().toCurrency(),
+      description: itemDetails.description,
+      foodTypes: itemDetails.foodPreferences,
+    });
   }
 
   const formik = useFormik({
@@ -47,7 +45,8 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
       console.log(values);
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
-      const itemResponse = await createItem(
+      const itemResponse = await editSauce(
+        itemDetails.id,
         values.name,
         numericPrice, // Ensure price is a number
         values.description,
@@ -66,20 +65,11 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1}} keyboardShouldPersistTaps="handled">
+        <ToastManager {...toastManagerProps} />
         <View style={createModalStyles.container}>
-          <ToastManager {...toastManagerProps} />
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false} >
-            {/* Header Section */}
-            <View style={createModalStyles.header}>
-              <Text style={createModalStyles.title}> Create Item</Text>
-
-              <TouchableOpacity onPress={props.onClose} style={createModalStyles.closeButton}>
-                <Text style={createModalStyles.closeButtonText}>✖</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={createModalStyles.card}>
+          <ScrollView contentContainerStyle={{}} showsVerticalScrollIndicator={false}>
+            <View style={[createModalStyles.card, { marginVertical: 19, marginHorizontal: 10 }]}>
               {inputBuilder("Enter your Item Name", "name", formik, {
                 multiline: true,
                 style: {
@@ -127,15 +117,24 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
                   padding: 10,
                 },
               })}
-              {buttonBuilder("Create", formik.handleSubmit, apiInUse)}
+              {buttonBuilder("Save", formik.handleSubmit, apiInUse)}
+              {buttonBuilder(
+                "Cancel",
+                () => {
+                  navigation.goBack();
+                },
+                apiInUse,
+                undefined,
+                true
+              )}
             </View>
           </ScrollView>
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
   );
 };
 
-export default CreateItemModal;
+export default EditSauce;
 
 const { width, height } = Dimensions.get("window");

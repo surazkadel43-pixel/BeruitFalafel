@@ -37,6 +37,31 @@ export const CustomeDetailsCard: React.FC<CustomeCardProps> = ({ itemId, title, 
     </TouchableOpacity>
   );
 };
+export const CustomeSauceCard: React.FC<CustomeCardProps> = ({ itemId, title, description, price, foodTypes, icon }) => {
+  return (
+    <TouchableOpacity style={styles.groupCard} activeOpacity={1}>
+      <View style={styles.groupInfo}>
+        <View style={[styles.followerContainer, { flexDirection: "column", alignItems: "flex-start" }]}>
+          <Text style={styles.followers}> <Text style={styles.groupName}>Sauce Id :</Text> {itemId}</Text>
+          <Text style={styles.followers}><Text style={styles.groupName}>Sauce Name :</Text> {title}</Text>
+        </View>
+
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}><Text style={styles.groupName}>Sauce Price :</Text> </Text>
+          <FontAwesome name={icon} size={18} color="white" />
+          <Text style={styles.followers}>{price}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}><Text style={styles.groupName}>Sauce Description :</Text> {description}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}> Food Types: </Text>
+          <Text style={[styles.followers, { fontWeight: "bold" }]}>{foodTypes.join(", ")}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
 const styles = StyleSheet.create({
   groupCard: { backgroundColor: "#191E2A", flexDirection: "row", borderRadius: 12, padding: 18, marginTop: 15, marginHorizontal: 10 }, //191E2A //1C2237
   groupInfo: { flex: 1, justifyContent: "center" },

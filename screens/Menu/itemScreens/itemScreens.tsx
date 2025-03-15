@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getItems } from "../../../api/item";
+import { getItem, searchItem } from "../../../api/item";
 import { CustomeCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
@@ -12,8 +12,8 @@ import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
 
-export default function ItemScreens({navigation}: {navigation: any}) {
-  const [apiInUse, setApiInUse] = useState(false);
+export default function ItemScreens({ navigation }: { navigation: any }) {
+  const [apiInUse, setApiInUse] = useState(true);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   //const [items, setItems] = useState<any[]>([]);
@@ -54,23 +54,32 @@ export default function ItemScreens({navigation}: {navigation: any}) {
       foodPreferences: ["NF"],
     },
   ]);
-
+  const [pages, setPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshes, setRefreshes] = useState<number>(0);
 
-  async function prepare() {
+  async function prepare(isRefreshing: boolean = false) {
+    if (isRefreshing) {
+      setItems([]);
+      setCurrentPage(1);
+      setRefreshes(refreshes + 1);
+    }
     setApiInUse(false);
 
-    const itemResponse = await getItems();
+    const itemResponse = await getItem();
 
-    if (itemResponse.status !== 200) {
+    if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
+      setRefreshing(false);
       setApiInUse(false);
       return;
     }
-
+    setPages(itemResponse.data.pages);
     setItems(itemResponse.data.items);
 
     setApiInUse(false);
+    setRefreshing(false);
   }
 
   useEffect(() => {
@@ -79,12 +88,7 @@ export default function ItemScreens({navigation}: {navigation: any}) {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    try {
-      await prepare();
-      setRefreshing(false);
-    } catch (error) {
-      setRefreshing(false);
-    }
+    prepare(true);
   };
   const formik = useFormik({
     initialValues: {
@@ -98,20 +102,74 @@ export default function ItemScreens({navigation}: {navigation: any}) {
     },
   });
 
+  const fetchItem = async (query: string) => {
+    if (query.trim() === "") {
+      setItems([]);
+      return;
+    }
+
+    setApiInUse(true);
+    try {
+      const itemSearchRes = await searchItem(query);
+      if (itemSearchRes.data.success === true) {
+        setItems(itemSearchRes.data);
+      } else {
+        Toast.error(parseError(itemSearchRes));
+      }
+    } catch (error) {
+      Toast.error("Something went wrong.");
+    }
+    setApiInUse(false);
+  };
+  async function loadMore() {
+    if (apiInUse) {
+      return;
+    }
+
+    setApiInUse(true);
+
+    const postReq = await getItem(currentPage + 1, items[items.length - 1].id);
+    if (postReq.data.success !== true) {
+      Toast.error(parseError(postReq));
+    } else {
+      setItems([...items, ...postReq.data.results] as []);
+      setCurrentPage(currentPage + 1);
+    }
+
+    setApiInUse(false);
+  }
   // Debounced search to prevent excessive API calls
   useEffect(() => {
     setButtonVisible(true);
-    const delayDebounce = setTimeout(() => {}, 500); // Delay search by 500ms after user stops typing
+    const delayDebounce = setTimeout(() => {
+      fetchItem(formik.values.itemName);
+    }, 500); // Delay search by 500ms after user stops typing
 
     return () => clearTimeout(delayDebounce); // Cleanup function
   }, [formik.values.itemName]);
 
+  function onScroll(event: any) {
+    if (apiInUse || currentPage === pages) {
+      return;
+    }
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
+      loadMore();
+    }
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.safeAreaView}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1, }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      <SafeAreaView key={refreshes} style={styles.safeAreaView}>
+        <ScrollView
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
           <ToastManager {...toastManagerProps} />
-          <View style={{  }}>{searchContainer(formik, buttonVisible, apiInUse, "itemName")}</View>
+          <View style={{}}>{searchContainer(formik, buttonVisible, apiInUse, "itemName")}</View>
 
           <ScrollView>
             {items.length > 0 ? (
@@ -159,7 +217,7 @@ export default function ItemScreens({navigation}: {navigation: any}) {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10,paddingBottom: 10 },
+  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10, paddingBottom: 10 },
 
   content: {
     //flex: 1,

@@ -79,16 +79,19 @@ export const recycledStyles = StyleSheet.create({
 export const toastManagerProps = {
   textStyle: { fontSize: 16, color: "white" },
   style: {
+    position: "absolute", // Make it float above other content
+    top: 10, // Adjust this value to control how far from the top it appears
+    alignSelf: "center", // Centers the toast horizontally
     backgroundColor: "#131517",
-    opacity: 0.8,
+    opacity: 1,
     borderRadius: 10,
     padding: 20,
     marginHorizontal: 10,
     marginBottom: 13,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOpacity: 0.9,
+    shadowRadius: 8,
     elevation: 5,
     width: width - 20,
     height: "auto",
