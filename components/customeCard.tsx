@@ -2,6 +2,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { buttonBuilder } from "./button";
+import { PostImages } from "./postImages";
 
 export const CustomeCard = ({
   itemId,
@@ -28,7 +29,7 @@ export const CustomeCard = ({
     <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
       <View style={styles.groupInfo}>
         <View style={styles.followerContainer}>
-          <Text style={styles.groupName}>{itemId}</Text>
+          {/* <Text style={styles.groupName}>{itemId}</Text> */}
           <Text style={styles.groupName}>{title}</Text>
         </View>
 
@@ -41,7 +42,7 @@ export const CustomeCard = ({
         </View>
         <View style={styles.followerContainer}>
           <Text style={styles.followers}> Food Types: </Text>
-          <Text style={[styles.followers, {fontWeight: "bold"}]}>{foodTypes.join(", ")}</Text>
+          <Text style={[styles.followers, { fontWeight: "bold" }]}>{foodTypes.join(", ")}</Text>
         </View>
         {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
       </View>
@@ -49,9 +50,57 @@ export const CustomeCard = ({
   );
 };
 
+export const CustomeImageCard = ({
+  itemId,
+  title,
+  description,
+  price,
+  drinkTypes,
+  onPress,
+  icon,
+  buttonName,
+  buttonIsActive,
+  files,
+  isSmall,
+}: {
+  itemId: string;
+  title: string;
+  description: string;
+  price: string;
+  drinkTypes: string[];
+  onPress: () => void;
+  icon: any;
+  buttonName: string;
+  buttonIsActive: boolean;
+  files: any[];
+  isSmall: boolean;
+}) => {
+  return (
+    <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
+      <View style={styles.groupInfo}>
+        <View style={styles.followerContainer}>
+          {/* <Text style={styles.groupName}>{itemId}</Text> */}
+          <Text style={styles.groupName}>{title}</Text>
+        </View>
 
-
-
+        <View style={styles.followerContainer}>
+          <FontAwesome name={icon} size={18} color="white" />
+          <Text style={styles.followers}>{price}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>{description}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}> Drink Types: </Text>
+          <Text style={[styles.followers, { fontWeight: "bold" }]}>{drinkTypes.join(", ")}</Text>
+        </View>
+        {/* Image Carousel */}
+        {files.length > 0 && <PostImages files={files} isSmall={isSmall} />}
+        {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   groupCard: { backgroundColor: "#191E2A", flexDirection: "row", borderRadius: 12, padding: 18, marginTop: 15, marginHorizontal: 10 }, //191E2A //1C2237

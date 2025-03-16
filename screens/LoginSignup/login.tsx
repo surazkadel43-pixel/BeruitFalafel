@@ -41,6 +41,7 @@ export default function LoginForm({ navigation }: any) {
 
       const logInRes = await logIn(values.email, values.password);
 
+      
       if (logInRes.status !== 200) {
         Toast.error(parseError(logInRes));
 

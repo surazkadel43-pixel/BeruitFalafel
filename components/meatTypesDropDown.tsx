@@ -51,6 +51,60 @@ export default function CheckBoxExample({ formik, valueName }: { formik: any; va
   );
 }
 
+
+export  function DrinkTypesCheckbox({ formik, valueName }: { formik: any; valueName: string }) {
+  const drinkOptions = [
+    { label: "Soda", value: "Soda" },
+    { label: "Juice", value: "Juice" },
+    { label: "Alcohol", value: "Alcohol" },
+    { label: "Tea", value: "Tea" },
+    { label: "Coffee", value: "Coffee" },
+  ];
+
+  const toggleSelection = (value: string) => {
+    let currentValues = formik.values[valueName] || [];
+
+    if (currentValues.includes(value)) {
+      currentValues = currentValues.filter((item: string) => item !== value);
+    } else {
+      currentValues = [...currentValues, value];
+    }
+
+    formik.setFieldValue(valueName, currentValues);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>Select Bevrages Types:</Text>
+
+      {drinkOptions.map((option) => (
+        <View key={option.value} style={styles.checkboxContainer}>
+          <BouncyCheckbox
+            size={25}
+            fillColor="#ff9900" // Orange when checked
+            unFillColor="#1a1f24"
+            text={option.label}
+            textStyle={[styles.checkboxLabel, { textDecorationLine: "none" }]}
+            iconStyle={{ borderColor: "#ccc" }}
+            isChecked={formik.values[valueName]?.includes(option.value)}
+            onPress={() => toggleSelection(option.value)}
+          />
+        </View>
+      ))}
+
+      {/* ✅ Display selected items */}
+      <Text style={styles.selectedText}>
+        Selected: {formik.values[valueName]?.length > 0 ? formik.values[valueName].join(", ") : "None"}
+      </Text>
+
+      {/* ✅ Display error message if validation fails */}
+      {formik.touched[valueName] && formik.errors[valueName] ? <Text style={styles.errorText}>{formik.errors[valueName]}</Text> : null}
+    </View>
+  );
+}
+
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

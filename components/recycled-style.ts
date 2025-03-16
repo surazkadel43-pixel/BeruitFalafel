@@ -54,21 +54,21 @@ export const recycledStyles = StyleSheet.create({
     backgroundColor: "green",
   },
   addButton: {
-    width: 70, 
-    height: 70, 
-    backgroundColor: "#4C5BD4", 
+    width: 70,
+    height: 70,
+    backgroundColor: "#4C5BD4",
     position: "absolute",
-    bottom: 10, 
+    bottom: 10,
     right: 30,
-    borderRadius: 35, 
+    borderRadius: 35,
     justifyContent: "center",
-    alignItems: "center", 
+    alignItems: "center",
     zIndex: 999,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 5, 
+    elevation: 5,
   },
   modal: {
     justifyContent: "flex-end",
@@ -131,7 +131,7 @@ export const createModalStyles = StyleSheet.create({
     color: "white",
     alignSelf: "center",
   },
-  card: { backgroundColor: "#1e2124", padding: 16, borderRadius: 8, borderWidth: 1, borderColor: "white", gap: 10 },
+  card: { backgroundColor: "#1e2124", padding: 15, borderRadius: 8, borderWidth: 1, borderColor: "white", gap: 10, marginHorizontal: 10 },
 });
 
 export const imagePickerStyles = StyleSheet.create({

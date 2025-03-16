@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Dimensions, Keyboard, ScrollView, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
 import { editSauce } from "../../../api/sauce";
 import { createItemSchema } from "../../../api/validations";
@@ -10,6 +11,7 @@ import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import CheckBoxExample from "../../../components/meatTypesDropDown";
 import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
+import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
 
@@ -42,7 +44,6 @@ const EditSauce = ({ navigation }: { navigation: any }) => {
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
-      console.log(values);
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const itemResponse = await editSauce(
@@ -58,16 +59,19 @@ const EditSauce = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Item created in!");
+      Toast.success("Successfully Sacue Edited in!");
+      showAlert("Sucess", `Successfully Sauce Edited  `, async () => {
+        navigation.goBack();
+      });
       setApiInUse(false);
     },
   });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1}} keyboardShouldPersistTaps="handled">
+      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }} keyboardShouldPersistTaps="handled">
         <ToastManager {...toastManagerProps} />
-        <View style={createModalStyles.container}>
+        <SafeAreaView style={createModalStyles.container}>
           <ScrollView contentContainerStyle={{}} showsVerticalScrollIndicator={false}>
             <View style={[createModalStyles.card, { marginVertical: 19, marginHorizontal: 10 }]}>
               {inputBuilder("Enter your Item Name", "name", formik, {
@@ -129,7 +133,7 @@ const EditSauce = ({ navigation }: { navigation: any }) => {
               )}
             </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
   );

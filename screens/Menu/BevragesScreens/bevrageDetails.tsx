@@ -3,14 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { deleteItem } from "../../../api/item";
+import { deleteBevrage } from "../../../api/bevrages";
 import { buttonBuilder } from "../../../components/button";
-import { CustomeDetailsCard, CustomeSauceCard } from "../../../components/customeDetailsCard";
+import { CustomeBevrageCard } from "../../../components/customeDetailsCard";
 import { toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-import { deleteSauce } from "../../../api/sauce";
-export default function SauceDetailsScreens({ navigation }: { navigation: any }) {
+export default function BevrageDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
   const route = useRoute(); // ✅ Get the route object
@@ -23,9 +22,9 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeleteSauce = async () => {
+  const handelDeleteBevrage = async () => {
     setApiInUse(true);
-    const deltedRes = await deleteSauce(itemDetails.id);
+    const deltedRes = await deleteBevrage(itemDetails.id);
     if (deltedRes.data.success !== true) {
       Toast.error(parseError(deltedRes));
       setApiInUse(false);
@@ -40,27 +39,30 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.safeAreaView}>
+        <ToastManager {...toastManagerProps} />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <ToastManager {...toastManagerProps} />
-          <CustomeSauceCard
+          <CustomeBevrageCard
+            key={itemDetails.id}
             itemId={itemDetails.id}
             title={itemDetails.name}
             description={itemDetails.description}
-            price={itemDetails.price}
-            foodTypes={itemDetails.foodPreferences}
+            drinkTypes={itemDetails.drinkTypes}
             icon="usd"
+            price={itemDetails.price}
+            files={itemDetails.files}
+            isSmall={false}
           />
           <View style={styles.buttons}>
             {buttonBuilder(
-              "Edit Sauce",
+              "Edit Bevrage",
               () => {
-                navigation.navigate("SauceEdit", { itemDetails });
+                navigation.navigate("BevrageEdit", { itemDetails });
               },
               apiInUse,
               undefined,
               true
             )}
-            {buttonBuilder("Delete Sauce", handelDeleteSauce, apiInUse)}
+            {buttonBuilder("Delete Bevrage", handelDeleteBevrage, apiInUse)}
           </View>
         </ScrollView>
       </SafeAreaView>

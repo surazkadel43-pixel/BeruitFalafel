@@ -75,8 +75,9 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
       setApiInUse(false);
       return;
     }
+
     setPages(itemResponse.data.pages);
-    setSauces(itemResponse.data.items);
+    setSauces(itemResponse.data.sauces);
 
     setApiInUse(false);
     setRefreshing(false);
@@ -96,15 +97,14 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
     },
     validationSchema: null,
     onSubmit: async (values) => {
-      //setApiInUse(true);
-      values.sauceName = "";
-      //setApiInUse(false);
+      setButtonVisible(false);
+      fetchSauce(values.sauceName);
     },
   });
 
   const fetchSauce = async (query: string) => {
     if (query.trim() === "") {
-      setSauces([]);
+      prepare();
       return;
     }
 
@@ -112,7 +112,7 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
     try {
       const itemSearchRes = await searchSauce(query);
       if (itemSearchRes.data.success === true) {
-        setSauces(itemSearchRes.data);
+        setSauces(itemSearchRes.data.sauces);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
@@ -125,9 +125,8 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
   useEffect(() => {
     setButtonVisible(true);
     const delayDebounce = setTimeout(() => {
-      console.log(formik.values.sauceName);
       fetchSauce(formik.values.sauceName);
-    }, 500); // Delay search by 500ms after user stops typing
+    }, 500); 
 
     return () => clearTimeout(delayDebounce); // Cleanup function
   }, [formik.values.sauceName]);
@@ -139,11 +138,11 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
 
-    const postReq = await getSauce(currentPage + 1, sauces[sauces.length - 1].id);
-    if (postReq.data.success !== true) {
-      Toast.error(parseError(postReq));
+    const itemResponse = await getSauce(currentPage+ 1, sauces[sauces.length - 1].id);
+    if (itemResponse.data.success !== true) {
+      Toast.error(parseError(itemResponse));
     } else {
-      setSauces([...sauces, ...postReq.data.results] as []);
+      setSauces([...sauces, ...itemResponse.data.sauces] as []);
       setCurrentPage(currentPage + 1);
     }
 
@@ -153,8 +152,10 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
     if (apiInUse || currentPage === pages) {
       return;
     }
+
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
+      console.log("loading more, 1000", apiInUse, currentPage, pages);
       loadMore();
     }
   }
@@ -182,7 +183,6 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
                   description={item.description}
                   foodTypes={item.foodPreferences}
                   onPress={() => {
-                    console.log(`this is  ${item.id}`);
                     navigation.navigate("SauceDetails", { itemDetails: item });
                   }}
                   icon="usd"
@@ -218,7 +218,7 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10 },
+  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingVertical: 10 },
 
   content: {
     //flex: 1,

@@ -1,44 +1,44 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/core";
 import * as ImagePicker from "expo-image-picker";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Dimensions, Image, Keyboard, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
+import { createBevrage } from "../../../api/bevrages";
+import { uploadImages } from "../../../api/images";
 import { createBeverageSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import { DrinkTypesCheckbox } from "../../../components/meatTypesDropDown";
 import { createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
-import ZoomImageModal from "../../../components/zoomImageModals";
-import "../../../extension/extension";
-import { createBevrage } from "../../../api/bevrages";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-import { uploadImages } from "../../../api/images";
+import ZoomImageModal from "../../../components/zoomImageModals";
+import "../../../extension/extension";
 
-interface CreateBevrageModal {
-  onClose: () => void;
-}
-
-const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
+const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-  const [price, setPrice] = useState<string>("");
+
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+  const route = useRoute(); // ✅ Get the route object
+  const { itemDetails } = route.params as { itemDetails: any };
+
   useEffect(() => {
     prepare();
+    const formattedImages = itemDetails.files?.map((file: any) => ({ uri: file.presignedURL })) || [];
+    formik.setValues({
+      name: itemDetails.name,
+      price: itemDetails.price.toString().toCurrency(),
+      description: itemDetails.description,
+      image: formattedImages,
+      drinkTypes: itemDetails.drinkTypes,
+    });
+    setSelectedImages(formattedImages);
   }, []);
 
   function prepare() {
@@ -68,15 +68,21 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
       let uploadedImages: any[] = [];
 
       if (selectedImages.length > 0) {
-        const uploadedImagesResp = await uploadImages(selectedImages);
+        try {
+          const uploadedImagesResp = await uploadImages(selectedImages);
 
-        for (const image of uploadedImagesResp) {
-          uploadedImages.push({ id: image.id });
+          for (const image of uploadedImagesResp) {
+            uploadedImages.push({ id: image.id });
+          }
+        } catch (error: any) {
+          Toast.error(error.message);
+          setApiInUse(false);
+          return;
         }
       }
 
       /**
-       * save bevrage  to server
+       * save bevrage to server
        */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const response = await createBevrage(
@@ -95,7 +101,7 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
 
       Toast.success("Successfully Bevrage created in!");
       showAlert("Sucess", `Successfully Bevrage created  `, async () => {
-        props.onClose();
+        navigation.goBack();
       });
       setApiInUse(false);
     },
@@ -172,25 +178,16 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
     const updatedImages = selectedImages.filter((_, i) => i !== index);
 
     setSelectedImages(updatedImages);
-    formik.setFieldValue("image", updatedImages.length > 0 ? updatedImages : null); 
+    formik.setFieldValue("image", updatedImages.length > 0 ? updatedImages : null); // ✅ Ensures Formik is updated
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View style={createModalStyles.container}>
-          <ToastManager {...toastManagerProps} />
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            {/* Header Section */}
-            <View style={createModalStyles.header}>
-              <Text style={createModalStyles.title}>Create Bevrage</Text>
-
-              <TouchableOpacity onPress={props.onClose} style={createModalStyles.closeButton}>
-                <Text style={createModalStyles.closeButtonText}>✖</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={createModalStyles.card}>
+      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }} keyboardShouldPersistTaps="handled">
+        <ToastManager {...toastManagerProps} />
+        <SafeAreaView style={createModalStyles.container}>
+          <ScrollView contentContainerStyle={{}} showsVerticalScrollIndicator={false}>
+            <View style={[createModalStyles.card, { marginVertical: 19, marginHorizontal: 10 }]}>
               {inputBuilder("Enter your Bevrage Name", "name", formik, {
                 multiline: true,
                 style: {
@@ -272,11 +269,11 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
                 {buttonBuilder("Camera", openCamera, false, <Ionicons name="camera" size={24} color="white" />)}
               </View>
 
-              {buttonBuilder("Create", formik.handleSubmit, apiInUse)}
+              {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
             </View>
           </ScrollView>
-        </View>
-      </KeyboardAvoidingView>
+        </SafeAreaView>
+      </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
   );
 };

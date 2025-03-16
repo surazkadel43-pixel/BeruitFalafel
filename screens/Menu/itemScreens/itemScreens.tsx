@@ -96,15 +96,14 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
     },
     validationSchema: null,
     onSubmit: async (values) => {
-      //setApiInUse(true);
-      values.itemName = "";
-      //setApiInUse(false);
+      setButtonVisible(false);
+      fetchItem(values.itemName);
     },
   });
 
   const fetchItem = async (query: string) => {
     if (query.trim() === "") {
-      setItems([]);
+      prepare();
       return;
     }
 
@@ -112,7 +111,7 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
     try {
       const itemSearchRes = await searchItem(query);
       if (itemSearchRes.data.success === true) {
-        setItems(itemSearchRes.data);
+        setItems(itemSearchRes.data.items);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
@@ -155,7 +154,7 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
       loadMore();
-    }
+    } 
   }
 
   return (
@@ -181,7 +180,6 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
                   description={item.description}
                   foodTypes={item.foodPreferences}
                   onPress={() => {
-                    console.log(`this is  ${item.id}`);
                     navigation.navigate("ItemDetail", { itemDetails: item });
                   }}
                   icon="usd"

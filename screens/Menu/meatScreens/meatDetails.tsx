@@ -3,14 +3,16 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { deleteItem } from "../../../api/item";
+
 import { buttonBuilder } from "../../../components/button";
-import { CustomeDetailsCard, CustomeSauceCard } from "../../../components/customeDetailsCard";
+import { CustomeMeatCard } from "../../../components/customeDetailsCard";
 import { toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-import { deleteSauce } from "../../../api/sauce";
-export default function SauceDetailsScreens({ navigation }: { navigation: any }) {
+
+import { deleteMeat } from "../../../api/meats";
+
+export default function MeatDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
   const route = useRoute(); // ✅ Get the route object
@@ -23,16 +25,16 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeleteSauce = async () => {
+  const handelDeleteMeat = async () => {
     setApiInUse(true);
-    const deltedRes = await deleteSauce(itemDetails.id);
+    const deltedRes = await deleteMeat(itemDetails.id);
     if (deltedRes.data.success !== true) {
       Toast.error(parseError(deltedRes));
       setApiInUse(false);
       return;
     }
     setApiInUse(false);
-    showAlert("Sucess", `Sauce deleted successfully  `, async () => {
+    showAlert("Sucess", `Meat deleted successfully  `, async () => {
       navigation.goBack();
     });
   };
@@ -42,7 +44,7 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
       <SafeAreaView style={styles.safeAreaView}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <ToastManager {...toastManagerProps} />
-          <CustomeSauceCard
+          <CustomeMeatCard
             itemId={itemDetails.id}
             title={itemDetails.name}
             description={itemDetails.description}
@@ -52,15 +54,15 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
           />
           <View style={styles.buttons}>
             {buttonBuilder(
-              "Edit Sauce",
+              "Edit Meat",
               () => {
-                navigation.navigate("SauceEdit", { itemDetails });
+                navigation.navigate("MeatEdit", { itemDetails });
               },
               apiInUse,
               undefined,
               true
             )}
-            {buttonBuilder("Delete Sauce", handelDeleteSauce, apiInUse)}
+            {buttonBuilder("Delete Meat", handelDeleteMeat, apiInUse)}
           </View>
         </ScrollView>
       </SafeAreaView>

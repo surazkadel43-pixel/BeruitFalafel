@@ -1,39 +1,38 @@
+import { useRoute } from "@react-navigation/core";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import {
-  Dimensions,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Dimensions, Keyboard, ScrollView, TouchableWithoutFeedback, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createSauce } from "../../../api/sauce";
+import { editSauce } from "../../../api/sauce";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import CheckBoxExample from "../../../components/meatTypesDropDown";
 import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
+import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
-import showAlert from "../../../components/showAlert";
-interface CreateSauceModal {
-  onClose: () => void;
-}
+import { editMeat } from "../../../api/meats";
 
-const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
+const EditMeat = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-  const [price, setPrice] = useState<string>("");
+
+  const route = useRoute(); // ✅ Get the route object
+  const { itemDetails } = route.params as { itemDetails: any };
+
   useEffect(() => {
     prepare();
   }, []);
 
   function prepare() {
     setApiInUse(false);
+    formik.setValues({
+      name: itemDetails.name,
+      price: itemDetails.price.toString().toCurrency(),
+      description: itemDetails.description,
+      foodTypes: itemDetails.foodPreferences,
+    });
   }
 
   const formik = useFormik({
@@ -41,51 +40,42 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
       name: "",
       price: "",
       description: "",
-      foodPreferences: [],
+      foodTypes: [],
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
+     
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
-      const response = await createSauce(
+      const itemResponse = await editMeat(
+        itemDetails.id,
         values.name,
         numericPrice, // Ensure price is a number
         values.description,
-        values.foodPreferences
+        values.foodTypes
       );
-
-      if (response.data.success !== true) {
-        Toast.error(parseError(response));
+      if (itemResponse.data.success !== true) {
+        Toast.error(parseError(itemResponse));
         setApiInUse(false);
         return;
       }
-     
-      Toast.success("Successfully Sauce created in!");
-      showAlert("Sucess", `Successfully Sauce created  `, async () => {
-        props.onClose();
-      });
 
+      Toast.success("Successfully Meat Edited in!");
+      showAlert("Sucess", `Successfully Meat Edited  `, async () => {
+        navigation.goBack();
+      });
       setApiInUse(false);
     },
   });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }} keyboardShouldPersistTaps="handled">
         <ToastManager {...toastManagerProps} />
         <View style={createModalStyles.container}>
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-            {/* Header Section */}
-            <View style={createModalStyles.header}>
-              <Text style={createModalStyles.title}> Create Sauce</Text>
-
-              <TouchableOpacity onPress={props.onClose} style={createModalStyles.closeButton}>
-                <Text style={createModalStyles.closeButtonText}>✖</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={createModalStyles.card}>
-              {inputBuilder("Enter your Sauce Name", "name", formik, {
+          <ScrollView contentContainerStyle={{}} showsVerticalScrollIndicator={false}>
+            <View style={[createModalStyles.card, { marginVertical: 19, marginHorizontal: 10 }]}>
+              {inputBuilder("Enter your Meat Name", "name", formik, {
                 multiline: true,
                 style: {
                   backgroundColor: "#1e2124",
@@ -99,7 +89,7 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
                   padding: 10,
                 },
               })}
-              {inputBuilder("Enter your Sauce Price", "price", formik, {
+              {inputBuilder("Enter your Meat Price", "price", formik, {
                 multiline: true,
                 keyboardType: "numeric",
                 onChangeText: (text: string) => {
@@ -117,8 +107,8 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
                   padding: 10,
                 },
               })}
-              <CheckBoxExample formik={formik} valueName="foodPreferences" />
-              {inputBuilder("Enter your Sauce Description", "description", formik, {
+              <CheckBoxExample formik={formik} valueName="foodTypes" />
+              {inputBuilder("Enter your Item Description", "description", formik, {
                 multiline: true,
                 style: {
                   backgroundColor: "#1e2124",
@@ -132,15 +122,24 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
                   padding: 10,
                 },
               })}
-              {buttonBuilder("Create", formik.handleSubmit, apiInUse)}
+              {buttonBuilder("Save", formik.handleSubmit, apiInUse)}
+              {buttonBuilder(
+                "Cancel",
+                () => {
+                  navigation.goBack();
+                },
+                apiInUse,
+                undefined,
+                true
+              )}
             </View>
           </ScrollView>
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
   );
 };
 
-export default CreateSauceModal;
+export default EditMeat;
 
 const { width, height } = Dimensions.get("window");

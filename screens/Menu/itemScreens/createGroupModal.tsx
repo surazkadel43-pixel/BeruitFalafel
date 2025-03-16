@@ -20,6 +20,7 @@ import CheckBoxExample from "../../../components/meatTypesDropDown";
 import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
+import showAlert from "../../../components/showAlert";
 interface CreateItemModal {
   onClose: () => void;
 }
@@ -44,7 +45,7 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
-      console.log(values);
+      
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const itemResponse = await createItem(
@@ -60,6 +61,9 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
       }
 
       Toast.success("Successfully Item created in!");
+      showAlert("Sucess", `Successfully Item created  `, async () => {
+        props.onClose();
+      });
       setApiInUse(false);
     },
   });

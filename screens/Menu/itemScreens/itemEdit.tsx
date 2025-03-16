@@ -1,7 +1,8 @@
 import { useRoute } from "@react-navigation/core";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, TouchableWithoutFeedback, View } from "react-native";
+import { Dimensions, Keyboard, SafeAreaView, ScrollView, TouchableWithoutFeedback, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import ToastManager, { Toast } from "toastify-react-native";
 import { editItem } from "../../../api/item";
 import { createItemSchema } from "../../../api/validations";
@@ -9,9 +10,9 @@ import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import CheckBoxExample from "../../../components/meatTypesDropDown";
 import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
+import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const EditItem = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -42,7 +43,7 @@ const EditItem = ({ navigation }: { navigation: any }) => {
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
-      console.log(values);
+      
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const itemResponse = await editItem(
@@ -58,18 +59,21 @@ const EditItem = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Item created in!");
+      Toast.success("Successfully Item Edited in!");
+      showAlert("Sucess", `Successfully Item Edited  `, async () => {
+        navigation.goBack();
+      });
       setApiInUse(false);
     },
   });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1}} keyboardShouldPersistTaps="handled">
+      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }} keyboardShouldPersistTaps="handled">
         <SafeAreaView style={{ flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10 }}>
           <View style={createModalStyles.container}>
             <ToastManager {...toastManagerProps} />
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false} >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
               <View style={[createModalStyles.card, { marginVertical: 19, marginHorizontal: 10 }]}>
                 {inputBuilder("Enter your Item Name", "name", formik, {
                   multiline: true,

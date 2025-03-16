@@ -1,3 +1,4 @@
+import { ImagePickerAsset } from "expo-image-picker";
 import * as Yup from "yup";
 
 export const authentication = Yup.object({
@@ -65,7 +66,18 @@ export const createSauceSchema = Yup.object().shape({
   foodTypes: Yup.array().min(1, "Please select at least one option"),
 });
 
-export const createBevrageSchema = Yup.object().shape({
+export const createMeatSchema = Yup.object().shape({
+  name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
+
+  price: Yup.string()
+    .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
+    .required("Price is required"),
+
+  description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
+  foodTypes: Yup.array().min(1, "Please select at least one option"),
+});
+
+export const createBeverageSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
 
   price: Yup.string()
@@ -74,5 +86,8 @@ export const createBevrageSchema = Yup.object().shape({
 
   description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
 
-  
+  drinkTypes: Yup.array().min(1, "Please select at least one option").required("Drink type is required"),
+
+  image: Yup.mixed<File | ImagePickerAsset>()
+  .required("Image is required")
 });

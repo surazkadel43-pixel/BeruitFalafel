@@ -11,12 +11,16 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import ToastManager from "toastify-react-native";
+import ToastManager, { Toast } from "toastify-react-native";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
 import "../../../extension/extension";
+import showAlert from "../../../components/showAlert";
+import { createMeat } from "../../../api/meats";
+import { parseError } from "../../../components/toasts";
+import CheckBoxExample from "../../../components/meatTypesDropDown";
 interface CreateMeatModal {
   onClose: () => void;
 }
@@ -37,17 +41,30 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
       name: "",
       price: "",
       description: "",
+      foodPreferences: [],
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
-      // const groupCreateRes = await createGroup(values.name, values.description);
-      // if (groupCreateRes.status !== 200) {
-      //   Toast.error(parseError(groupCreateRes));
-      //   setApiInUse(false);
-      //   return;
-      // }
-      // props.onClose();
+      const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
+      const response = await createMeat(
+        values.name,
+        numericPrice, // Ensure price is a number
+        values.description,
+        values.foodPreferences
+      );
+
+      if (response.data.success !== true) {
+        Toast.error(parseError(response));
+        setApiInUse(false);
+        return;
+      }
+     
+      Toast.success("Successfully Sauce created in!");
+      showAlert("Sucess", `Successfully Sauce created  `, async () => {
+        props.onClose();
+      });
+
       setApiInUse(false);
     },
   });
@@ -55,12 +72,12 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+        <ToastManager {...toastManagerProps} />
         <View style={createModalStyles.container}>
-          <ToastManager {...toastManagerProps} />
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
             {/* Header Section */}
             <View style={createModalStyles.header}>
-              <Text style={createModalStyles.title}> Create Item</Text>
+              <Text style={createModalStyles.title}> Create Meat</Text>
 
               <TouchableOpacity onPress={props.onClose} style={createModalStyles.closeButton}>
                 <Text style={createModalStyles.closeButtonText}>✖</Text>
@@ -100,6 +117,7 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
                   padding: 10,
                 },
               })}
+              <CheckBoxExample formik={formik} valueName="foodPreferences" />
               {inputBuilder("Enter your Meat Description", "description", formik, {
                 multiline: true,
                 style: {
