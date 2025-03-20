@@ -3,14 +3,8 @@ import { Dimensions, StyleSheet } from "react-native";
 const { width, height } = Dimensions.get("window");
 
 export const recycledStyles = StyleSheet.create({
-  safeAreaView: {
-    padding: 5,
-    paddingTop: 15,
-    flex: 1,
-    backgroundColor: "#12193D",
-    // alignItems: "center",
-    justifyContent: "center",
-  },
+  
+  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10, paddingVertical: 10  },
 
   disabled: {
     opacity: 0.5,
@@ -74,7 +68,48 @@ export const recycledStyles = StyleSheet.create({
     justifyContent: "flex-end",
     margin: 0,
   },
+  buttons: {
+    marginVertical: 10,
+    paddingHorizontal: 15,
+    rowGap: 5,
+  },
 });
+
+export const createItemPropsStyles = {
+  itemName: {
+    backgroundColor: "#1e2124",
+    color: "white",
+    borderRadius: 8,
+    fontSize: 20,
+    minHeight: height * 0.08,
+    maxHeight: height * 0.3,
+    borderColor: "white",
+    borderWidth: 2,
+    padding: 10,
+  },
+  itemPrice: {
+    backgroundColor: "#1e2124",
+    color: "white",
+    borderRadius: 8,
+    fontSize: 20,
+    minHeight: height * 0.08,
+    maxHeight: height * 0.3,
+    borderColor: "white",
+    borderWidth: 2,
+    padding: 10,
+  },
+  itemDescription: {
+    backgroundColor: "#1e2124",
+    color: "white",
+    borderRadius: 8,
+    fontSize: 20,
+    minHeight: height * 0.15,
+    maxHeight: height * 0.3,
+    borderColor: "white",
+    borderWidth: 2,
+    padding: 10,
+  }
+}
 
 export const toastManagerProps = {
   textStyle: { fontSize: 16, color: "white" },
@@ -131,7 +166,7 @@ export const createModalStyles = StyleSheet.create({
     color: "white",
     alignSelf: "center",
   },
-  card: { backgroundColor: "#1e2124", padding: 15, borderRadius: 8, borderWidth: 1, borderColor: "white", gap: 10, marginHorizontal: 10 },
+  card: { backgroundColor: "#1e2124", padding: 15, borderRadius: 8, borderWidth: 2, borderColor: "white", gap: 10, marginHorizontal: 10 },
 });
 
 export const imagePickerStyles = StyleSheet.create({

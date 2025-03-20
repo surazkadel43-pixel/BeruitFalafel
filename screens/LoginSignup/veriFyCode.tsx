@@ -111,7 +111,7 @@ export default function VerifyCode({ navigation }: any) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={recycledStyles.safeAreaView}>
+      <SafeAreaView style={[recycledStyles.safeAreaView, { justifyContent: "center" }]}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
           <Text style={recycledStyles.title}> Verify Code</Text>
           <ToastManager {...toastManagerProps} />

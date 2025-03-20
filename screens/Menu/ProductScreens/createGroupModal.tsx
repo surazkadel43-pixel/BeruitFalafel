@@ -15,7 +15,7 @@ import {
   View,
 } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createBevrageSchema } from "../../../api/validations";
+import { createBeverageSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import { createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
@@ -46,7 +46,7 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
       price: "",
       description: "",
     },
-    validationSchema: createBevrageSchema,
+    validationSchema: createBeverageSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
       if (selectedImages.length === 0) {

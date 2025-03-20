@@ -7,13 +7,13 @@ import { Dimensions, Image, Keyboard, ScrollView, Text, TouchableOpacity, Toucha
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createBevrage } from "../../../api/bevrages";
+import { createBevrage, editBevrage } from "../../../api/bevrages";
 import { uploadImages } from "../../../api/images";
 import { createBeverageSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { DrinkTypesCheckbox } from "../../../components/meatTypesDropDown";
-import { createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
+import { DrinkTypesCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
@@ -65,32 +65,33 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
        * Handles image uploads
        */
 
-      let uploadedImages: any[] = [];
+      // let uploadedImages: any[] = [];
 
-      if (selectedImages.length > 0) {
-        try {
-          const uploadedImagesResp = await uploadImages(selectedImages);
+      // if (selectedImages.length > 0) {
+      //   try {
+      //     const uploadedImagesResp = await uploadImages(selectedImages);
 
-          for (const image of uploadedImagesResp) {
-            uploadedImages.push({ id: image.id });
-          }
-        } catch (error: any) {
-          Toast.error(error.message);
-          setApiInUse(false);
-          return;
-        }
-      }
+      //     for (const image of uploadedImagesResp) {
+      //       uploadedImages.push({ id: image.id });
+      //     }
+      //   } catch (error: any) {
+      //     Toast.error(error.message);
+      //     setApiInUse(false);
+      //     return;
+      //   }
+      // }
 
       /**
        * save bevrage to server
        */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
-      const response = await createBevrage(
+      const response = await editBevrage(
+        itemDetails.id,
         values.name,
         numericPrice, // Ensure price is a number
         values.description,
         values.drinkTypes,
-        uploadedImages
+        values.image || []
       );
 
       if (response.data.success !== true) {
@@ -99,8 +100,8 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Bevrage created in!");
-      showAlert("Sucess", `Successfully Bevrage created  `, async () => {
+      Toast.success("Successfully Bevrage Edited in!");
+      showAlert("Sucess", `Successfully Edited created  `, async () => {
         navigation.goBack();
       });
       setApiInUse(false);
@@ -187,20 +188,10 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
         <ToastManager {...toastManagerProps} />
         <SafeAreaView style={createModalStyles.container}>
           <ScrollView contentContainerStyle={{}} showsVerticalScrollIndicator={false}>
-            <View style={[createModalStyles.card, { marginVertical: 19, marginHorizontal: 10 }]}>
+            <View style={[createModalStyles.card, { marginVertical: 10 }]}>
               {inputBuilder("Enter your Bevrage Name", "name", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style:  createItemPropsStyles.itemName,
               })}
               {inputBuilder("Enter your Bevrage Price", "price", formik, {
                 multiline: true,
@@ -208,32 +199,13 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
                 onChangeText: (text: string) => {
                   formik.setFieldValue("price", text.toCurrency());
                 },
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemPrice,
               })}
-              <DrinkTypesCheckbox formik={formik} valueName="drinkTypes" />
+              
+              <SidesTypesCheckbox formik={formik} valueName="drinkTypes" expanded= {true} />
               {inputBuilder("Enter your Bevrage Description", "description", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.15,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemDescription,
               })}
 
               <View style={imagePickerStyles.imageContainer}>

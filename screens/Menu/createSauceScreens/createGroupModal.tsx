@@ -17,7 +17,7 @@ import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import CheckBoxExample from "../../../components/meatTypesDropDown";
-import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
+import { createItemPropsStyles, createModalStyles, toastManagerProps } from "../../../components/recycled-style";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
 import showAlert from "../../../components/showAlert";
@@ -27,7 +27,7 @@ interface CreateSauceModal {
 
 const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-  const [price, setPrice] = useState<string>("");
+
   useEffect(() => {
     prepare();
   }, []);
@@ -87,17 +87,7 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
             <View style={createModalStyles.card}>
               {inputBuilder("Enter your Sauce Name", "name", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemName,
               })}
               {inputBuilder("Enter your Sauce Price", "price", formik, {
                 multiline: true,
@@ -105,32 +95,12 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
                 onChangeText: (text: string) => {
                   formik.setFieldValue("price", text.toCurrency());
                 },
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemPrice,
               })}
               <CheckBoxExample formik={formik} valueName="foodPreferences" />
               {inputBuilder("Enter your Sauce Description", "description", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.15,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemDescription,
               })}
               {buttonBuilder("Create", formik.handleSubmit, apiInUse)}
             </View>

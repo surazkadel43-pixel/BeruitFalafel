@@ -15,7 +15,7 @@ import ToastManager, { Toast } from "toastify-react-native";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { createModalStyles, toastManagerProps } from "../../../components/recycled-style";
+import { createItemPropsStyles, createModalStyles, toastManagerProps } from "../../../components/recycled-style";
 import "../../../extension/extension";
 import showAlert from "../../../components/showAlert";
 import { createMeat } from "../../../api/meats";
@@ -27,7 +27,6 @@ interface CreateMeatModal {
 
 const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-  const [price, setPrice] = useState<string>("");
   useEffect(() => {
     prepare();
   }, []);
@@ -60,8 +59,8 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
         return;
       }
      
-      Toast.success("Successfully Sauce created in!");
-      showAlert("Sucess", `Successfully Sauce created  `, async () => {
+      Toast.success("Successfully Meat item created in!");
+      showAlert("Sucess", `Successfully Meat item created  `, async () => {
         props.onClose();
       });
 
@@ -87,17 +86,7 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
             <View style={createModalStyles.card}>
               {inputBuilder("Enter your Meat Name", "name", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemName,
               })}
               {inputBuilder("Enter your Meat Price", "price", formik, {
                 multiline: true,
@@ -105,32 +94,12 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
                 onChangeText: (text: string) => {
                   formik.setFieldValue("price", text.toCurrency());
                 },
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemPrice,
               })}
               <CheckBoxExample formik={formik} valueName="foodPreferences" />
               {inputBuilder("Enter your Meat Description", "description", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.15,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemDescription,
               })}
               {buttonBuilder("Create", formik.handleSubmit, apiInUse)}
             </View>

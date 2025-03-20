@@ -16,44 +16,8 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(true);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  //const [items, setItems] = useState<any[]>([]);
-  const [items, setItems] = useState<any[]>([
-    {
-      id: 1,
-      name: "Burger",
-      description: "A delicious cheeseburger",
-      price: 8.99,
-      foodPreferences: ["V", "DF"],
-    },
-    {
-      id: 2,
-      name: "Vegan Salad",
-      description: "A fresh green salad with avocado",
-      price: 6.49,
-      foodPreferences: ["V", "GF"],
-    },
-    {
-      id: 3,
-      name: "Pasta",
-      description: "Classic Italian pasta with tomato sauce",
-      price: 10.99,
-      foodPreferences: ["V"],
-    },
-    {
-      id: 4,
-      name: "Gluten-Free Pizza",
-      description: "A crispy pizza with gluten-free crust",
-      price: 12.99,
-      foodPreferences: ["GF"],
-    },
-    {
-      id: 5,
-      name: "Nut-Free Cake",
-      description: "Chocolate cake made without nuts",
-      price: 5.99,
-      foodPreferences: ["NF"],
-    },
-  ]);
+  
+  const [items, setItems] = useState<any[]>([])
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [refreshing, setRefreshing] = useState(false);
@@ -61,7 +25,7 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
-      setItems([]);
+     
       setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
@@ -103,7 +67,7 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
 
   const fetchItem = async (query: string) => {
     if (query.trim() === "") {
-      prepare();
+      prepare(true);
       return;
     }
 
@@ -159,7 +123,7 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView key={refreshes} style={styles.safeAreaView}>
+      <SafeAreaView key={refreshes} style={recycledStyles.safeAreaView}>
         <ScrollView
           onScroll={onScroll}
           scrollEventThrottle={16}
@@ -202,7 +166,7 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
           onRequestClose={() => setModalVisible(false)}
           animationType="slide"
           transparent={true} // ✅ Keeps background transparent
-          style={styles.modal}
+          style={recycledStyles.modal}
         >
           <CreateGroupModal onClose={() => setModalVisible(false)} />
         </Modal>
@@ -215,37 +179,5 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10, paddingBottom: 10 },
-
-  content: {
-    //flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-  },
-  subtitle: {
-    color: "white",
-    textAlign: "center",
-    marginTop: 8,
-    paddingHorizontal: 16,
-  },
-  button: {
-    marginTop: 16,
-    backgroundColor: "#3b82f6",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "600",
-  },
-  modal: {
-    justifyContent: "flex-end",
-    margin: 0,
-  },
+  
 });

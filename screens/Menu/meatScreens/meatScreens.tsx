@@ -17,51 +17,8 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
-  const [meats, setMeats] = useState<any[]>([
-    {
-      id: 1,
-      name: "Chicken",
-      description: "Juicy and tender grilled chicken breast, lightly seasoned.",
-      price: 8.99,
-      foodPreferences: ["GF", "DF"], // Gluten-Free, Dairy-Free
-    },
-    {
-      id: 2,
-      name: "Beef",
-      description: "A premium cut of beef, grilled to perfection.",
-      price: 14.99,
-      foodPreferences: ["GF"], // Gluten-Free
-    },
-    {
-      id: 3,
-      name: "Lamb",
-      description: "Marinated lamb skewers, grilled and served with garlic sauce.",
-      price: 12.99,
-      foodPreferences: ["GF", "DF"], // Gluten-Free, Dairy-Free
-    },
-    {
-      id: 4,
-      name: "Falafel",
-      description: "Crispy chickpea fritters served with tahini sauce.",
-      price: 6.99,
-      foodPreferences: ["V", "GF", "NF"], // Vegan, Gluten-Free, Nut-Free
-    },
-    {
-      id: 5,
-      name: "Vegan Chicken",
-      description: "Delicious plant-based chicken alternative, lightly battered.",
-      price: 7.99,
-      foodPreferences: ["V", "NF"], // Vegan, Nut-Free
-    },
-    {
-      id: 6,
-      name: "Vegan Beef",
-      description: "Plant-based beef alternative, seasoned for a rich taste.",
-      price: 9.49,
-      foodPreferences: ["V", "GF", "NF"], // Vegan, Gluten-Free, Nut-Free
-    },
-  ]);
-  
+  const [meats, setMeats] = useState<any[]>([])
+
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -69,7 +26,7 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
-      setMeats([]);
+     
       setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
@@ -85,7 +42,7 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
     }
 
     setPages(itemResponse.data.pages);
-    setMeats(itemResponse.data.meats);
+    setMeats(itemResponse.data.results);
 
     setApiInUse(false);
     setRefreshing(false);
@@ -112,7 +69,7 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
 
   const fetchSauce = async (query: string) => {
     if (query.trim() === "") {
-      prepare();
+      prepare(true);
       return;
     }
 
@@ -120,7 +77,7 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
     try {
       const itemSearchRes = await searchMeat(query);
       if (itemSearchRes.data.success === true) {
-        setMeats(itemSearchRes.data);
+        setMeats(itemSearchRes.data.results);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
@@ -170,7 +127,7 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView key={refreshes} style={styles.safeAreaView}>
+      <SafeAreaView key={refreshes} style={recycledStyles.safeAreaView}>
         <ToastManager {...toastManagerProps} />
         <ScrollView
           onScroll={onScroll}
@@ -226,37 +183,5 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10 },
-
-  content: {
-    //flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-  },
-  subtitle: {
-    color: "white",
-    textAlign: "center",
-    marginTop: 8,
-    paddingHorizontal: 16,
-  },
-  button: {
-    marginTop: 16,
-    backgroundColor: "#3b82f6",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "600",
-  },
-  modal: {
-    justifyContent: "flex-end",
-    margin: 0,
-  },
+  
 });

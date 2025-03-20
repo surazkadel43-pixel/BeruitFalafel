@@ -66,7 +66,7 @@ export default function LoginForm({ navigation }: any) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={recycledStyles.safeAreaView}>
+      <SafeAreaView style={[recycledStyles.safeAreaView, { justifyContent: "center" }]}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
           <Text style={recycledStyles.title}> LOGIN</Text>
           <ToastManager {...toastManagerProps} />

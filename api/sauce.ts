@@ -18,7 +18,7 @@ export async function createSauce(
   return response;
 }
 
-export async function getSauces() {
+export async function getAllSauces() {
   const response = await get(`${endpoint}all`);
   return response;
 }

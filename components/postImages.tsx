@@ -4,7 +4,7 @@ import PagerView from "react-native-pager-view";
 import ZoomImageModal from "./zoomImageModals";
 
 interface PostImageProps {
-  files: any[];
+  files: any[] ;
   isSmall?: boolean;
 }
 

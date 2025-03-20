@@ -8,14 +8,17 @@ Number.prototype.formatData = function (): string {
   return (num / 1_000_000_000).toFixed(num % 1_000_000_000 === 0 ? 0 : 2) + "B"; // 1B+
 };
 
-
 String.prototype.toCurrency = function (): string {
   const value = this as string;
 
-  if (value === "") return "";
+  // ✅ Allow an empty input to return an empty string
+  if (value.trim() === "") return "";
 
   // Remove any characters that are not numbers or a decimal point
   let numericValue = value.replace(/[^0-9.]/g, "");
+
+  // ✅ If there's no valid number, return an empty string
+  if (numericValue === "") return "";
 
   // Ensure there's only one decimal point
   let parts = numericValue.split(".");

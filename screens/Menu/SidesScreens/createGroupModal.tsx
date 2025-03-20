@@ -15,38 +15,82 @@ import {
   View,
 } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createBevrageSchema } from "../../../api/validations";
+import { createBevrage, getAllBevrages } from "../../../api/bevrages";
+import { getAllItems } from "../../../api/item";
+import { createSideSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
+import { BevragesCheckbox, ItemsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
+import showAlert from "../../../components/showAlert";
+import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
+import { getAllSauces } from "../../../api/sauce";
 
-interface CreateSideModal {
+interface CreateSidesModal {
   onClose: () => void;
 }
 
-const CreateSideModal: React.FC<CreateSideModal> = (props) => {
+const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-  const [price, setPrice] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [items, setitems] = useState<any[]>([]);
+  const [bevrages, setBevrages] = useState<any[]>([]);
+  const [sauces, setSauces] = useState<any[]>([]);
+  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
+
+  async function prepare() {
+    setApiInUse(false);
+    const itemRes = await getAllItems();
+
+    if (itemRes.data.success !== true) {
+      Toast.error(parseError(itemRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setitems(itemRes.data.items);
+
+    const sauceRes = await getAllSauces();
+    if (sauceRes.data.success !== true) {
+      Toast.error(parseError(sauceRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setSauces(sauceRes.data.sauces);
+
+    const bevrageRes = await getAllBevrages();
+    if (bevrageRes.data.success !== true) {
+      Toast.error(parseError(bevrageRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setBevrages(bevrageRes.data.results);
+
+   
+  }
 
   useEffect(() => {
     prepare();
   }, []);
-
-  function prepare() {
-    setApiInUse(false);
-  }
 
   const formik = useFormik({
     initialValues: {
       name: "",
       price: "",
       description: "",
+      discountedPrice: "",
+      image: null,
+      sidesTypes: [],
+      items: [],
+      sauces: [],
+      bevrages: [],
     },
-    validationSchema: createBevrageSchema,
+    validationSchema: createSideSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
       if (selectedImages.length === 0) {
@@ -54,13 +98,40 @@ const CreateSideModal: React.FC<CreateSideModal> = (props) => {
         setApiInUse(false);
         return;
       }
+
+      /**
+       * save sides  to server
+       */
+      const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
+      const response = await createBevrage(
+        values.name,
+        numericPrice, // Ensure price is a number
+        values.description,
+        values.sidesTypes,
+        values.image || []
+      );
+
+      if (response.data.success !== true) {
+        Toast.error(parseError(response));
+        setApiInUse(false);
+        return;
+      }
+
+      Toast.success("Successfully Bevrage created in!");
+      showAlert("Sucess", `Successfully Bevrage created  `, async () => {
+        props.onClose();
+      });
       setApiInUse(false);
     },
   });
 
+  //  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(false);
   const pickImage = async () => {
-    if (selectedImages.length >= 1) {
-      Toast.error("You can only attach up to 1 image at once.");
+  
+   
+    const maxImages = canAttachMultipleImages ? 5 : 1;
+    if (selectedImages.length >= maxImages) {
+      Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
       return;
     }
 
@@ -77,8 +148,8 @@ const CreateSideModal: React.FC<CreateSideModal> = (props) => {
     });
 
     if (!result.canceled) {
-      if (result.assets.length > 1) {
-        Toast.error("You can select up to 1 image at once.");
+      if (result.assets.length > maxImages) {
+        Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
         return;
       }
 
@@ -89,18 +160,20 @@ const CreateSideModal: React.FC<CreateSideModal> = (props) => {
         }
         newSelection.push(asset);
       }
-      if (newSelection.length > 1) {
-        Toast.error("You can select up to 1 image at once.");
+      if (newSelection.length > maxImages) {
+        Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
         return;
       }
 
       setSelectedImages(newSelection);
+      formik.setFieldValue("image", newSelection);
     }
   };
 
   const openCamera = async () => {
-    if (selectedImages.length >= 1) {
-      Toast.error("You can only attach up to 1 image at once.");
+    const maxImages = canAttachMultipleImages ? 5 : 1;
+    if (selectedImages.length >= maxImages) {
+      Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
       return;
     }
 
@@ -120,11 +193,14 @@ const CreateSideModal: React.FC<CreateSideModal> = (props) => {
         Toast.error("Encountered image larger than 10MB, this image has been excluded.");
       }
       setSelectedImages([...selectedImages, result.assets[0]]);
+      formik.setFieldValue("image", [...selectedImages, result.assets[0]]);
     }
   };
-
   const removeImage = (index: number) => {
-    setSelectedImages(selectedImages.filter((_, i) => i !== index));
+    const updatedImages = selectedImages.filter((_, i) => i !== index);
+
+    setSelectedImages(updatedImages);
+    formik.setFieldValue("image", updatedImages.length > 0 ? updatedImages : null);
   };
 
   return (
@@ -145,17 +221,7 @@ const CreateSideModal: React.FC<CreateSideModal> = (props) => {
             <View style={createModalStyles.card}>
               {inputBuilder("Enter your Side Name", "name", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemName,
               })}
               {inputBuilder("Enter your Side Price", "price", formik, {
                 multiline: true,
@@ -163,31 +229,24 @@ const CreateSideModal: React.FC<CreateSideModal> = (props) => {
                 onChangeText: (text: string) => {
                   formik.setFieldValue("price", text.toCurrency());
                 },
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemPrice,
               })}
+              {inputBuilder("Enter your discountedPrice Price", "discountedPrice", formik, {
+                multiline: true,
+                keyboardType: "numeric",
+                onChangeText: (text: string) => {
+                  formik.setFieldValue("discountedPrice", text.toCurrency());
+                },
+                style: createItemPropsStyles.itemPrice,
+              })}
+              <SidesTypesCheckbox formik={formik} valueName="sidesTypes" />
+              <ItemsCheckbox formik={formik} valueName="items" items={items}/>
+              <SauceCheckbox formik={formik} valueName="sauces" items={sauces}/>
+              <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages}/>
+
               {inputBuilder("Enter your Side Description", "description", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.15,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemDescription,
               })}
 
               <View style={imagePickerStyles.imageContainer}>
@@ -210,6 +269,12 @@ const CreateSideModal: React.FC<CreateSideModal> = (props) => {
                     </TouchableOpacity>
                   </View>
                 ))}
+                {/* ✅ Display error message if validation fails */}
+                {formik.touched.image && formik.errors.image ? (
+                  <Text style={{ fontSize: 18, color: "red", paddingHorizontal: 15, paddingLeft: 20 }}>
+                    {Array.isArray(formik.errors.image) ? formik.errors.image.join(", ") : formik.errors.image}
+                  </Text>
+                ) : null}
               </View>
 
               <View style={imagePickerStyles.chooseImage}>
@@ -226,6 +291,6 @@ const CreateSideModal: React.FC<CreateSideModal> = (props) => {
   );
 };
 
-export default CreateSideModal;
+export default CreateSidesModal;
 
 const { width, height } = Dimensions.get("window");

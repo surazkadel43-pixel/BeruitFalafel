@@ -6,7 +6,7 @@ import ToastManager, { Toast } from "toastify-react-native";
 import { deleteItem } from "../../../api/item";
 import { buttonBuilder } from "../../../components/button";
 import { CustomeDetailsCard, CustomeSauceCard } from "../../../components/customeDetailsCard";
-import { toastManagerProps } from "../../../components/recycled-style";
+import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import { deleteSauce } from "../../../api/sauce";
@@ -39,7 +39,7 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.safeAreaView}>
+      <SafeAreaView style={recycledStyles.safeAreaView}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <ToastManager {...toastManagerProps} />
           <CustomeSauceCard
@@ -50,7 +50,7 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
             foodTypes={itemDetails.foodPreferences}
             icon="usd"
           />
-          <View style={styles.buttons}>
+          <View style={recycledStyles.buttons}>
             {buttonBuilder(
               "Edit Sauce",
               () => {
@@ -69,42 +69,5 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10 },
-
-  content: {
-    //flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-  },
-  subtitle: {
-    color: "white",
-    textAlign: "center",
-    marginTop: 8,
-    paddingHorizontal: 16,
-  },
-  button: {
-    marginTop: 16,
-    backgroundColor: "#3b82f6",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "600",
-  },
-  modal: {
-    justifyContent: "flex-end",
-    margin: 0,
-  },
-  buttons: {
-    marginVertical: 10,
-    paddingHorizontal: 15,
-    rowGap: 5,
-  },
+  
 });

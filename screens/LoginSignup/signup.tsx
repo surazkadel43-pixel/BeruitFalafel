@@ -62,7 +62,7 @@ export default function SignUpForm({ navigation }: any) {
   });
 
   return (
-    <SafeAreaView style={recycledStyles.safeAreaView}>
+    <SafeAreaView style={[recycledStyles.safeAreaView, { justifyContent: "center" }]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
           <Text style={recycledStyles.title}> SignUp</Text>

@@ -129,6 +129,7 @@ export const CustomeMeatCard: React.FC<CustomeCardProps> = ({ itemId, title, des
 };
 
 export const CustomeBevrageCard: React.FC<CustomeBevrageCardProps> = ({ itemId, title, description, price, drinkTypes, icon, files, isSmall }) => {
+ 
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1}>
       <View style={styles.groupInfo}>
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
   groupCard: { backgroundColor: "#191E2A", flexDirection: "row", borderRadius: 12, padding: 18, marginTop: 15, marginHorizontal: 10 }, //191E2A //1C2237
   groupInfo: { flex: 1, justifyContent: "center" },
   groupName: { color: "#fff", fontSize: 24, fontWeight: "400", marginBottom: 5, alignSelf: "center" },
-  followerContainer: { flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 8, marginVertical: 5, marginHorizontal: 15 },
+  followerContainer: { flexDirection: "row", alignItems: "center", justifyContent: "flex-start", gap: 8, marginVertical: 5, marginHorizontal: 15, flexWrap: "wrap" },
   followers: { color: "white", fontSize: 22, fontWeight: "300", paddingHorizontal: 0 },
   separator: { width: 10 }, // Adds spacing between icons instead of opacity trick
 });

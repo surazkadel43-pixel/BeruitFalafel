@@ -22,55 +22,14 @@ const images = [
   require("../../../assets/images/traditionalFalafelWrap.png"),
 ];
 
-const dummyBeverageData = [
-  {
-    id: 1,
-    name: "Fresh Orange Juice",
-    price: 4.99,
-    description: "Freshly squeezed orange juice with no added sugar.",
-    files: [{ presignedURL: Image.resolveAssetSource(images[0]).uri }],
-    drinkTypes: ["Juice"],
-  },
-  {
-    id: 2,
-    name: "Green Tea",
-    price: 3.99,
-    description: "A soothing cup of hot green tea, rich in antioxidants.",
-    files: [{ presignedURL: Image.resolveAssetSource(images[1]).uri }],
-    drinkTypes: ["Tea"],
-  },
-  {
-    id: 3,
-    name: "Classic Coca-Cola",
-    price: 2.99,
-    description: "Chilled, carbonated Coca-Cola for a refreshing taste.",
-    files: [{ presignedURL: Image.resolveAssetSource(images[2]).uri }],
-    drinkTypes: ["Soda"],
-  },
-  {
-    id: 4,
-    name: "Caffe Latte",
-    price: 5.49,
-    description: "Smooth espresso with steamed milk and a touch of foam.",
-    files: [{ presignedURL: Image.resolveAssetSource(images[3]).uri }],
-    drinkTypes: ["Coffee"],
-  },
-  {
-    id: 5,
-    name: "Red Wine",
-    price: 8.99,
-    description: "A glass of rich, aged red wine with deep flavors.",
-    files: [{ presignedURL: Image.resolveAssetSource(images[4]).uri }],
-    drinkTypes: ["Alcohol"],
-  },
-];
+
 
 
 export default function BevrageScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [bevrages, setBevrages] = useState<any[]>(dummyBeverageData);
+  const [bevrages, setBevrages] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const [pages, setPages] = useState<number>(0);
@@ -80,7 +39,7 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
-      setBevrages([]);
+      
       setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
@@ -94,9 +53,11 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
       setApiInUse(false);
       return;
     }
+   
 
     setPages(itemResponse.data.pages);
-    setBevrages(itemResponse.data.bevrages);
+    setBevrages(itemResponse.data.results);
+
 
     setApiInUse(false);
     setRefreshing(false);
@@ -118,7 +79,7 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
   });
   const fetchBevrage = async (query: string) => {
     if (query.trim() === "") {
-      prepare();
+      prepare(true);
       return;
     }
 
@@ -126,7 +87,7 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
     try {
       const itemSearchRes = await searchBevrage(query);
       if (itemSearchRes.data.success === true) {
-        setBevrages(itemSearchRes.data);
+        setBevrages(itemSearchRes.data.results);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
@@ -181,11 +142,12 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.safeAreaView}>
+      <SafeAreaView style={recycledStyles.safeAreaView}>
         <ScrollView
           onScroll={onScroll}
           scrollEventThrottle={16}
           contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
           <ToastManager {...toastManagerProps} />
@@ -207,7 +169,7 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
                   buttonName="manage"
                   buttonIsActive={true}
                   price={item.price}
-                  files={item.files}
+                  files={item.images || []}
                   isSmall={true}
                 />
               ))
@@ -235,33 +197,7 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10 },
+  
 
-  content: {
-    //flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-  },
-  subtitle: {
-    color: "white",
-    textAlign: "center",
-    marginTop: 8,
-    paddingHorizontal: 16,
-  },
-  button: {
-    marginTop: 16,
-    backgroundColor: "#3b82f6",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "600",
-  },
+  
 });

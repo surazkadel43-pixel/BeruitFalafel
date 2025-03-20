@@ -42,7 +42,7 @@ export default function BevrageStackNavigator({ navigation }: { navigation: any 
         options={{
           presentation: "modal",
           headerShown: true,
-          headerTitle: "Bevrage Sauce",
+          headerTitle: "Bevrage Edit",
           headerStyle: {
             backgroundColor: "#1C2237", // Change header background color
           },

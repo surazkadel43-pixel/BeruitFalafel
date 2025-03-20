@@ -17,7 +17,7 @@ export async function createItem(
   return response;
 }
 
-export async function getItems() {
+export async function getAllItems() {
   const response = await get(`${endpoint}all`);
   return response;
 }

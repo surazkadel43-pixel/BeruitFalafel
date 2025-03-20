@@ -62,7 +62,7 @@ export default function VerifyEmail({ navigation }: any) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={recycledStyles.safeAreaView}>
+      <SafeAreaView style={[recycledStyles.safeAreaView, { justifyContent: "center" }]}>
         <Text style={recycledStyles.title}> Verify Your Email</Text>
         <ToastManager {...toastManagerProps} />
         {inputBuilder("Enter your email", "email", formik)}

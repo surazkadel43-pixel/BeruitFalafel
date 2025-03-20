@@ -17,43 +17,7 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
-  const [sauces, setSauces] = useState<any[]>([
-    {
-      id: 6,
-      name: "Spicy Mango Sauce",
-      description: "A tangy and spicy mango-infused sauce with a hint of chili.",
-      price: 3.99,
-      foodPreferences: ["V", "GF"],
-    },
-    {
-      id: 7,
-      name: "Garlic Parmesan Sauce",
-      description: "A creamy garlic sauce with a rich Parmesan flavor.",
-      price: 4.49,
-      foodPreferences: ["GF"],
-    },
-    {
-      id: 8,
-      name: "Honey Mustard Sauce",
-      description: "A sweet and tangy blend of honey and mustard.",
-      price: 2.99,
-      foodPreferences: ["V", "NF"],
-    },
-    {
-      id: 9,
-      name: "Chipotle Mayo",
-      description: "A smoky and spicy mayonnaise infused with chipotle peppers.",
-      price: 3.49,
-      foodPreferences: ["DF"],
-    },
-    {
-      id: 10,
-      name: "Teriyaki Glaze",
-      description: "A sweet and savory Asian-style teriyaki sauce.",
-      price: 3.99,
-      foodPreferences: ["V", "GF"],
-    },
-  ]);
+  const [sauces, setSauces] = useState<any[]>([])
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -61,7 +25,7 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
-      setSauces([]);
+      
       setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
@@ -104,7 +68,7 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
 
   const fetchSauce = async (query: string) => {
     if (query.trim() === "") {
-      prepare();
+      prepare(true);
       return;
     }
 
@@ -154,7 +118,7 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
     }
 
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 900) {
       console.log("loading more, 1000", apiInUse, currentPage, pages);
       loadMore();
     }
@@ -162,7 +126,7 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView key={refreshes} style={styles.safeAreaView}>
+      <SafeAreaView key={refreshes} style={recycledStyles.safeAreaView}>
         <ToastManager {...toastManagerProps} />
         <ScrollView
           onScroll={onScroll}
@@ -218,33 +182,7 @@ export default function SauceScreens({ navigation }: { navigation: any }) {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingVertical: 10 },
+  //recycledStyles
 
-  content: {
-    //flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-  },
-  subtitle: {
-    color: "white",
-    textAlign: "center",
-    marginTop: 8,
-    paddingHorizontal: 16,
-  },
-  button: {
-    marginTop: 16,
-    backgroundColor: "#3b82f6",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "600",
-  },
+  
 });

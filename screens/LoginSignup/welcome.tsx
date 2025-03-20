@@ -53,7 +53,7 @@ export default function Welcome({ navigation }: any) {
   }, []);
 
   return (
-    <SafeAreaView style={recycledStyles.safeAreaView}>
+    <SafeAreaView style={[recycledStyles.safeAreaView, { justifyContent: "center" }]}>
       <ToastManager {...toastManagerProps} />
       <Text style={recycledStyles.title}>Welcome to Beruit Falafel!</Text>
       <Text style={styles.subTitle}>This app is for Owner!</Text>

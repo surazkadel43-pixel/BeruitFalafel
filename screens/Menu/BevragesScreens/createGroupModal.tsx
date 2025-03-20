@@ -15,17 +15,16 @@ import {
   View,
 } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
+import { createBevrage } from "../../../api/bevrages";
 import { createBeverageSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { DrinkTypesCheckbox } from "../../../components/meatTypesDropDown";
-import { createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
-import ZoomImageModal from "../../../components/zoomImageModals";
-import "../../../extension/extension";
-import { createBevrage } from "../../../api/bevrages";
+import { BevragesTypesCheckbox, DrinkTypesCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-import { uploadImages } from "../../../api/images";
+import ZoomImageModal from "../../../components/zoomImageModals";
+import "../../../extension/extension";
 
 interface CreateBevrageModal {
   onClose: () => void;
@@ -33,10 +32,9 @@ interface CreateBevrageModal {
 
 const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-  const [price, setPrice] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-
+  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(false);
   useEffect(() => {
     prepare();
   }, []);
@@ -65,15 +63,15 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
        * Handles image uploads
        */
 
-      let uploadedImages: any[] = [];
+      // let uploadedImages: any[] = [];
 
-      if (selectedImages.length > 0) {
-        const uploadedImagesResp = await uploadImages(selectedImages);
+      // if (selectedImages.length > 0) {
+      //   const uploadedImagesResp = await uploadImages(selectedImages);
 
-        for (const image of uploadedImagesResp) {
-          uploadedImages.push({ id: image.id });
-        }
-      }
+      //   for (const image of uploadedImagesResp) {
+      //     uploadedImages.push({ id: image.id });
+      //   }
+      // }
 
       /**
        * save bevrage  to server
@@ -84,7 +82,7 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
         numericPrice, // Ensure price is a number
         values.description,
         values.drinkTypes,
-        uploadedImages
+        values.image || []
       );
 
       if (response.data.success !== true) {
@@ -102,8 +100,9 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
   });
 
   const pickImage = async () => {
-    if (selectedImages.length >= 1) {
-      Toast.error("You can only attach up to 1 image at once.");
+    const maxImages = canAttachMultipleImages ? 5 : 1;
+    if (selectedImages.length >= maxImages) {
+      Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
       return;
     }
 
@@ -120,8 +119,8 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
     });
 
     if (!result.canceled) {
-      if (result.assets.length > 1) {
-        Toast.error("You can select up to 1 image at once.");
+      if (result.assets.length > maxImages) {
+        Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
         return;
       }
 
@@ -132,8 +131,8 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
         }
         newSelection.push(asset);
       }
-      if (newSelection.length > 1) {
-        Toast.error("You can select up to 1 image at once.");
+      if (newSelection.length > maxImages) {
+        Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
         return;
       }
 
@@ -143,8 +142,9 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
   };
 
   const openCamera = async () => {
-    if (selectedImages.length >= 1) {
-      Toast.error("You can only attach up to 1 image at once.");
+    const maxImages = canAttachMultipleImages ? 5 : 1;
+    if (selectedImages.length >= maxImages) {
+      Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
       return;
     }
 
@@ -172,7 +172,7 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
     const updatedImages = selectedImages.filter((_, i) => i !== index);
 
     setSelectedImages(updatedImages);
-    formik.setFieldValue("image", updatedImages.length > 0 ? updatedImages : null); 
+    formik.setFieldValue("image", updatedImages.length > 0 ? updatedImages : null);
   };
 
   return (
@@ -193,17 +193,7 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
             <View style={createModalStyles.card}>
               {inputBuilder("Enter your Bevrage Name", "name", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemName,
               })}
               {inputBuilder("Enter your Bevrage Price", "price", formik, {
                 multiline: true,
@@ -211,32 +201,13 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
                 onChangeText: (text: string) => {
                   formik.setFieldValue("price", text.toCurrency());
                 },
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.08,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemPrice,
               })}
-              <DrinkTypesCheckbox formik={formik} valueName="drinkTypes" />
+              
+              <BevragesTypesCheckbox formik={formik} valueName="drinkTypes" />
               {inputBuilder("Enter your Bevrage Description", "description", formik, {
                 multiline: true,
-                style: {
-                  backgroundColor: "#1e2124",
-                  color: "white",
-                  borderRadius: 8,
-                  fontSize: 20,
-                  minHeight: height * 0.15,
-                  maxHeight: height * 0.3,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  padding: 10,
-                },
+                style: createItemPropsStyles.itemDescription,
               })}
 
               <View style={imagePickerStyles.imageContainer}>
