@@ -1,24 +1,13 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/core";
 import * as ImagePicker from "expo-image-picker";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Dimensions, Image, Keyboard, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createBevrage, getAllBevrages } from "../../../api/bevrages";
-import { getAllItems } from "../../../api/item";
-import { getAllMeats } from "../../../api/meats";
-import { getAllSauces } from "../../../api/sauce";
+import { editSide } from "../../../api/sides";
 import { createSideSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
@@ -28,60 +17,35 @@ import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
-import { createSide } from "../../../api/sides";
 
-interface CreateSidesModal {
-  onClose: () => void;
-}
 
-const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
+
+const EditSides = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [items, setitems] = useState<any[]>([]);
-  const [bevrages, setBevrages] = useState<any[]>([]);
-  const [sauces, setSauces] = useState<any[]>([]);
-  const [meats, setMeats] = useState<any[]>([]);
+
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
+
+  const route = useRoute(); // ✅ Get the route object
+  const { itemDetails } = route.params as { itemDetails: any };
 
   async function prepare() {
     setApiInUse(false);
-    const itemRes = await getAllItems();
-
-    if (itemRes.data.success !== true) {
-      Toast.error(parseError(itemRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setitems(itemRes.data.items);
-
-    const sauceRes = await getAllSauces();
-    if (sauceRes.data.success !== true) {
-      Toast.error(parseError(sauceRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setSauces(sauceRes.data.sauces);
-
-    const bevrageRes = await getAllBevrages();
-    if (bevrageRes.data.success !== true) {
-      Toast.error(parseError(bevrageRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setBevrages(bevrageRes.data.results);
-
-    const MeatRes = await getAllMeats();
-    if (MeatRes.data.success !== true) {
-      Toast.error(parseError(MeatRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setMeats(MeatRes.data.results);
+    const formattedImages = itemDetails.files?.map((file: any) => ({ uri: file.presignedURL })) || [];
+    formik.setValues({
+      name: itemDetails.name,
+      price: itemDetails.price.toString().toCurrency(),
+      description: itemDetails.description,
+      discountedPrice: itemDetails.discountedPrice.toString().toCurrency(),
+      image: formattedImages,
+      sidesTypes: itemDetails.sidesTypes,
+      items: itemDetails.items,
+      sauces: itemDetails.sauces,
+      bevrages: itemDetails.bevrages,
+      meats: itemDetails.meats,
+    });
+    setSelectedImages(formattedImages);
   }
 
   useEffect(() => {
@@ -95,7 +59,7 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
       description: "",
       discountedPrice: "",
       image: null,
-      foodTypes: [],
+      sidesTypes: [],
       items: [],
       sauces: [],
       bevrages: [],
@@ -115,19 +79,19 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
        */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
-      const response = await createSide(
+
+      const response = await editSide(
+        itemDetails.id,
         values.name,
         numericPrice, // Ensure price is a number
         numericDiscountPrice,
         values.description,
-        
+        values.sidesTypes,
         values.image || [],
-        values.foodTypes,
         values.items,
-        values.sauces,  
-        
+        values.sauces,
         values.bevrages,
-        values.meats,
+        values.meats
       );
 
       if (response.data.success !== true) {
@@ -136,9 +100,9 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
         return;
       }
 
-      Toast.success("Successfully Sides created in!");
+      Toast.success("Successfully Sides Edited in!");
       showAlert("Sucess", `Successfully Sides created  `, async () => {
-        props.onClose();
+        navigation.goBack();
       });
       setApiInUse(false);
     },
@@ -222,20 +186,11 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View style={createModalStyles.container}>
+      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }} keyboardShouldPersistTaps="handled">
+        <SafeAreaView style={createModalStyles.container}>
           <ToastManager {...toastManagerProps} />
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            {/* Header Section */}
-            <View style={createModalStyles.header}>
-              <Text style={createModalStyles.title}>Create Sides</Text>
-
-              <TouchableOpacity onPress={props.onClose} style={createModalStyles.closeButton}>
-                <Text style={createModalStyles.closeButtonText}>✖</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={createModalStyles.card}>
+            <View style={[createModalStyles.card, { marginVertical: 10 }]}>
               {inputBuilder("Enter your Side Name", "name", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemName,
@@ -256,11 +211,11 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
-              <SidesTypesCheckbox formik={formik} valueName="foodTypes" />
-              <ItemsCheckbox formik={formik} valueName="items" items={items} />
-              <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
-              <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
-              <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
+              <SidesTypesCheckbox formik={formik} valueName="sidesTypes" />
+              <ItemsCheckbox formik={formik} valueName="items" items={formik.values.items} />
+              <SauceCheckbox formik={formik} valueName="sauces" items={formik.values.sauces} />
+              <BevragesCheckbox formik={formik} valueName="bevrages" items={formik.values.bevrages} />
+              <MeatsCheckbox formik={formik} valueName="meats" items={formik.values.meats} />
 
               {inputBuilder("Enter your Side Description", "description", formik, {
                 multiline: true,
@@ -300,15 +255,15 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
                 {buttonBuilder("Camera", openCamera, false, <Ionicons name="camera" size={24} color="white" />)}
               </View>
 
-              {buttonBuilder("Create", formik.handleSubmit, apiInUse)}
+             {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
             </View>
           </ScrollView>
-        </View>
-      </KeyboardAvoidingView>
+        </SafeAreaView>
+      </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
   );
 };
 
-export default CreateSidesModal;
+export default EditSides;
 
 const { width, height } = Dimensions.get("window");

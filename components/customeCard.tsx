@@ -5,15 +5,15 @@ import { buttonBuilder } from "./button";
 import { PostImages } from "./postImages";
 
 export const CustomeCard = ({
-  itemId,
-  title,
-  description,
-  price,
-  foodTypes,
-  onPress,
-  icon,
-  buttonName,
-  buttonIsActive,
+  itemId = "N/A",
+  title = "Untitled",
+  description = "No description available",
+  price = "$0.00",
+  foodTypes = [],
+  onPress = () => {},
+  icon = "usd",
+  buttonName = "Manage",
+  buttonIsActive = true,
 }: {
   itemId: string;
   title: string;
@@ -51,17 +51,17 @@ export const CustomeCard = ({
 };
 
 export const CustomeImageCard = ({
-  itemId,
-  title,
-  description,
-  price,
-  drinkTypes,
-  onPress,
-  icon,
-  buttonName,
-  buttonIsActive,
-  files,
-  isSmall,
+  itemId = "N/A",
+  title = "Untitled",
+  description = "No description available",
+  price = "$0.00",
+  drinkTypes = [],
+  onPress = () => {},
+  icon = "usd",
+  buttonName = "Manage",
+  buttonIsActive = true,
+  files = [],
+  isSmall = true,
 }: {
   itemId: string;
   title: string;
@@ -72,10 +72,9 @@ export const CustomeImageCard = ({
   icon: any;
   buttonName: string;
   buttonIsActive: boolean;
-  files: any[] | [];
+  files: any[] ;
   isSmall: boolean;
 }) => {
- 
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
       <View style={styles.groupInfo}>
@@ -105,37 +104,32 @@ export const CustomeImageCard = ({
 };
 
 export const CustomeMenuCard = ({
-  itemId = "",
+ 
   title = "",
   description = "",
   price = "",
   menuTypes = [],
-  items = [],
-  sauces = [],
-  bevrages =  [],
+  
   onPress = () => {},
-  icon ,
-  buttonName,
+  icon = "usd",
+  buttonName = "Manage",
   buttonIsActive = true,
   files = [],
   isSmall = true,
 }: {
-  itemId: string;
+ 
   title: string;
   description: string;
   price: string;
   menuTypes: string[];
-  items: string[];
-  sauces: string[],
-  bevrages: string[],
+  
   onPress: () => void;
   icon: any;
   buttonName: string;
   buttonIsActive: boolean;
-  files: any[] ;
+  files: any[];
   isSmall: boolean;
 }) => {
- 
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
       <View style={styles.groupInfo}>
@@ -152,24 +146,60 @@ export const CustomeMenuCard = ({
           <Text style={styles.followers}>{description}</Text>
         </View>
         <View style={styles.followerContainer}>
-          <Text style={styles.followers}> Drink Types: </Text>
+          <Text style={styles.followers}> Food Types: </Text>
           <Text style={[styles.followers, { fontWeight: "bold" }]}>{menuTypes.join(", ")}</Text>
         </View>
-        <View style={styles.followerContainer}>
-          <Text style={styles.followers}> Drink Types: </Text>
-          <Text style={[styles.followers, { fontWeight: "bold" }]}>{items.join(", ")}</Text>
-        </View>
-        <View style={styles.followerContainer}>
-          <Text style={styles.followers}> Drink Types: </Text>
-          <Text style={[styles.followers, { fontWeight: "bold" }]}>{sauces.join(", ")}</Text>
-        </View>
-        <View style={styles.followerContainer}>
-          <Text style={styles.followers}> Drink Types: </Text>
-          <Text style={[styles.followers, { fontWeight: "bold" }]}>{bevrages.join(", ")}</Text>
-        </View>
+        
 
         {files.length > 0 && <PostImages files={files || []} isSmall={isSmall} />}
 
+        {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export const CustomePromotionCard = ({
+  itemId = "N/A",
+  title = "Untitled",
+  description = "No description available",
+  code = "$0.00",
+  expiryDate = "N/A",
+  onPress = () => {},
+  icon = "date-range",
+  buttonName = "Manage",
+  buttonIsActive = true,
+}: {
+  itemId: string;
+  title: string;
+  description: string;
+  code: string;
+  expiryDate: string;
+  onPress: () => void;
+  icon: any;
+  buttonName: string;
+  buttonIsActive: boolean;
+}) => {
+  return (
+    <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
+      <View style={styles.groupInfo}>
+        <View style={styles.followerContainer}>
+          {/* <Text style={styles.groupName}>{itemId}</Text> */}
+          <Text style={styles.groupName}>{title}</Text>
+        </View>
+
+        <View style={styles.followerContainer}>
+          <FontAwesome name={icon} size={18} color="white" />
+          <Text style={styles.followers}>{expiryDate}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          
+          <Text style={styles.followers}>{code}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>{description}</Text>
+        </View>
+        
         {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
       </View>
     </TouchableOpacity>

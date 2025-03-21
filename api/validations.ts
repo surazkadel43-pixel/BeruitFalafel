@@ -114,8 +114,53 @@ export const createSideSchema = Yup.object().shape({
 
   description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
 
-  sidesTypes: Yup.array().min(1, "Please select at least one option").required("Side type is required"),
- // items: Yup.array().min(1, "Please select at least one item").required("Items are required"), 
+  foodTypes: Yup.array().min(1, "Please select at least one option").required("Side type is required"),
+  items: Yup.array().min(1, "Please select at least one item").required("Items are required"),
 
   image: Yup.mixed<File | ImagePickerAsset>().required("Image is required"),
+});
+
+export const createProductSchema = Yup.object().shape({
+  name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
+
+  price: Yup.string()
+    .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
+    .required("Price is required"),
+
+  discountedPrice: Yup.string()
+    .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)") // Ensures valid currency format
+    .test("is-lower-or-equal", "Discounted price cannot be greater than the price", function (value) {
+      const priceValue = this.parent.price; // Get the `price` field value
+
+      if (!value || !priceValue) return true; // ✅ Skip validation if either value is empty
+
+      // ✅ Remove `$` sign before parsing
+      const numericDiscountedPrice = parseFloat(value.replace("$", ""));
+      const numericPrice = parseFloat(priceValue.replace("$", ""));
+
+      return numericDiscountedPrice <= numericPrice; // ✅ Compare as numbers
+    }),
+
+  description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
+
+  foodTypes: Yup.array().min(1, "Please select at least one option").required("Side type is required"),
+  items: Yup.array().min(1, "Please select at least one item").required("Items are required"),
+  sauces: Yup.array().min(1, "Please select at least one item").required("sauces are required"),
+  meats: Yup.array().min(1, "Please select at least one item").required("meats are required"),
+
+  image: Yup.mixed<File | ImagePickerAsset>().required("Image is required"),
+});
+
+export const createPromotionSchema = Yup.object().shape({
+  name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
+  code: Yup.string()
+    .required("Code is required")
+    .min(2, "Code must be at least 2 characters")
+    .max(20, "Code cannot be longer than 20 characters")
+    .matches(/^[A-Z0-9]+$/, "Code must be uppercase and contain only letters or numbers"),
+
+  description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
+
+  image: Yup.mixed<File | ImagePickerAsset>().optional(),
+  expiry: Yup.date().nullable().min(new Date(), "Expiry date cannot be in the past").required("Expiry date is required"),
 });

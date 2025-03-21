@@ -15,119 +15,53 @@ import {
   View,
 } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createBevrage, getAllBevrages } from "../../../api/bevrages";
-import { getAllItems } from "../../../api/item";
-import { getAllMeats } from "../../../api/meats";
-import { getAllSauces } from "../../../api/sauce";
-import { createSideSchema } from "../../../api/validations";
-import { buttonBuilder } from "../../../components/button";
-import { inputBuilder } from "../../../components/input";
-import { BevragesCheckbox, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
-import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
-import showAlert from "../../../components/showAlert";
-import { parseError } from "../../../components/toasts";
-import ZoomImageModal from "../../../components/zoomImageModals";
-import "../../../extension/extension";
-import { createSide } from "../../../api/sides";
+import { createPromotion } from "../../api/promotion";
+import { createPromotionSchema } from "../../api/validations";
+import { buttonBuilder } from "../../components/button";
+import { inputBuilder } from "../../components/input";
+import { DatePickerField } from "../../components/meatTypesDropDown";
+import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../components/recycled-style";
+import showAlert from "../../components/showAlert";
+import { parseError } from "../../components/toasts";
+import ZoomImageModal from "../../components/zoomImageModals";
+import "../../extension/extension";
 
-interface CreateSidesModal {
+interface CreatePromotionModal {
   onClose: () => void;
 }
 
-const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
+const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [items, setitems] = useState<any[]>([]);
-  const [bevrages, setBevrages] = useState<any[]>([]);
-  const [sauces, setSauces] = useState<any[]>([]);
-  const [meats, setMeats] = useState<any[]>([]);
-  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
-
-  async function prepare() {
-    setApiInUse(false);
-    const itemRes = await getAllItems();
-
-    if (itemRes.data.success !== true) {
-      Toast.error(parseError(itemRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setitems(itemRes.data.items);
-
-    const sauceRes = await getAllSauces();
-    if (sauceRes.data.success !== true) {
-      Toast.error(parseError(sauceRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setSauces(sauceRes.data.sauces);
-
-    const bevrageRes = await getAllBevrages();
-    if (bevrageRes.data.success !== true) {
-      Toast.error(parseError(bevrageRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setBevrages(bevrageRes.data.results);
-
-    const MeatRes = await getAllMeats();
-    if (MeatRes.data.success !== true) {
-      Toast.error(parseError(MeatRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setMeats(MeatRes.data.results);
-  }
-
+  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(false);
   useEffect(() => {
     prepare();
   }, []);
 
+  function prepare() {
+    setApiInUse(false);
+  }
+
   const formik = useFormik({
     initialValues: {
       name: "",
-      price: "",
+      code: "",
       description: "",
-      discountedPrice: "",
-      image: null,
-      foodTypes: [],
-      items: [],
-      sauces: [],
-      bevrages: [],
-      meats: [],
+      image: [],
+      expiry: undefined,
     },
-    validationSchema: createSideSchema,
+    validationSchema: createPromotionSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
-      if (selectedImages.length === 0) {
-        Toast.error("Please select an image.");
-        setApiInUse(false);
-        return;
-      }
+      console.log(values);
 
-      /**
-       * save sides  to server
-       */
-      const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
-      const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
-      const response = await createSide(
+      const response = await createPromotion(
         values.name,
-        numericPrice, // Ensure price is a number
-        numericDiscountPrice,
+        values.code, // Ensure price is a number
         values.description,
-        
-        values.image || [],
-        values.foodTypes,
-        values.items,
-        values.sauces,  
-        
-        values.bevrages,
-        values.meats,
+        values.expiry,
+        values.image
       );
 
       if (response.data.success !== true) {
@@ -136,15 +70,14 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
         return;
       }
 
-      Toast.success("Successfully Sides created in!");
-      showAlert("Sucess", `Successfully Sides created  `, async () => {
+      Toast.success("Successfully Promotion created in!");
+      showAlert("Sucess", `Successfully Promotion created  `, async () => {
         props.onClose();
       });
       setApiInUse(false);
     },
   });
 
-  //  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(false);
   const pickImage = async () => {
     const maxImages = canAttachMultipleImages ? 5 : 1;
     if (selectedImages.length >= maxImages) {
@@ -213,6 +146,7 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
       formik.setFieldValue("image", [...selectedImages, result.assets[0]]);
     }
   };
+
   const removeImage = (index: number) => {
     const updatedImages = selectedImages.filter((_, i) => i !== index);
 
@@ -228,7 +162,7 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             {/* Header Section */}
             <View style={createModalStyles.header}>
-              <Text style={createModalStyles.title}>Create Sides</Text>
+              <Text style={createModalStyles.title}>Create Promotion</Text>
 
               <TouchableOpacity onPress={props.onClose} style={createModalStyles.closeButton}>
                 <Text style={createModalStyles.closeButtonText}>✖</Text>
@@ -236,33 +170,18 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
             </View>
 
             <View style={createModalStyles.card}>
-              {inputBuilder("Enter your Side Name", "name", formik, {
+              {inputBuilder("Enter your Promotion Name", "name", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemName,
               })}
-              {inputBuilder("Enter your Side Price", "price", formik, {
+              {inputBuilder("Enter your Promotion Code", "code", formik, {
                 multiline: true,
-                keyboardType: "numeric",
-                onChangeText: (text: string) => {
-                  formik.setFieldValue("price", text.toCurrency());
-                },
-                style: createItemPropsStyles.itemPrice,
+                autoCapitalize: "characters",
+                style: createItemPropsStyles.itemPrice, // You can rename this style to something more semantic like `itemCode`
               })}
-              {inputBuilder("Enter your discountedPrice Price", "discountedPrice", formik, {
-                multiline: true,
-                keyboardType: "numeric",
-                onChangeText: (text: string) => {
-                  formik.setFieldValue("discountedPrice", text.toCurrency());
-                },
-                style: createItemPropsStyles.itemPrice,
-              })}
-              <SidesTypesCheckbox formik={formik} valueName="foodTypes" />
-              <ItemsCheckbox formik={formik} valueName="items" items={items} />
-              <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
-              <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
-              <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
 
-              {inputBuilder("Enter your Side Description", "description", formik, {
+              <DatePickerField formik={formik} valueName="expiry" />
+              {inputBuilder("Enter your Promotion Description", "description", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemDescription,
               })}
@@ -309,6 +228,6 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
   );
 };
 
-export default CreateSidesModal;
+export default CreatePromotionModal;
 
 const { width, height } = Dimensions.get("window");

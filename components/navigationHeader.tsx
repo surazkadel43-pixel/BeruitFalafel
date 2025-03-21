@@ -1,71 +1,60 @@
-import { StyleSheet, Text, View, Image, ImageBackground } from 'react-native';
-import { recycledStyles } from './recycled-style';
+import { Image, StyleSheet, Text, View } from "react-native";
 
-import { MaterialIcons, FontAwesome, Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React from "react";
 
 type name = {
-  name?: string | null,
-  age?: number | null,
-}
+  name?: string | null;
+  age?: number | null;
+};
 
-let suraj: string| undefined;
+let suraj: string | undefined;
 
+export default function NavigationHeader({ title, navigation }: { title: string; navigation: any }) {
+  //source={require('../assets/icon.png')}
 
-export default function NavigationHeader({ title, navigation }: { title: string, navigation: any }) {
-    //source={require('../assets/icon.png')}
-    
-      
-      
-    return(
-        <View style= {styles.header}  >
-               
-
-
-        
-            <View  style ={styles.headerView} >
-                <Image source={require('../assets/favicon.png')} style= {{alignItems: 'center'}}  />
-                <Text style = {styles.title}> {title} </Text>
-            </View>
-
-        </View>
-    )
+  return (
+    <View style={styles.header}>
+      <View style={styles.headerView}>
+        <Image source={require("../assets/favicon.png")} style={{ alignItems: "center" }} />
+        <Text style={styles.title}> {title} </Text>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    header: {
-      flex: 1,
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'skyblue',
-    },
+  header: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "skyblue",
+  },
 
-    headerText: {
-      fontWeight: 'bold',
-      fontSize: 20,
-      color: '#333',
-    },
+  headerText: {
+    fontWeight: "bold",
+    fontSize: 20,
+    color: "#333",
+  },
 
-    headerView: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
+  headerView: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
-    icon: {
-        position: 'absolute',
-        left: 15,
-    },
-    Addicon: {
-        position: 'absolute',
-        right: 15,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: 'black',
-    }
-  });
-  
+  icon: {
+    position: "absolute",
+    left: 15,
+  },
+  Addicon: {
+    position: "absolute",
+    right: 15,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "black",
+  },
+});

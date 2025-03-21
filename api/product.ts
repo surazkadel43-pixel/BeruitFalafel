@@ -1,14 +1,14 @@
 import { del, get, patch, post } from "./communications";
 
-const endpoint = "api/v1/sides/";
+const endpoint = "api/v1/products/";
 
-export async function createSide(
+export async function createProduct(
   name: string,
   price: number,
   discountedPrice: number,
   description: string,
   image: any[] = [],
-  sidesTypes: string[] = [], 
+  productTypes: string[] = [], 
   items: string[] = [], 
   sauces: string[] = [], 
   beverages: string[] = [],
@@ -20,7 +20,7 @@ export async function createSide(
     discountedPrice,
     description,
     image,
-    sidesTypes,
+    productTypes,
     items,
     sauces,
     beverages,
@@ -30,31 +30,31 @@ export async function createSide(
   return response;
 }
 
-export async function getAllSides() {
+export async function getAllProducts() {
   const response = await get(`${endpoint}all`);
   return response;
 }
 
-export async function editSide(
-  sideId: number,
+export async function editProduct(
+  productId: number,
   name: string,
   price: number,
   discountedPrice: number,
   description: string,
   image: any[] = [],
-  sidesTypes: string[] = [], // ✅ Defaults to an empty array
+  productTypes: string[] = [], // ✅ Defaults to an empty array
   items: string[] = [], // ✅ Defaults to an empty array
   sauces: string[] = [], // ✅ Defaults to an empty array
   beverages: string[] = [], // ✅ Defaults to an empty array
   meats: string[] = []
 ) {
-  return await patch(`${endpoint}update/${sideId}`, {
+  return await patch(`${endpoint}update/${productId}`, {
     name,
     price,
     discountedPrice,
     description,
     image,
-    sidesTypes,
+    productTypes,
     items,
     sauces,
     beverages,
@@ -62,19 +62,19 @@ export async function editSide(
   });
 }
 
-export async function deleteSide(sideId: string) {
-  const response = await del(`${endpoint}delete/${sideId}`);
+export async function deleteProduct(productId: string) {
+  const response = await del(`${endpoint}delete/${productId}`);
   return response;
 }
 
-export async function getSide(page: number = 0, initialId: number = 0) {
+export async function getProduct(page: number = 0, initialId: number = 0) {
   const response = await get(
-    page === 0 && initialId === 0 ? `${endpoint}feed/side` : `${endpoint}feed/side?page=${page}&initId=${initialId}`
+    page === 0 && initialId === 0 ? `${endpoint}feed/product` : `${endpoint}feed/product?page=${page}&initId=${initialId}`
   );
   return response;
 }
 
-export async function searchSide(name: string) {
-  const response = await get(`${endpoint}side?name=${name}`);
+export async function searchProduct(name: string) {
+  const response = await get(`${endpoint}product?name=${name}`);
   return response;
 }

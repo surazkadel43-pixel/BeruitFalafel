@@ -4,16 +4,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import NavigationHeader from "../components/navigationHeader";
 import { recycledStyles } from "../components/recycled-style";
-import BevrageScreens from "../screens/Menu/BevragesScreens/bevragesScreens";
-import CateringProductScreens from "../screens/Menu/cateringProductScrrens/cateringMenu";
 
 
-import ProductScreens from "../screens/Menu/ProductScreens/productScreens";
-import SidesScreens from "../screens/Menu/SidesScreens/sidesScreens";
-import ItemStackNavigator from "./itemNavigation/itemStackNavigation";
-import SauceStackNavigator from "./sauceNavigation/sauceStackNavigation";
-import MeatStackNavigator from "./meatNavigation/meatStackNavigator";
+
 import BevrageStackNavigator from "./bevrageNavigation/bevrageStackNavigator";
+import ItemStackNavigator from "./itemNavigation/itemStackNavigation";
+import MeatStackNavigator from "./meatNavigation/meatStackNavigator";
+import ProductStackNavigator from "./productNavigation/productStackNavigator";
+import SauceStackNavigator from "./sauceNavigation/sauceStackNavigation";
+import SidesStackNavigator from "./sidesNavigation/sideStackNavigator";
+import CateringStackNavigator from "./cateringNavigation/cateringStackNavigator";
 
 const RootDrawerNavigator = createDrawerNavigator();
 export default function MenuDrawer(navigation: any) {
@@ -37,7 +37,7 @@ export default function MenuDrawer(navigation: any) {
     >
       <RootDrawerNavigator.Screen
         name="Product"
-        component={ProductScreens}
+        component={ProductStackNavigator}
         options={{
           drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
           headerTitle: () => <NavigationHeader title="Product" navigation={navigation} />,
@@ -66,7 +66,7 @@ export default function MenuDrawer(navigation: any) {
       />
       <RootDrawerNavigator.Screen
         name="Sides"
-        component={SidesScreens}
+        component={SidesStackNavigator}
         options={{
           drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
           headerTitle: () => <NavigationHeader title="Sides" navigation={navigation} />,
@@ -75,7 +75,7 @@ export default function MenuDrawer(navigation: any) {
       />
       <RootDrawerNavigator.Screen
         name="CateringProduct"
-        component={CateringProductScreens}
+        component={CateringStackNavigator}
         options={{
           drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
           headerTitle: () => <NavigationHeader title="Catering" navigation={navigation} />,

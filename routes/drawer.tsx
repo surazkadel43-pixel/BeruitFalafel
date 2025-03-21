@@ -3,13 +3,11 @@ import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import NavigationHeader from "../components/navigationHeader";
-import Home from "../screens/homepage";
-import CreatePost from "../screens/createPost";
+import { recycledStyles } from "../components/recycled-style";
+import CateringOrder from "../screens/orderCatering/caterinOrderScreen";
 import NewOrder from "../screens/orderCatering/newOrder";
 import Order from "../screens/orderCatering/orderScreen";
-import CateringOrder from "../screens/orderCatering/caterinOrderScreen";
 const RootDrawerNavigator = createDrawerNavigator();
-import { recycledStyles } from "../components/recycled-style";
 
 export default function Drawer(navigation: any) {
   return (
@@ -21,7 +19,7 @@ export default function Drawer(navigation: any) {
         drawerInactiveTintColor: "purple",
         drawerActiveBackgroundColor: "green",
         drawerStyle: {
-          backgroundColor: recycledStyles.tabBarBackGroundColor.backgroundColor
+          backgroundColor: recycledStyles.tabBarBackGroundColor.backgroundColor,
         },
         drawerLabelStyle: {
           fontSize: 16, // Change font size

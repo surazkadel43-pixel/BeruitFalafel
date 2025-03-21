@@ -3,8 +3,7 @@ import { Dimensions, StyleSheet } from "react-native";
 const { width, height } = Dimensions.get("window");
 
 export const recycledStyles = StyleSheet.create({
-  
-  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10, paddingVertical: 10  },
+  safeAreaView: { flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10, paddingVertical: 10 },
 
   disabled: {
     opacity: 0.5,
@@ -19,7 +18,7 @@ export const recycledStyles = StyleSheet.create({
 
   normalText: {
     color: "white",
-    fontSize: 20, // Larger size for the 'X'
+    fontSize: 20, 
     fontWeight: "300",
     textAlign: "center",
   },
@@ -108,8 +107,8 @@ export const createItemPropsStyles = {
     borderColor: "white",
     borderWidth: 2,
     padding: 10,
-  }
-}
+  },
+};
 
 export const toastManagerProps = {
   textStyle: { fontSize: 16, color: "white" },
@@ -166,7 +165,16 @@ export const createModalStyles = StyleSheet.create({
     color: "white",
     alignSelf: "center",
   },
-  card: { backgroundColor: "#1e2124", padding: 15, borderRadius: 8, borderWidth: 2, borderColor: "white", gap: 10, marginHorizontal: 10 },
+  card: {
+    backgroundColor: "#1e2124",
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "white",
+    gap: 10,
+    marginHorizontal: 10,
+    marginVertical: 20,
+  },
 });
 
 export const imagePickerStyles = StyleSheet.create({

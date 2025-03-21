@@ -4,34 +4,35 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getSauce, searchSauce } from "../../../api/sauce";
-import { getSide, searchSide } from "../../../api/sides";
-import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
-import searchContainer from "../../../components/searchContainer";
-import NoResultsCard from "../../../components/searchNotFound";
-import { parseError } from "../../../components/toasts";
-import CreateGroupModal from "./createGroupModal";
-import { CustomeImageCard, CustomeMenuCard } from "../../../components/customeCard";
-export default function SidesScreens({ navigation }: { navigation: any }) {
-  const [apiInUse, setApiInUse] = useState(false);
+
+import { CustomeCard, CustomePromotionCard } from "../../components/customeCard";
+import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
+import searchContainer from "../../components/searchContainer";
+import NoResultsCard from "../../components/searchNotFound";
+import { parseError } from "../../components/toasts";
+import CreatePromotionModal from "./createGroupModal";
+import { getPromotion, searchPromotion } from "../../api/promotion";
+
+export default function PromotionScreens({ navigation }: { navigation: any }) {
+  const [apiInUse, setApiInUse] = useState(true);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
-  const [refreshing, setRefreshing] = useState(false);
-  const [sides, setSides] = useState<any[]>([]);
+  
+  const [promotions, setPromotions] = useState<any[]>([])
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-
+  const [refreshing, setRefreshing] = useState(false);
   const [refreshes, setRefreshes] = useState<number>(0);
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
+     
       setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
     setApiInUse(false);
 
-    const itemResponse = await getSide();
+    const itemResponse = await getPromotion();
 
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
@@ -39,9 +40,8 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
       setApiInUse(false);
       return;
     }
-
     setPages(itemResponse.data.pages);
-    setSides(itemResponse.data.results);
+    setPromotions(itemResponse.data.results);
 
     setApiInUse(false);
     setRefreshing(false);
@@ -57,16 +57,16 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   };
   const formik = useFormik({
     initialValues: {
-      sideName: "",
+      promotionCode: "",
     },
     validationSchema: null,
     onSubmit: async (values) => {
       setButtonVisible(false);
-      fetchSides(values.sideName);
+      fetchItem(values.promotionCode);
     },
   });
 
-  const fetchSides = async (query: string) => {
+  const fetchItem = async (query: string) => {
     if (query.trim() === "") {
       prepare(true);
       return;
@@ -74,9 +74,9 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
     try {
-      const itemSearchRes = await searchSide(query);
+      const itemSearchRes = await searchPromotion(query);
       if (itemSearchRes.data.success === true) {
-        setSides(itemSearchRes.data.results);
+        setPromotions(itemSearchRes.data.results);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
@@ -85,16 +85,6 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
   };
-  // Debounced search to prevent excessive API calls
-  useEffect(() => {
-    setButtonVisible(true);
-    const delayDebounce = setTimeout(() => {
-      fetchSides(formik.values.sideName);
-    }, 500);
-
-    return () => clearTimeout(delayDebounce); // Cleanup function
-  }, [formik.values.sideName]);
-
   async function loadMore() {
     if (apiInUse) {
       return;
@@ -102,32 +92,39 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
 
-    const itemResponse = await getSide(currentPage + 1, sides[sides.length - 1].id);
-    if (itemResponse.data.success !== true) {
-      Toast.error(parseError(itemResponse));
+    const postReq = await getPromotion(currentPage + 1, promotions[promotions.length - 1].id);
+    if (postReq.data.success !== true) {
+      Toast.error(parseError(postReq));
     } else {
-      setSides([...sides, ...itemResponse.data.results] as []);
+      setPromotions([...promotions, ...postReq.data.results] as []);
       setCurrentPage(currentPage + 1);
     }
 
     setApiInUse(false);
   }
+  // Debounced search to prevent excessive API calls
+  useEffect(() => {
+    setButtonVisible(true);
+    const delayDebounce = setTimeout(() => {
+      fetchItem(formik.values.promotionCode);
+    }, 500); // Delay search by 500ms after user stops typing
+
+    return () => clearTimeout(delayDebounce); // Cleanup function
+  }, [formik.values.promotionCode]);
+
   function onScroll(event: any) {
     if (apiInUse || currentPage === pages) {
       return;
     }
-
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 900) {
-      console.log("loading more, 1000", apiInUse, currentPage, pages);
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
       loadMore();
-    }
+    } 
   }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView key={refreshes} style={recycledStyles.safeAreaView}>
-        <ToastManager {...toastManagerProps} />
         <ScrollView
           onScroll={onScroll}
           scrollEventThrottle={16}
@@ -135,32 +132,30 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "sideName")}</View>
+          <ToastManager {...toastManagerProps} />
+          <View style={{}}>{searchContainer(formik, buttonVisible, apiInUse, "promotionCode")}</View>
 
           <ScrollView>
-            {sides.length > 0 ? (
-              sides.map((item) => (
-                <CustomeMenuCard
+            {promotions.length > 0 ? (
+              promotions.map((item) => (
+                <CustomePromotionCard
                   key={item.id}
-                  
+                  itemId={item.id}
                   title={item.name}
                   description={item.description}
-                  menuTypes={item.menuTypes}
-                  
+                  code={item.code}
                   onPress={() => {
-                    navigation.navigate("SidesDetails", { itemDetails: item });
+                    navigation.navigate("PromotionDetail", { itemDetails: item });
                   }}
-                  icon="usd"
+                  icon="date-range"
                   buttonName="manage"
                   buttonIsActive={true}
-                  price={item.price}
-                  files={item.images }
-                  isSmall={true}
+                  expiryDate={item.expiryDate}
                 />
               ))
             ) : (
               <NoResultsCard
-                message={"Sorry, No Item found In the Sides."}
+                message={"Sorry, No promotions found In the Menu."}
                 additionalProps={{ icon: <FontAwesome name="cutlery" size={30} color="white" /> }}
               />
             )}
@@ -174,7 +169,7 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreateGroupModal onClose={() => setModalVisible(false)} />
+          <CreatePromotionModal onClose={() => setModalVisible(false)} />
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />
@@ -185,5 +180,5 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
 }
 
 const styles = StyleSheet.create({
-  //recycledStyles
+  
 });

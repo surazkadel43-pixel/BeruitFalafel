@@ -1,66 +1,75 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
-import { View, Text, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import Home from "../screens/homepage";
-import Search from "../screens/searchpage";
-import CreatePost from "../screens/createPost";
 import Profile from "../screens/profilepage";
 import Subcribed from "../screens/subcribedPage";
 import Drawer from "./drawer";
 import MenuDrawer from "./menuDrawer";
+import PromotionStackNavigator from "./promotionNavigation/promotionStackNavigator";
+import { recycledStyles } from "../components/recycled-style";
+import NavigationHeader from "../components/navigationHeader";
 
 const Tab = createBottomTabNavigator();
 
-export default function BottomNavigation() {
+export default function BottomNavigation(navigation: any) {
   return (
-    
-      <Tab.Navigator
-      initialRouteName="Drawer" 
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName: keyof typeof Ionicons.glyphMap;
+    <Tab.Navigator
+      initialRouteName="Drawer"
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: keyof typeof Ionicons.glyphMap;
 
-            switch (route.name) {
-              case "Drawer":
-                iconName = focused ? "home" : "home-outline";
-                break;
-              case "Menu":
-                iconName = focused ? "menu" : "menu-outline";
-                break;
-              case "CreatePost":
-                iconName = focused ? "add-circle" : "add-circle-outline";
-                break;
-              case "Profile":
-                iconName = focused ? "person" : "person-outline";
-                break;
-              case "Sucribed":
-                iconName = focused ? "notifications" : "notifications-outline";
-                break;
-              default:
-                iconName = "help-circle-outline";
-                break;
-            }
-
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          headerShown: false,
-          tabBarActiveTintColor: "white",
-          tabBarInactiveTintColor: "gray",
-          tabBarStyle: {
-            backgroundColor: "#16181c",
+          switch (route.name) {
+            case "Drawer":
+              iconName = focused ? "home" : "home-outline";
+              break;
+            case "Menu":
+              iconName = focused ? "menu" : "menu-outline";
+              break;
+            case "Promotion":
+              iconName = focused ? "gift" : "gift-outline";
+              break;
+            case "Profile":
+              iconName = focused ? "person" : "person-outline";
+              break;
+            case "Sucribed":
+              iconName = focused ? "notifications" : "notifications-outline";
+              break;
+            default:
+              iconName = "help-circle-outline";
+              break;
           }
-        })}
-        
-      >
-        <Tab.Screen name="Drawer" component={Drawer} options={{ title: "Home", }} />
-        <Tab.Screen name="Menu" component={MenuDrawer} options={{ title: "Menu" }} />
-        <Tab.Screen name="CreatePost" component={CreatePost} options={{ title: "Create" }} />
-        <Tab.Screen name="Sucribed" component={Subcribed} options={{ title: "Stats" }} />
-        <Tab.Screen name="Profile" component={Profile} options={{ title: "Profile" }} />
-      </Tab.Navigator>
 
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        headerShown: false,
+        tabBarActiveTintColor: "white",
+        tabBarInactiveTintColor: "gray",
+        tabBarStyle: {
+          backgroundColor: "#16181c",
+        },
+      })}
+    >
+      <Tab.Screen name="Drawer" component={Drawer} options={{ title: "Home" }} />
+      <Tab.Screen name="Menu" component={MenuDrawer} options={{ title: "Menu" }} />
+      <Tab.Screen
+        name="Promotion"
+        component={PromotionStackNavigator}
+        options={{
+          title: "Promotion",
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: "skyblue",
+          },
+          headerTitle: () => <NavigationHeader title="Promotion" navigation={navigation} />,
+          headerTitleAlign: 'center',
+          headerTitleStyle: { backgroundColor: "skyblue" },
+        }}
+      />
+      <Tab.Screen name="Sucribed" component={Subcribed} options={{ title: "Stats" }} />
+      <Tab.Screen name="Profile" component={Profile} options={{ title: "Profile" }} />
+    </Tab.Navigator>
   );
 }
 

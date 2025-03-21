@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getSauce, searchSauce } from "../../../api/sauce";
+
 import { getSide, searchSide } from "../../../api/sides";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
@@ -12,13 +12,17 @@ import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
 import { CustomeImageCard, CustomeMenuCard } from "../../../components/customeCard";
-export default function SidesScreens({ navigation }: { navigation: any }) {
+import { getProduct } from "../../../api/product";
+import { getCateringProduct, searchCateringProduct } from "../../../api/cateringProduct";
+
+
+export default function CateringScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
-  const [sides, setSides] = useState<any[]>([]);
+  const [products, setProduct] = useState<any[]>([]);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -31,7 +35,7 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
 
-    const itemResponse = await getSide();
+    const itemResponse = await getCateringProduct();
 
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
@@ -41,7 +45,7 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
     }
 
     setPages(itemResponse.data.pages);
-    setSides(itemResponse.data.results);
+    setProduct(itemResponse.data.results);
 
     setApiInUse(false);
     setRefreshing(false);
@@ -57,16 +61,16 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   };
   const formik = useFormik({
     initialValues: {
-      sideName: "",
+      productName: "",
     },
     validationSchema: null,
     onSubmit: async (values) => {
       setButtonVisible(false);
-      fetchSides(values.sideName);
+      fetchProduct(values.productName);
     },
   });
 
-  const fetchSides = async (query: string) => {
+  const fetchProduct = async (query: string) => {
     if (query.trim() === "") {
       prepare(true);
       return;
@@ -74,9 +78,9 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
     try {
-      const itemSearchRes = await searchSide(query);
+      const itemSearchRes = await searchCateringProduct(query);
       if (itemSearchRes.data.success === true) {
-        setSides(itemSearchRes.data.results);
+        setProduct(itemSearchRes.data.results);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
@@ -89,11 +93,11 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   useEffect(() => {
     setButtonVisible(true);
     const delayDebounce = setTimeout(() => {
-      fetchSides(formik.values.sideName);
+      fetchProduct(formik.values.productName);
     }, 500);
 
     return () => clearTimeout(delayDebounce); // Cleanup function
-  }, [formik.values.sideName]);
+  }, [formik.values.productName]);
 
   async function loadMore() {
     if (apiInUse) {
@@ -102,11 +106,11 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
 
-    const itemResponse = await getSide(currentPage + 1, sides[sides.length - 1].id);
+    const itemResponse = await getCateringProduct(currentPage + 1, products[products.length - 1].id);
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
     } else {
-      setSides([...sides, ...itemResponse.data.results] as []);
+      setProduct([...products, ...itemResponse.data.results] as []);
       setCurrentPage(currentPage + 1);
     }
 
@@ -135,11 +139,11 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "sideName")}</View>
+          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "productName")}</View>
 
           <ScrollView>
-            {sides.length > 0 ? (
-              sides.map((item) => (
+            {products.length > 0 ? (
+              products.map((item) => (
                 <CustomeMenuCard
                   key={item.id}
                   
@@ -148,7 +152,7 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
                   menuTypes={item.menuTypes}
                   
                   onPress={() => {
-                    navigation.navigate("SidesDetails", { itemDetails: item });
+                    navigation.navigate("ProductDetails", { itemDetails: item });
                   }}
                   icon="usd"
                   buttonName="manage"
@@ -160,7 +164,7 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
               ))
             ) : (
               <NoResultsCard
-                message={"Sorry, No Item found In the Sides."}
+                message={"Sorry, No Item found In the Products."}
                 additionalProps={{ icon: <FontAwesome name="cutlery" size={30} color="white" /> }}
               />
             )}
