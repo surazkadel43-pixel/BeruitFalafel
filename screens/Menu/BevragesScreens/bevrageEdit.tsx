@@ -7,12 +7,11 @@ import { Dimensions, Image, Keyboard, ScrollView, Text, TouchableOpacity, Toucha
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createBevrage, editBevrage } from "../../../api/bevrages";
-import { uploadImages } from "../../../api/images";
+import { editBevrage } from "../../../api/bevrages";
 import { createBeverageSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { DrinkTypesCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -24,6 +23,7 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
 
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
 
   const route = useRoute(); // ✅ Get the route object
   const { itemDetails } = route.params as { itemDetails: any };
@@ -109,8 +109,9 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
   });
 
   const pickImage = async () => {
-    if (selectedImages.length >= 1) {
-      Toast.error("You can only attach up to 1 image at once.");
+    const maxImages = canAttachMultipleImages ? 5 : 1;
+    if (selectedImages.length >= maxImages) {
+      Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
       return;
     }
 
@@ -127,8 +128,8 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
     });
 
     if (!result.canceled) {
-      if (result.assets.length > 1) {
-        Toast.error("You can select up to 1 image at once.");
+      if (result.assets.length > maxImages) {
+        Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
         return;
       }
 
@@ -139,8 +140,8 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
         }
         newSelection.push(asset);
       }
-      if (newSelection.length > 1) {
-        Toast.error("You can select up to 1 image at once.");
+      if (newSelection.length > maxImages) {
+        Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
         return;
       }
 
@@ -150,8 +151,9 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
   };
 
   const openCamera = async () => {
-    if (selectedImages.length >= 1) {
-      Toast.error("You can only attach up to 1 image at once.");
+    const maxImages = canAttachMultipleImages ? 5 : 1;
+    if (selectedImages.length >= maxImages) {
+      Toast.error(`You can only attach up to ${maxImages} image${maxImages === 1 ? "" : "s"} at once.`);
       return;
     }
 
@@ -191,7 +193,7 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
             <View style={[createModalStyles.card, { marginVertical: 10 }]}>
               {inputBuilder("Enter your Bevrage Name", "name", formik, {
                 multiline: true,
-                style:  createItemPropsStyles.itemName,
+                style: createItemPropsStyles.itemName,
               })}
               {inputBuilder("Enter your Bevrage Price", "price", formik, {
                 multiline: true,
@@ -201,8 +203,8 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
-              
-              <SidesTypesCheckbox formik={formik} valueName="drinkTypes" expanded= {true} />
+
+              <SidesTypesCheckbox formik={formik} valueName="drinkTypes" expanded={true} />
               {inputBuilder("Enter your Bevrage Description", "description", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemDescription,

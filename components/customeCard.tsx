@@ -75,6 +75,7 @@ export const CustomeImageCard = ({
   files: any[] ;
   isSmall: boolean;
 }) => {
+
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
       <View style={styles.groupInfo}>
@@ -95,7 +96,7 @@ export const CustomeImageCard = ({
           <Text style={[styles.followers, { fontWeight: "bold" }]}>{drinkTypes.join(", ")}</Text>
         </View>
 
-        {files.length > 0 && <PostImages files={files || []} isSmall={isSmall} />}
+        {files.length > 0 && <PostImages files={files } isSmall={isSmall} />}
 
         {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
       </View>
@@ -153,6 +154,35 @@ export const CustomeMenuCard = ({
 
         {files.length > 0 && <PostImages files={files || []} isSmall={isSmall} />}
 
+        {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export const CustomeProfileCard = ({
+  title,
+  description,
+  onPress,
+  icon,
+  buttonName,
+  buttonIsActive,
+}: {
+  title: string;
+  description: string;
+  onPress: () => void;
+  icon: any;
+  buttonName: string;
+  buttonIsActive: boolean;
+}) => {
+  return (
+    <TouchableOpacity style={styles.groupCard} activeOpacity={1} >
+      <View style={styles.groupInfo}>
+        <Text style={styles.groupName}>{title}</Text>
+        <View style={styles.followerContainer}>
+          <FontAwesome name={icon} size={18} color="white" />
+          <Text style={styles.followers}>{description}</Text>
+        </View>
         {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
       </View>
     </TouchableOpacity>

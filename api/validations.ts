@@ -7,8 +7,8 @@ export const authentication = Yup.object({
 });
 
 export const SignUpSchema = Yup.object().shape({
-  firstName: Yup.string().required("First Name is required"),
-  lastName: Yup.string().required("Last Name is required"),
+  firstName: Yup.string().required("First Name is required").min(2, "First name must be at least 2 characters"),
+  lastName: Yup.string().required("Last Name is required").min(2, "First name must be at least 2 characters"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   phoneNumber: Yup.string()
     .required("phone number is required")
@@ -163,4 +163,24 @@ export const createPromotionSchema = Yup.object().shape({
 
   image: Yup.mixed<File | ImagePickerAsset>().optional(),
   expiry: Yup.date().nullable().min(new Date(), "Expiry date cannot be in the past").required("Expiry date is required"),
+});
+
+export const changeNameSchema = Yup.object().shape({
+  firstName: Yup.string().required("First name is required").min(2, "First name must be at least 2 characters"),
+  lastName: Yup.string().required("Last name is required").min(2, "Last name must be at least 2 characters"),
+});
+export const changePhoneNumberSchema = Yup.object({
+  newPhoneNumber: Yup.string()
+    .required("New phone number is required")
+    .matches(/^[0-9]{10,15}$/, "Phone number must be valid"),
+  confirmPhoneNumber: Yup.string()
+    .oneOf([Yup.ref("newPhoneNumber")], "Phone numbers must match")
+    .required("Please confirm your phone number"),
+});
+
+export const changePasswordSchema = Yup.object({
+  newPassword: Yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm Password is required"),
 });

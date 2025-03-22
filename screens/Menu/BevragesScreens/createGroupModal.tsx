@@ -34,7 +34,7 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(false);
+  const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
   useEffect(() => {
     prepare();
   }, []);
@@ -85,6 +85,7 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
         values.image || []
       );
 
+      console.log(response.data);
       if (response.data.success !== true) {
         Toast.error(parseError(response));
         setApiInUse(false);

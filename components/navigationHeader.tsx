@@ -9,9 +9,7 @@ type name = {
 
 let suraj: string | undefined;
 
-export default function NavigationHeader({ title, navigation }: { title: string; navigation: any }) {
-  //source={require('../assets/icon.png')}
-
+export default function NavigationHeader({ title, navigation }: { title: string; navigation?: any }) {
   return (
     <View style={styles.header}>
       <View style={styles.headerView}>

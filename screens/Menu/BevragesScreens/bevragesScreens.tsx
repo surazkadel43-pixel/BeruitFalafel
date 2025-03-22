@@ -57,6 +57,7 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
 
     setPages(itemResponse.data.pages);
     setBevrages(itemResponse.data.results);
+   
 
 
     setApiInUse(false);
@@ -169,7 +170,7 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
                   buttonName="manage"
                   buttonIsActive={true}
                   price={item.price}
-                  files={item.images || []}
+                  files={item.files || []}
                   isSmall={true}
                 />
               ))

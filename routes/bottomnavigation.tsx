@@ -2,13 +2,12 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import Profile from "../screens/profilepage";
+import NavigationHeader from "../components/navigationHeader";
 import Subcribed from "../screens/subcribedPage";
 import Drawer from "./drawer";
 import MenuDrawer from "./menuDrawer";
+import ProfileStackNavigator from "./profileNavigation/profileStacknavigator";
 import PromotionStackNavigator from "./promotionNavigation/promotionStackNavigator";
-import { recycledStyles } from "../components/recycled-style";
-import NavigationHeader from "../components/navigationHeader";
 
 const Tab = createBottomTabNavigator();
 
@@ -63,12 +62,25 @@ export default function BottomNavigation(navigation: any) {
             backgroundColor: "skyblue",
           },
           headerTitle: () => <NavigationHeader title="Promotion" navigation={navigation} />,
-          headerTitleAlign: 'center',
+          headerTitleAlign: "center",
           headerTitleStyle: { backgroundColor: "skyblue" },
         }}
       />
       <Tab.Screen name="Sucribed" component={Subcribed} options={{ title: "Stats" }} />
-      <Tab.Screen name="Profile" component={Profile} options={{ title: "Profile" }} />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStackNavigator}
+        options={{
+          title: "Profile",
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: "skyblue",
+          },
+          headerTitle: () => <NavigationHeader title="Profile" navigation={navigation} />,
+          headerTitleAlign: "center",
+          headerTitleStyle: { backgroundColor: "skyblue" },
+        }}
+      />
     </Tab.Navigator>
   );
 }

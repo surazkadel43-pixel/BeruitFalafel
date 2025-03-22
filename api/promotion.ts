@@ -1,22 +1,35 @@
-import { del, get, patch, post } from "./communications";
+import { del, get, imagePost, patch, post } from "./communications";
 
 const endpoint = "api/v1/promotion/";
 export async function createPromotion(
-  name: string = "",	
+  name: string = "",
   code: string = "",
-  description: string =  "",
-  expiry: Date = new Date(Date.now() + 24 * 60 * 60 * 1000), 
-  image: any[] = [] 
+  description: string = "",
+  expiry: Date = new Date(Date.now() + 24 * 60 * 60 * 1000),
+  image: any[] = []
 ) {
-  const response = await post(`${endpoint}create`, {
-    name: name,
-    code: code,
-    description: description,
-    expiry: expiry,
-  });
+  const formData = new FormData();
 
+  formData.append('name', name);
+  formData.append('code', code);
+  formData.append('description', description);
+  formData.append('expiry', expiry.toISOString()); // Use ISO string for date format
+
+  if (image && image.length > 0) {
+    for (const img of image) {
+      const imageInfo: any = {
+        uri: img.uri,
+        type: img.mimeType || 'image/jpeg',
+        name: img.fileName || 'image.jpg'
+      };
+      formData.append('images', imageInfo); // Assuming backend accepts 'images'
+    }
+  }
+
+  const response = await imagePost(`${endpoint}create`, formData);
   return response;
 }
+
 
 export async function getAllPromotion() {
   const response = await get(`${endpoint}all`);

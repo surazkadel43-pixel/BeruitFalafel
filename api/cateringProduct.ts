@@ -1,4 +1,4 @@
-import { del, get, patch, post } from "./communications";
+import { del, get, imagePatch, imagePost, patch, post } from "./communications";
 
 const endpoint = "api/v1/caterings/";
 
@@ -8,27 +8,39 @@ export async function createCateringProduct(
   discountedPrice: number,
   description: string,
   image: any[] = [],
-  productTypes: string[] = [], 
-  items: string[] = [], 
-  sauces: string[] = [], 
+  productTypes: string[] = [],
+  items: string[] = [],
+  sauces: string[] = [],
   beverages: string[] = [],
   meats: string[] = []
 ) {
-  const response = await post(`${endpoint}create`, {
-    name,
-    price,
-    discountedPrice,
-    description,
-    image,
-    productTypes,
-    items,
-    sauces,
-    beverages,
-    meats
-  });
+  const formData = new FormData();
 
+  formData.append('name', name);
+  formData.append('price', price.toString());
+  formData.append('discountedPrice', discountedPrice.toString());
+  formData.append('description', description);
+  formData.append('productTypes', JSON.stringify(productTypes));
+  formData.append('items', JSON.stringify(items));
+  formData.append('sauces', JSON.stringify(sauces));
+  formData.append('beverages', JSON.stringify(beverages));
+  formData.append('meats', JSON.stringify(meats));
+
+  if (image && image.length > 0) {
+    for (const img of image) {
+      const imageInfo: any = {
+        uri: img.uri,
+        type: img.mimeType || 'image/jpeg',
+        name: img.fileName || 'image.jpg'
+      };
+      formData.append('images', imageInfo);
+    }
+  }
+
+  const response = await imagePost(`${endpoint}create`, formData);
   return response;
 }
+
 
 export async function getAllCateringProducts() {
   const response = await get(`${endpoint}all`);
@@ -42,25 +54,40 @@ export async function editCateringProduct(
   discountedPrice: number,
   description: string,
   image: any[] = [],
-  productTypes: string[] = [], // ✅ Defaults to an empty array
-  items: string[] = [], // ✅ Defaults to an empty array
-  sauces: string[] = [], // ✅ Defaults to an empty array
-  beverages: string[] = [], // ✅ Defaults to an empty array
+  productTypes: string[] = [],
+  items: string[] = [],
+  sauces: string[] = [],
+  beverages: string[] = [],
   meats: string[] = []
 ) {
-  return await patch(`${endpoint}update/${productId}`, {
-    name,
-    price,
-    discountedPrice,
-    description,
-    image,
-    productTypes,
-    items,
-    sauces,
-    beverages,
-    meats
-  });
+  const formData = new FormData();
+
+  formData.append('productId', productId.toString()); // ✅ Include productId in body
+  formData.append('name', name);
+  formData.append('price', price.toString());
+  formData.append('discountedPrice', discountedPrice.toString());
+  formData.append('description', description);
+  formData.append('productTypes', JSON.stringify(productTypes));
+  formData.append('items', JSON.stringify(items));
+  formData.append('sauces', JSON.stringify(sauces));
+  formData.append('beverages', JSON.stringify(beverages));
+  formData.append('meats', JSON.stringify(meats));
+
+  if (image && image.length > 0) {
+    for (const img of image) {
+      const imageInfo: any = {
+        uri: img.uri,
+        type: img.mimeType || 'image/jpeg',
+        name: img.fileName || 'image.jpg'
+      };
+      formData.append('images', imageInfo); // 🔄 Assuming 'images' is the backend field
+    }
+  }
+
+  const response = await imagePatch(`${endpoint}update/${productId}`, formData);
+  return response;
 }
+
 
 export async function deleteCateringProduct(productId: string) {
   const response = await del(`${endpoint}delete/${productId}`);

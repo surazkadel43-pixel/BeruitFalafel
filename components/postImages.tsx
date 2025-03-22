@@ -12,8 +12,9 @@ export const PostImages: React.FC<PostImageProps> = ({ files, isSmall }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
 
+
   return (
-    <View>
+    <View style={styles.container}>
       {/* Image Carousel */}
       <PagerView
         style={[styles.pagerView, { height: isSmall ? 200 : 400 }]}
@@ -53,6 +54,9 @@ export const PostImages: React.FC<PostImageProps> = ({ files, isSmall }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 10,
+  },
   pagerView: {
     height: 400,
     flex: 1,
