@@ -167,7 +167,7 @@ export const createModalStyles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#1e2124",
-    padding: 15,
+    padding: 10,
     borderRadius: 8,
     borderWidth: 2,
     borderColor: "white",
@@ -201,5 +201,5 @@ export const imagePickerStyles = StyleSheet.create({
     borderRadius: 50,
     padding: 5,
   },
-  chooseImage: { flexDirection: "row", justifyContent: "space-between", marginTop: 10, gap: 5 },
+  chooseImage: { flexDirection: "row", justifyContent: "space-between", marginTop: 10,  flexWrap: "wrap" },
 });

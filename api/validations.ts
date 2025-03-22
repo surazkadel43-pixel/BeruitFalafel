@@ -172,7 +172,7 @@ export const changeNameSchema = Yup.object().shape({
 export const changePhoneNumberSchema = Yup.object({
   newPhoneNumber: Yup.string()
     .required("New phone number is required")
-    .matches(/^[0-9]{10,15}$/, "Phone number must be valid"),
+    .matches(/^\d{10}$/, "Phone number must be exactly 10 digits"),
   confirmPhoneNumber: Yup.string()
     .oneOf([Yup.ref("newPhoneNumber")], "Phone numbers must match")
     .required("Please confirm your phone number"),
@@ -181,6 +181,6 @@ export const changePhoneNumberSchema = Yup.object({
 export const changePasswordSchema = Yup.object({
   newPassword: Yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Passwords must match")
+    .oneOf([Yup.ref("newPassword")], "Passwords must match")
     .required("Confirm Password is required"),
 });

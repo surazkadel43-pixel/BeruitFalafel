@@ -3,13 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { deleteItem } from "../../../api/item";
+import { deleteSauce } from "../../../api/sauce";
 import { buttonBuilder } from "../../../components/button";
-import { CustomeDetailsCard, CustomeSauceCard } from "../../../components/customeDetailsCard";
+import { CustomeSauceCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-import { deleteSauce } from "../../../api/sauce";
+import { popWithParams } from "../../../utils/routes";
 export default function SauceDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
@@ -33,7 +33,7 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
     }
     setApiInUse(false);
     showAlert("Sucess", `Sauce deleted successfully  `, async () => {
-      navigation.goBack();
+      popWithParams(navigation, 1, { refresh: true });
     });
   };
 
@@ -68,6 +68,4 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
   );
 }
 
-const styles = StyleSheet.create({
-  
-});
+const styles = StyleSheet.create({});

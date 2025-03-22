@@ -12,7 +12,7 @@ import { inputBuilder } from "../../components/input";
 import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
 import { parseError } from "../../components/toasts";
 import { useRoute } from "@react-navigation/core";
-export default function EditPhoneNumber(navigation: any) {
+export default function EditPhoneNumber({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const route = useRoute();
   const { currentUser } = route.params as { currentUser: any };
@@ -34,15 +34,15 @@ export default function EditPhoneNumber(navigation: any) {
       setApiInUse(true);
 
       const updatedUser = await changePhoneNumber(values.newPhoneNumber);
-      if (updatedUser.status !== 200) {
+      if (updatedUser.status !== 200 && updatedUser.data.success !== true) {
         Toast.error(parseError(updatedUser));
         setApiInUse(false);
         return;
       }
 
       setApiInUse(false);
-      Toast.success(`Successfully changed the password!`);
-      showAlert("Sucess", `Successfully changed the password!`, async () => {
+      Toast.success(`Successfully changed the phone Number!`);
+      showAlert("Sucess", `Successfully changed the phoneNumber!`, async () => {
         navigation.goBack();
       });
     },
@@ -66,7 +66,7 @@ export default function EditPhoneNumber(navigation: any) {
               {inputBuilder("Confrim your new password", "confirmPhoneNumber", formik)}
             </View>
             <View style={styles.buttons}>
-              {buttonBuilder("Save", formik.handleSubmit, false, undefined, true)}
+              {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
               {buttonBuilder(
                 "Cancel",
                 () => {

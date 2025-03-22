@@ -7,7 +7,6 @@ export async function createSauce(
   description: string,
   foodPreferences: string[] // Array of dietary preferences
 ) {
- 
   const response = await post(`${endpoint}create`, {
     name: name,
     price: price,
@@ -24,7 +23,6 @@ export async function getAllSauces() {
 }
 
 export async function editSauce(itemId: number, name: string, price: number, description: string, foodPreferences: string[]) {
-  console.log(itemId, name, price, description, foodPreferences);
   return await patch(`${endpoint}update/${itemId}`, {
     name,
     price,
@@ -32,7 +30,6 @@ export async function editSauce(itemId: number, name: string, price: number, des
     foodPreferences,
   });
 }
-
 
 export async function deleteSauce(itemId: string) {
   return await del(`${endpoint}delete/${itemId}`);

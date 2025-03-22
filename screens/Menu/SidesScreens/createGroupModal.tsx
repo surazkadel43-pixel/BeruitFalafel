@@ -32,6 +32,7 @@ import { createSide } from "../../../api/sides";
 
 interface CreateSidesModal {
   onClose: () => void;
+  onRefresh: () => void;
 }
 
 const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
@@ -138,6 +139,7 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
 
       Toast.success("Successfully Sides created in!");
       showAlert("Sucess", `Successfully Sides created  `, async () => {
+        props.onRefresh();
         props.onClose();
       });
       setApiInUse(false);

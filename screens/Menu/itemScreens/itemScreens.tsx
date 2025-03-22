@@ -1,6 +1,7 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
@@ -16,16 +17,16 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(true);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  
-  const [items, setItems] = useState<any[]>([])
+  const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [items, setItems] = useState<any[]>([]);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshes, setRefreshes] = useState<number>(0);
+  const route = useRoute() as { params?: { refresh?: boolean } };
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
-     
       setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
@@ -49,6 +50,23 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
   useEffect(() => {
     prepare();
   }, []);
+  // 2. Refresh only after modal closes with new data
+
+  useEffect(() => {
+    if (shouldRefresh) {
+      prepare(); // ✅ Refresh after creation
+      setShouldRefresh(false);
+    }
+  }, [shouldRefresh]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.refresh) {
+        prepare();
+        navigation.setParams({ refresh: false }); // Reset the flag
+      }
+    }, [route.params?.refresh])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -118,7 +136,7 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
       loadMore();
-    } 
+    }
   }
 
   return (
@@ -168,7 +186,7 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreateGroupModal onClose={() => setModalVisible(false)} />
+          <CreateGroupModal onClose={() => setModalVisible(false)} onRefresh={() => setShouldRefresh(true)} />
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />
@@ -178,6 +196,4 @@ export default function ItemScreens({ navigation }: { navigation: any }) {
   );
 }
 
-const styles = StyleSheet.create({
-  
-});
+const styles = StyleSheet.create({});

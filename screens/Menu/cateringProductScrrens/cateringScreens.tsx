@@ -1,30 +1,28 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-
-import { getSide, searchSide } from "../../../api/sides";
+import { getCateringProduct, searchCateringProduct } from "../../../api/cateringProduct";
+import { CustomeMenuCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
 import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
-import { CustomeImageCard, CustomeMenuCard } from "../../../components/customeCard";
-import { getProduct } from "../../../api/product";
-import { getCateringProduct, searchCateringProduct } from "../../../api/cateringProduct";
-
 
 export default function CateringScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [shouldRefresh, setShouldRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [products, setProduct] = useState<any[]>([]);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const route = useRoute() as { params?: { refresh?: boolean } };
 
   const [refreshes, setRefreshes] = useState<number>(0);
 
@@ -54,6 +52,24 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
   useEffect(() => {
     prepare();
   }, []);
+
+
+
+  useEffect(() => {
+    if (shouldRefresh) {
+      prepare(); 
+      setShouldRefresh(false);
+    }
+  }, [shouldRefresh]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.refresh) {
+        prepare();
+        navigation.setParams({ refresh: false }); 
+      }
+    }, [route.params?.refresh])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -146,11 +162,9 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
               products.map((item) => (
                 <CustomeMenuCard
                   key={item.id}
-                  
                   title={item.name}
                   description={item.description}
                   menuTypes={item.menuTypes}
-                  
                   onPress={() => {
                     navigation.navigate("ProductDetails", { itemDetails: item });
                   }}
@@ -158,7 +172,7 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
                   buttonName="manage"
                   buttonIsActive={true}
                   price={item.price}
-                  files={item.images }
+                  files={item.images}
                   isSmall={true}
                 />
               ))
@@ -178,7 +192,7 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreateGroupModal onClose={() => setModalVisible(false)} />
+          <CreateGroupModal onClose={() => setModalVisible(false)} onRefresh={() => setShouldRefresh(true)}/>
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />

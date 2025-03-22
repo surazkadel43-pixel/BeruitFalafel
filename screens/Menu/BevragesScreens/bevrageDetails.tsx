@@ -9,6 +9,7 @@ import { CustomeBevrageCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
+import { popWithParams } from "../../../utils/routes";
 export default function BevrageDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
@@ -32,7 +33,7 @@ export default function BevrageDetailsScreens({ navigation }: { navigation: any 
     }
     setApiInUse(false);
     showAlert("Sucess", `Bevrages deleted successfully  `, async () => {
-      navigation.goBack();
+      popWithParams(navigation, 1, { refresh: true });
     });
   };
 
@@ -70,6 +71,4 @@ export default function BevrageDetailsScreens({ navigation }: { navigation: any 
   );
 }
 
-const styles = StyleSheet.create({
-  
-});
+const styles = StyleSheet.create({});

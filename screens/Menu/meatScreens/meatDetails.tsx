@@ -11,6 +11,7 @@ import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 
 import { deleteMeat } from "../../../api/meats";
+import { popWithParams } from "../../../utils/routes";
 
 export default function MeatDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
@@ -35,7 +36,7 @@ export default function MeatDetailsScreens({ navigation }: { navigation: any }) 
     }
     setApiInUse(false);
     showAlert("Sucess", `Meat deleted successfully  `, async () => {
-      navigation.goBack();
+      popWithParams(navigation, 1, { refresh: true });
     });
   };
 
@@ -70,6 +71,4 @@ export default function MeatDetailsScreens({ navigation }: { navigation: any }) 
   );
 }
 
-const styles = StyleSheet.create({
-  
-});
+const styles = StyleSheet.create({});

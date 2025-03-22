@@ -33,6 +33,8 @@ import { createProduct } from "../../../api/product";
 
 interface CreateProductModal {
   onClose: () => void;
+ 
+  onRefresh: () => void;
 }
 
 const CreateProductModal: React.FC<CreateProductModal> = (props) => {
@@ -139,6 +141,7 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
 
       Toast.success("Successfully Product created in!");
       showAlert("Sucess", `Successfully Product created  `, async () => {
+        props.onRefresh();
         props.onClose();
       });
       setApiInUse(false);
@@ -297,8 +300,8 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
               </View>
 
               <View style={imagePickerStyles.chooseImage}>
-                {buttonBuilder("Choose Image", pickImage, false, <Ionicons name="image" size={24} color="white" />)}
-                {buttonBuilder("Camera", openCamera, false, <Ionicons name="camera" size={24} color="white" />)}
+                {buttonBuilder("Choose Image", pickImage, apiInUse, <Ionicons name="image" size={24} color="white" />)}
+                {buttonBuilder("Camera", openCamera, apiInUse, <Ionicons name="camera" size={24} color="white" />)}
               </View>
 
               {buttonBuilder("Create", formik.handleSubmit, apiInUse)}

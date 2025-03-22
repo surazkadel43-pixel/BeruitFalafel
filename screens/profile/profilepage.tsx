@@ -40,7 +40,7 @@ export default function ProfileScreens({ navigation }: { navigation: any }) {
       return;
     }
     setCurrentUser(userResponse.data.user);
-    console.log(userResponse.data.user);
+
     setApiInUse(false);
   };
   const handelLogout = async () => {
@@ -69,7 +69,7 @@ export default function ProfileScreens({ navigation }: { navigation: any }) {
   };
 
   return (
-    <SafeAreaView style={recycledStyles.safeAreaView}>
+    <SafeAreaView style={[recycledStyles.safeAreaView, { paddingHorizontal: 0 }]}>
       <ToastManager {...toastManagerProps} />
       <Animated.ScrollView scrollEventThrottle={16} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <ProfileHeader

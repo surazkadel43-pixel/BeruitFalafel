@@ -17,6 +17,7 @@ import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
+import { popWithParams } from "../../../utils/routes";
 
 const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -100,9 +101,9 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Bevrage Edited in!");
+      
       showAlert("Sucess", `Successfully Edited created  `, async () => {
-        navigation.goBack();
+        popWithParams(navigation, 2, { refresh: true });
       });
       setApiInUse(false);
     },

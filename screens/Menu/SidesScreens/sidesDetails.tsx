@@ -7,10 +7,11 @@ import ToastManager, { Toast } from "toastify-react-native";
 import { buttonBuilder } from "../../../components/button";
 
 import { deleteSide } from "../../../api/sides";
+import { CustomeMenuCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-import { CustomeMenuCard } from "../../../components/customeDetailsCard";
+import { popWithParams } from "../../../utils/routes";
 export default function SidesDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
@@ -34,7 +35,7 @@ export default function SidesDetailsScreens({ navigation }: { navigation: any })
     }
     setApiInUse(false);
     showAlert("Sucess", `Sides deleted successfully  `, async () => {
-      navigation.goBack();
+      popWithParams(navigation, 1, { refresh: true });
     });
   };
 

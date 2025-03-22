@@ -23,6 +23,7 @@ import "../../../extension/extension";
 import showAlert from "../../../components/showAlert";
 interface CreateItemModal {
   onClose: () => void;
+  onRefresh: () => void;
 }
 
 const CreateItemModal: React.FC<CreateItemModal> = (props) => {
@@ -62,6 +63,7 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
 
       Toast.success("Successfully Item created in!");
       showAlert("Sucess", `Successfully Item created  `, async () => {
+        props.onRefresh();
         props.onClose();
       });
       setApiInUse(false);

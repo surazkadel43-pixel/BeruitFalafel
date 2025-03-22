@@ -1,29 +1,30 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
+
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getSauce, searchSauce } from "../../../api/sauce";
-import { getSide, searchSide } from "../../../api/sides";
+import { getProduct, searchProduct } from "../../../api/product";
+import { CustomeMenuCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
 import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
-import { CustomeImageCard, CustomeMenuCard } from "../../../components/customeCard";
-import { getProduct, searchProduct } from "../../../api/product";
+
 export default function ProductScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const route = useRoute() as { params?: { refresh?: boolean } };
   const [refreshing, setRefreshing] = useState(false);
   const [products, setProduct] = useState<any[]>([]);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-
   const [refreshes, setRefreshes] = useState<number>(0);
+  const [shouldRefresh, setShouldRefresh] = useState(false);
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
@@ -48,9 +49,29 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
     setRefreshing(false);
   }
 
+  // 1. Run once on initial screen mount
   useEffect(() => {
-    prepare();
+    prepare(); // ✅ Initial load
   }, []);
+
+  // 2. Refresh only after modal closes with new data
+  //const [shouldRefresh, setShouldRefresh] = useState(false);
+  useEffect(() => {
+    if (shouldRefresh) {
+      prepare(); // ✅ Refresh after creation
+      setShouldRefresh(false);
+    }
+  }, [shouldRefresh]);
+
+  //const route = useRoute() as { params?: { refresh?: boolean } };
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.refresh) {
+        prepare();
+        navigation.setParams({ refresh: false }); // Reset the flag
+      }
+    }, [route.params?.refresh])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -143,11 +164,9 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
               products.map((item) => (
                 <CustomeMenuCard
                   key={item.id}
-                  
                   title={item.name}
                   description={item.description}
-                  menuTypes={item.menuTypes}
-                  
+                  menuTypes={item.productTypes}
                   onPress={() => {
                     navigation.navigate("ProductDetails", { itemDetails: item });
                   }}
@@ -155,7 +174,7 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
                   buttonName="manage"
                   buttonIsActive={true}
                   price={item.price}
-                  files={item.images }
+                  files={item.files}
                   isSmall={true}
                 />
               ))
@@ -175,7 +194,7 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreateGroupModal onClose={() => setModalVisible(false)} />
+          <CreateGroupModal onClose={() => setModalVisible(false)}  onRefresh={() => setShouldRefresh(true)} />
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />

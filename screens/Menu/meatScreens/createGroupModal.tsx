@@ -23,6 +23,7 @@ import { parseError } from "../../../components/toasts";
 import CheckBoxExample from "../../../components/meatTypesDropDown";
 interface CreateMeatModal {
   onClose: () => void;
+  onRefresh: () => void;
 }
 
 const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
@@ -61,6 +62,7 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
      
       Toast.success("Successfully Meat item created in!");
       showAlert("Sucess", `Successfully Meat item created  `, async () => {
+        props.onRefresh();
         props.onClose();
       });
 

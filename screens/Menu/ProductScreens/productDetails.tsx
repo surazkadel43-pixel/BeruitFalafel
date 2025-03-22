@@ -3,14 +3,14 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-
 import { buttonBuilder } from "../../../components/button";
 
+import { deleteProduct } from "../../../api/product";
+import { CustomeMenuCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-import { CustomeMenuCard } from "../../../components/customeDetailsCard";
-import { deleteProduct } from "../../../api/product";
+import { popWithParams } from "../../../utils/routes";
 export default function ProductDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
@@ -33,9 +33,9 @@ export default function ProductDetailsScreens({ navigation }: { navigation: any 
       return;
     }
     setApiInUse(false);
-    Toast.success("Product deleted successfully");
+
     showAlert("Sucess", `Product deleted successfully  `, async () => {
-      navigation.goBack();
+      popWithParams(navigation, 1, { refresh: true });
     });
   };
 
@@ -49,10 +49,10 @@ export default function ProductDetailsScreens({ navigation }: { navigation: any 
             itemId={itemDetails.id}
             title={itemDetails.name}
             description={itemDetails.description}
-            foodTypes={itemDetails.drinkTypes}
+            foodTypes={itemDetails.productTypes}
             meats={itemDetails.meats}
             sauces={itemDetails.sauces}
-            bevrages={itemDetails.bevrages}
+            bevrages={itemDetails.beverages}
             items={itemDetails.items}
             icon="usd"
             price={itemDetails.price}
@@ -63,7 +63,7 @@ export default function ProductDetailsScreens({ navigation }: { navigation: any 
             {buttonBuilder(
               "Edit Product",
               () => {
-                navigation.navigate("ProductsEdit", { itemDetails });
+                navigation.navigate("ProductEdit", { itemDetails });
               },
               apiInUse,
               undefined,

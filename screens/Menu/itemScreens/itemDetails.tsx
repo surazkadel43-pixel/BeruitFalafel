@@ -9,6 +9,7 @@ import { CustomeDetailsCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
+import { popWithParams } from "../../../utils/routes";
 export default function ItemDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
@@ -24,10 +25,9 @@ export default function ItemDetailsScreens({ navigation }: { navigation: any }) 
   }, []);
   const handelDeleteItem = async () => {
     setApiInUse(true);
-   
+
     const deltedRes = await deleteItem(itemDetails.id);
     if (deltedRes.data.success !== true) {
-     
       Toast.error("deltedRes.data.error");
       Toast.error(parseError(deltedRes));
       setApiInUse(false);
@@ -35,7 +35,7 @@ export default function ItemDetailsScreens({ navigation }: { navigation: any }) 
     }
     setApiInUse(false);
     showAlert("Sucess", `Item deleted successfully  `, async () => {
-      navigation.goBack();
+      popWithParams(navigation, 1, { refresh: true });
     });
   };
 
@@ -70,6 +70,4 @@ export default function ItemDetailsScreens({ navigation }: { navigation: any }) 
   );
 }
 
-const styles = StyleSheet.create({
- 
-});
+const styles = StyleSheet.create({});

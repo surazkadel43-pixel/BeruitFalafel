@@ -12,7 +12,7 @@ import { buttonBuilder } from "../../components/button";
 import { inputBuilder } from "../../components/input";
 import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
 import { parseError } from "../../components/toasts";
-export default function EditName(navigation: any) {
+export default function EditName({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const route = useRoute();
   const { currentUser } = route.params as { currentUser: any };
@@ -35,7 +35,7 @@ export default function EditName(navigation: any) {
       setApiInUse(true);
 
       const updatedUser = await changeName(values.firstName, values.lastName);
-      if (updatedUser.status !== 200) {
+      if (updatedUser.status !== 200 && updatedUser.data.success !== true) {
         Toast.error(parseError(updatedUser));
         setApiInUse(false);
         return;

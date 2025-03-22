@@ -17,8 +17,7 @@ import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
-
-
+import { popWithParams } from "../../../utils/routes";
 
 const EditSides = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -100,9 +99,9 @@ const EditSides = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Sides Edited in!");
-      showAlert("Sucess", `Successfully Sides created  `, async () => {
-        navigation.goBack();
+      
+      showAlert("Sucess", `Successfully Sides edited  `, async () => {
+        popWithParams(navigation, 2, { refresh: true });
       });
       setApiInUse(false);
     },
@@ -255,7 +254,7 @@ const EditSides = ({ navigation }: { navigation: any }) => {
                 {buttonBuilder("Camera", openCamera, false, <Ionicons name="camera" size={24} color="white" />)}
               </View>
 
-             {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
+              {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
             </View>
           </ScrollView>
         </SafeAreaView>

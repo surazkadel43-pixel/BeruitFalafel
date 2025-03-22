@@ -1,6 +1,6 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
@@ -11,6 +11,7 @@ import searchContainer from "../../../components/searchContainer";
 import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 export default function MeatScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
@@ -18,10 +19,10 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
 
   const [refreshing, setRefreshing] = useState(false);
   const [meats, setMeats] = useState<any[]>([])
-
+  const route = useRoute() as { params?: { refresh?: boolean } };
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-
+  const [shouldRefresh, setShouldRefresh] = useState(false);
   const [refreshes, setRefreshes] = useState<number>(0);
 
   async function prepare(isRefreshing: boolean = false) {
@@ -52,6 +53,24 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
     prepare();
   }, []);
 
+  // 2. Refresh only after modal closes with new data
+   
+    useEffect(() => {
+      if (shouldRefresh) {
+        prepare(); // ✅ Refresh after creation
+        setShouldRefresh(false);
+      }
+    }, [shouldRefresh]);
+  
+    
+    useFocusEffect(
+      useCallback(() => {
+        if (route.params?.refresh) {
+          prepare();
+          navigation.setParams({ refresh: false }); // Reset the flag
+        }
+      }, [route.params?.refresh])
+    );
   const onRefresh = async () => {
     setRefreshing(true);
     prepare(true);
@@ -172,7 +191,7 @@ export default function MeatScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreateGroupModal onClose={() => setModalVisible(false)} />
+          <CreateGroupModal onClose={() => setModalVisible(false)}  onRefresh={() => setShouldRefresh(true)}/>
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />

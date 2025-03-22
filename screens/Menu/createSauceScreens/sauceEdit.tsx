@@ -14,6 +14,7 @@ import { createItemPropsStyles, createModalStyles, toastManagerProps } from "../
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
+import { popWithParams } from "../../../utils/routes";
 
 const EditSauce = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -59,9 +60,8 @@ const EditSauce = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Sacue Edited in!");
       showAlert("Sucess", `Successfully Sauce Edited  `, async () => {
-        navigation.goBack();
+        popWithParams(navigation, 2, { refresh: true });
       });
       setApiInUse(false);
     },

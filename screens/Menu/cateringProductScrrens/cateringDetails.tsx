@@ -6,12 +6,12 @@ import ToastManager, { Toast } from "toastify-react-native";
 
 import { buttonBuilder } from "../../../components/button";
 
+import { deleteCateringProduct } from "../../../api/cateringProduct";
+import { CustomeMenuCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
-import { CustomeMenuCard } from "../../../components/customeDetailsCard";
-import { deleteProduct } from "../../../api/product";
-import { deleteCateringProduct } from "../../../api/cateringProduct";
+import { popWithParams } from "../../../utils/routes";
 export default function CateringDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
@@ -34,9 +34,9 @@ export default function CateringDetailsScreens({ navigation }: { navigation: any
       return;
     }
     setApiInUse(false);
-    Toast.success("Catering deleted successfully");
+    
     showAlert("Sucess", `Catering deleted successfully  `, async () => {
-      navigation.goBack();
+      popWithParams(navigation, 1, { refresh: true });
     });
   };
 

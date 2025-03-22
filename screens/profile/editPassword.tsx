@@ -13,7 +13,7 @@ import { buttonBuilder } from "../../components/button";
 import { secureInputBuilder } from "../../components/input";
 import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
 import { parseError } from "../../components/toasts";
-export default function EditPassword(navigation: any) {
+export default function EditPassword({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
 
   async function prepare() {
@@ -34,7 +34,7 @@ export default function EditPassword(navigation: any) {
       setApiInUse(true);
 
       const updatedUser = await changePassword(values.newPassword, values.confirmPassword);
-      if (updatedUser.status !== 200) {
+      if (updatedUser.status !== 200 && updatedUser.data.success !== true) {
         Toast.error(parseError(updatedUser));
         setApiInUse(false);
         return;
@@ -57,7 +57,7 @@ export default function EditPassword(navigation: any) {
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback >
         <View style={{ flex: 1 }}>
           <ToastManager {...toastManagerProps} />
 

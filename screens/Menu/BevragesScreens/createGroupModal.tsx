@@ -28,6 +28,7 @@ import "../../../extension/extension";
 
 interface CreateBevrageModal {
   onClose: () => void;
+  onRefresh: () => void;
 }
 
 const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
@@ -94,6 +95,7 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
 
       Toast.success("Successfully Bevrage created in!");
       showAlert("Sucess", `Successfully Bevrage created  `, async () => {
+        props.onRefresh();
         props.onClose();
       });
       setApiInUse(false);

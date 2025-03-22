@@ -7,8 +7,8 @@ import { Dimensions, Image, Keyboard, ScrollView, Text, TouchableOpacity, Toucha
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { editSide } from "../../../api/sides";
-import { createProductSchema, createSideSchema } from "../../../api/validations";
+import { editCateringProduct } from "../../../api/cateringProduct";
+import { createProductSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import { BevragesCheckbox, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
@@ -17,10 +17,7 @@ import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
-import { editProduct } from "../../../api/product";
-import { editCateringProduct } from "../../../api/cateringProduct";
-
-
+import { popWithParams } from "../../../utils/routes";
 
 const EditCatering = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -102,14 +99,13 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Product Edited in!");
+  
       showAlert("Sucess", `Successfully Product created  `, async () => {
-        navigation.goBack();
+        popWithParams(navigation, 2, { refresh: true });
       });
       setApiInUse(false);
     },
   });
-
 
   const pickImage = async () => {
     const maxImages = canAttachMultipleImages ? 5 : 1;
@@ -257,7 +253,7 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
                 {buttonBuilder("Camera", openCamera, false, <Ionicons name="camera" size={24} color="white" />)}
               </View>
 
-             {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
+              {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
             </View>
           </ScrollView>
         </SafeAreaView>

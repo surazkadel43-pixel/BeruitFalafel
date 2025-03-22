@@ -231,6 +231,7 @@ export function ItemsCheckbox({ formik, valueName, expanded = false, items= [] }
   
   const [isExpanded, setIsExpanded] = useState(expanded);
   
+  
   const sidesOptions = items.map(item => ({
     label: item.name, 
     value: item.name, // Using name as value
@@ -290,9 +291,9 @@ export function SauceCheckbox({ formik, valueName, expanded = false, items= [] }
   
   const [isExpanded, setIsExpanded] = useState(expanded);
   
-  const sidesOptions = items.map(item => ({
+  const sauceOptions = items.map(item => ({
     label: item.name, 
-    value: item.name, // Using name as value
+    value: item.name, 
   }));
   
 
@@ -320,7 +321,7 @@ export function SauceCheckbox({ formik, valueName, expanded = false, items= [] }
         style={styles.accordionBox} // Custom box styling
       >
         <View style={styles.container}>
-          {sidesOptions.map((option) => (
+          {sauceOptions.map((option) => (
             <View key={option.value} style={styles.checkboxContainer}>
               <BouncyCheckbox
                 size={25}

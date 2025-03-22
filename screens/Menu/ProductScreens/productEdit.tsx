@@ -7,8 +7,12 @@ import { Dimensions, Image, Keyboard, ScrollView, Text, TouchableOpacity, Toucha
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { editSide } from "../../../api/sides";
-import { createProductSchema, createSideSchema } from "../../../api/validations";
+import { getAllBevrages } from "../../../api/bevrages";
+import { getAllItems } from "../../../api/item";
+import { getAllMeats } from "../../../api/meats";
+import { editProduct } from "../../../api/product";
+import { getAllSauces } from "../../../api/sauce";
+import { createProductSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
 import { BevragesCheckbox, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
@@ -17,9 +21,7 @@ import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
-import { editProduct } from "../../../api/product";
-
-
+import { popWithParams } from "../../../utils/routes";
 
 const EditProduct = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -28,10 +30,54 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
 
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
 
-  const route = useRoute(); // ✅ Get the route object
+  const route = useRoute();
   const { itemDetails } = route.params as { itemDetails: any };
+  const [items, setitems] = useState<any[]>([]);
+  const [bevrages, setBevrages] = useState<any[]>([]);
+  const [sauces, setSauces] = useState<any[]>([]);
+  const [meats, setMeats] = useState<any[]>([]);
 
   async function prepare() {
+    setApiInUse(false);
+    const itemRes = await getAllItems();
+
+    if (itemRes.data.success !== true) {
+      Toast.error(parseError(itemRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setitems(itemRes.data.items);
+
+    const sauceRes = await getAllSauces();
+    if (sauceRes.data.success !== true) {
+      Toast.error(parseError(sauceRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setSauces(sauceRes.data.sauces);
+
+    const bevrageRes = await getAllBevrages();
+    if (bevrageRes.data.success !== true) {
+      Toast.error(parseError(bevrageRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setBevrages(bevrageRes.data.results);
+
+    const MeatRes = await getAllMeats();
+    if (MeatRes.data.success !== true) {
+      Toast.error(parseError(MeatRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setMeats(MeatRes.data.results);
+  }
+
+  async function setValues() {
     setApiInUse(false);
     const formattedImages = itemDetails.files?.map((file: any) => ({ uri: file.presignedURL })) || [];
     formik.setValues({
@@ -40,10 +86,10 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
       description: itemDetails.description,
       discountedPrice: itemDetails.discountedPrice.toString().toCurrency(),
       image: formattedImages,
-      foodTypes: itemDetails.sidesTypes,
+      foodTypes: itemDetails.productTypes,
       items: itemDetails.items,
       sauces: itemDetails.sauces,
-      bevrages: itemDetails.bevrages,
+      bevrages: itemDetails.beverages,
       meats: itemDetails.meats,
     });
     setSelectedImages(formattedImages);
@@ -51,6 +97,7 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
 
   useEffect(() => {
     prepare();
+    setValues();
   }, []);
 
   const formik = useFormik({
@@ -75,9 +122,6 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      /**
-       * save sides  to server
-       */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
 
@@ -87,8 +131,9 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
         numericPrice, // Ensure price is a number
         numericDiscountPrice,
         values.description,
-        values.foodTypes,
         values.image || [],
+        values.foodTypes,
+
         values.items,
         values.sauces,
         values.bevrages,
@@ -101,14 +146,13 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Product Edited in!");
-      showAlert("Sucess", `Successfully Product created  `, async () => {
-        navigation.goBack();
+      //Toast.success("Successfully Product Edited in!");
+      showAlert("Sucess", `Successfully Product Edited  `, async () => {
+        popWithParams(navigation, 2, { refresh: true });
       });
       setApiInUse(false);
     },
   });
-
 
   const pickImage = async () => {
     const maxImages = canAttachMultipleImages ? 5 : 1;
@@ -213,10 +257,10 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
                 style: createItemPropsStyles.itemPrice,
               })}
               <SidesTypesCheckbox formik={formik} valueName="foodTypes" />
-              <ItemsCheckbox formik={formik} valueName="items" items={formik.values.items} />
-              <SauceCheckbox formik={formik} valueName="sauces" items={formik.values.sauces} />
-              <BevragesCheckbox formik={formik} valueName="bevrages" items={formik.values.bevrages} />
-              <MeatsCheckbox formik={formik} valueName="meats" items={formik.values.meats} />
+              <ItemsCheckbox formik={formik} valueName="items" items={items} />
+              <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
+              <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
+              <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
 
               {inputBuilder("Enter your Product Description", "description", formik, {
                 multiline: true,
@@ -252,11 +296,11 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
               </View>
 
               <View style={imagePickerStyles.chooseImage}>
-                {buttonBuilder("Choose Image", pickImage, false, <Ionicons name="image" size={24} color="white" />)}
-                {buttonBuilder("Camera", openCamera, false, <Ionicons name="camera" size={24} color="white" />)}
+                {buttonBuilder("Choose Image", pickImage, apiInUse, <Ionicons name="image" size={24} color="white" />)}
+                {buttonBuilder("Camera", openCamera, apiInUse, <Ionicons name="camera" size={24} color="white" />)}
               </View>
 
-             {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
+              {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}
             </View>
           </ScrollView>
         </SafeAreaView>

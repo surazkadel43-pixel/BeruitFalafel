@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Dimensions, Keyboard, ScrollView, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import ToastManager, { Toast } from "toastify-react-native";
-import { editSauce } from "../../../api/sauce";
+import { editMeat } from "../../../api/meats";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
@@ -13,7 +13,7 @@ import { createItemPropsStyles, createModalStyles, toastManagerProps } from "../
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
-import { editMeat } from "../../../api/meats";
+import { popWithParams } from "../../../utils/routes";
 
 const EditMeat = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -44,7 +44,6 @@ const EditMeat = ({ navigation }: { navigation: any }) => {
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
-     
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const itemResponse = await editMeat(
@@ -60,9 +59,8 @@ const EditMeat = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Meat Edited in!");
       showAlert("Sucess", `Successfully Meat Edited  `, async () => {
-        navigation.goBack();
+        popWithParams(navigation, 2, { refresh: true });
       });
       setApiInUse(false);
     },

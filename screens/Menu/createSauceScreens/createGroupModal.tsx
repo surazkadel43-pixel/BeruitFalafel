@@ -23,6 +23,7 @@ import "../../../extension/extension";
 import showAlert from "../../../components/showAlert";
 interface CreateSauceModal {
   onClose: () => void;
+  onRefresh: () => void;
 }
 
 const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
@@ -62,6 +63,7 @@ const CreateSauceModal: React.FC<CreateSauceModal> = (props) => {
      
       Toast.success("Successfully Sauce created in!");
       showAlert("Sucess", `Successfully Sauce created  `, async () => {
+        props.onRefresh();
         props.onClose();
       });
 

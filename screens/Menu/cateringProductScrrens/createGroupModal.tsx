@@ -32,6 +32,7 @@ import "../../../extension/extension";
 
 interface CreateCateringModal {
   onClose: () => void;
+  onRefresh: () => void;
 }
 
 const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
@@ -138,6 +139,7 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
 
       Toast.success("Successfully Product created in!");
       showAlert("Sucess", `Successfully Product created  `, async () => {
+        props.onRefresh();
         props.onClose();
       });
       setApiInUse(false);

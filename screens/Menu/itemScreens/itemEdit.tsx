@@ -13,6 +13,7 @@ import { createItemPropsStyles, createModalStyles, toastManagerProps } from "../
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
+import { popWithParams } from "../../../utils/routes";
 
 const EditItem = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -43,7 +44,6 @@ const EditItem = ({ navigation }: { navigation: any }) => {
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
-      
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const itemResponse = await editItem(
@@ -59,9 +59,8 @@ const EditItem = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      Toast.success("Successfully Item Edited in!");
       showAlert("Sucess", `Successfully Item Edited  `, async () => {
-        navigation.goBack();
+        popWithParams(navigation, 2, { refresh: true });
       });
       setApiInUse(false);
     },
@@ -70,7 +69,7 @@ const EditItem = ({ navigation }: { navigation: any }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }} keyboardShouldPersistTaps="handled">
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#12193D", paddingHorizontal: 10, paddingTop: 10 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#12193D", paddingTop: 10 }}>
           <View style={createModalStyles.container}>
             <ToastManager {...toastManagerProps} />
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>

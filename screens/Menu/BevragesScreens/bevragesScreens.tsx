@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
@@ -11,8 +12,6 @@ import searchContainer from "../../../components/searchContainer";
 import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
-import { Image } from "react-native";
-
 
 const images = [
   require("../../../assets/images/skewers.png"),
@@ -22,24 +21,20 @@ const images = [
   require("../../../assets/images/traditionalFalafelWrap.png"),
 ];
 
-
-
-
 export default function BevrageScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [bevrages, setBevrages] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [shouldRefresh, setShouldRefresh] = useState(false);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-
+  const route = useRoute() as { params?: { refresh?: boolean } };
   const [refreshes, setRefreshes] = useState<number>(0);
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
-      
       setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
@@ -53,12 +48,9 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
       setApiInUse(false);
       return;
     }
-   
 
     setPages(itemResponse.data.pages);
     setBevrages(itemResponse.data.results);
-   
-
 
     setApiInUse(false);
     setRefreshing(false);
@@ -67,6 +59,22 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
   useEffect(() => {
     prepare();
   }, []);
+
+  useEffect(() => {
+    if (shouldRefresh) {
+      prepare();
+      setShouldRefresh(false);
+    }
+  }, [shouldRefresh]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.refresh) {
+        prepare();
+        navigation.setParams({ refresh: false });
+      }
+    }, [route.params?.refresh])
+  );
 
   const formik = useFormik({
     initialValues: {
@@ -140,7 +148,6 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
     prepare(true);
   };
 
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={recycledStyles.safeAreaView}>
@@ -187,7 +194,7 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreateGroupModal onClose={() => setModalVisible(false)} />
+          <CreateGroupModal onClose={() => setModalVisible(false)} onRefresh={() => setShouldRefresh(true)} />
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />
@@ -197,8 +204,4 @@ export default function BevrageScreens({ navigation }: { navigation: any }) {
   );
 }
 
-const styles = StyleSheet.create({
-  
-
-  
-});
+const styles = StyleSheet.create({});
