@@ -17,13 +17,14 @@ import {
 import ToastManager, { Toast } from "toastify-react-native";
 import { getAllBevrages } from "../../../api/bevrages";
 import { createCateringProduct } from "../../../api/cateringProduct";
+import { getAllGenericItems } from "../../../api/genericItem";
 import { getAllItems } from "../../../api/item";
 import { getAllMeats } from "../../../api/meats";
 import { getAllSauces } from "../../../api/sauce";
 import { createProductSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { BevragesCheckbox, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { BevragesCheckbox, GenericItemsRadioButton, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -34,6 +35,12 @@ interface CreateCateringModal {
   onClose: () => void;
   onRefresh: () => void;
 }
+const genericNames = [
+  { id: "1", name: "Bowl" },
+  { id: "2", name: "Falafel Wrap" },
+  { id: "3", name: "Meat Wrap" },
+  { id: "4", name: "Plates" },
+];
 
 const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
@@ -43,6 +50,7 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
   const [bevrages, setBevrages] = useState<any[]>([]);
   const [sauces, setSauces] = useState<any[]>([]);
   const [meats, setMeats] = useState<any[]>([]);
+  const [genericItems, setGenericItems] = useState<any[]>(genericNames);
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
 
   async function prepare() {
@@ -83,6 +91,15 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
     }
 
     setMeats(MeatRes.data.results);
+
+    const genericItemRes = await getAllGenericItems();
+    if (genericItemRes.data.success !== true) {
+      Toast.error(parseError(genericItemRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setGenericItems(genericItemRes.data.results);
   }
 
   useEffect(() => {
@@ -101,6 +118,7 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
       sauces: [],
       bevrages: [],
       meats: [],
+      genericName: "",
     },
     validationSchema: createProductSchema,
     onSubmit: async (values) => {
@@ -118,17 +136,16 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
       const response = await createCateringProduct(
         values.name,
-        numericPrice, // Ensure price is a number
+        numericPrice,
         numericDiscountPrice,
         values.description,
-
         values.image || [],
         values.foodTypes,
         values.items,
         values.sauces,
-
         values.bevrages,
-        values.meats
+        values.meats,
+        values.genericName
       );
 
       if (response.data.success !== true) {
@@ -146,7 +163,6 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
     },
   });
 
-  
   const pickImage = async () => {
     const maxImages = canAttachMultipleImages ? 5 : 1;
     if (selectedImages.length >= maxImages) {
@@ -258,6 +274,7 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
+              <GenericItemsRadioButton formik={formik} valueName="genericName" items={genericItems} />
               <SidesTypesCheckbox formik={formik} valueName="foodTypes" />
               <ItemsCheckbox formik={formik} valueName="items" items={items} />
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />

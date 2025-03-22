@@ -164,15 +164,15 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
                   key={item.id}
                   title={item.name}
                   description={item.description}
-                  menuTypes={item.menuTypes}
+                  menuTypes={item.productTypes}
                   onPress={() => {
-                    navigation.navigate("ProductDetails", { itemDetails: item });
+                    navigation.navigate("CateringDetails", { itemDetails: item });
                   }}
                   icon="usd"
                   buttonName="manage"
                   buttonIsActive={true}
                   price={item.price}
-                  files={item.images}
+                  files={item.files}
                   isSmall={true}
                 />
               ))

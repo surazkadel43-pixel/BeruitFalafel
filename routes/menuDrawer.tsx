@@ -15,6 +15,8 @@ import SauceStackNavigator from "./sauceNavigation/sauceStackNavigation";
 import SidesStackNavigator from "./sidesNavigation/sideStackNavigator";
 import CateringStackNavigator from "./cateringNavigation/cateringStackNavigator";
 
+import GenericItemStackNavigator from "./genericNavigation/genericStackNavigator";
+
 const RootDrawerNavigator = createDrawerNavigator();
 export default function MenuDrawer(navigation: any) {
   return (
@@ -97,6 +99,16 @@ export default function MenuDrawer(navigation: any) {
         options={{
           drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
           headerTitle: () => <NavigationHeader title="Meat" navigation={navigation} />,
+          headerStyle: { backgroundColor: "skyblue" },
+        }}
+      />
+      
+      <RootDrawerNavigator.Screen
+        name="Generic"
+        component={GenericItemStackNavigator}
+        options={{
+          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
+          headerTitle: () => <NavigationHeader title="Generic" navigation={navigation} />,
           headerStyle: { backgroundColor: "skyblue" },
         }}
       />

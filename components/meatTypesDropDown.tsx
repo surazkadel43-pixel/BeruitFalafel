@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { List } from "react-native-paper";
-import { IconButton } from "react-native-paper";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { MaterialIcons } from "@expo/vector-icons";
+import { RadioButton } from 'react-native-paper';
 
 export default function CheckBoxExample({ formik, valueName }: { formik: any; valueName: string }) {
   const foodOptions = [
@@ -104,8 +104,7 @@ export function DrinkTypesCheckbox({ formik, valueName }: { formik: any; valueNa
   );
 }
 
-export function BevragesTypesCheckbox({ formik, valueName, expanded = false }: { formik: any; valueName: string, expanded?: boolean  }) {
-  
+export function BevragesTypesCheckbox({ formik, valueName, expanded = false }: { formik: any; valueName: string; expanded?: boolean }) {
   const [isExpanded, setIsExpanded] = useState(expanded);
   const drinkOptions = [
     { label: "Soda", value: "Soda" },
@@ -135,7 +134,7 @@ export function BevragesTypesCheckbox({ formik, valueName, expanded = false }: {
         onPress={() => setIsExpanded(!isExpanded)}
         titleStyle={styles.accordionTitle} // Custom title style
         left={(props) => <List.Icon {...props} icon="glass-mug-variant" color="white" />}
-        right={(props) => <List.Icon {...props} icon="chevron-down" color="white"  />} // Custom right icon
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />} // Custom right icon
         style={styles.accordionBox} // Custom box styling
       >
         <View style={styles.container}>
@@ -165,10 +164,19 @@ export function BevragesTypesCheckbox({ formik, valueName, expanded = false }: {
   );
 }
 
-export function SidesTypesCheckbox({ formik, valueName, expanded = false, items= [] }: { formik: any; valueName: string, expanded?: boolean, items?: any[] }) {
-  
+export function SidesTypesCheckbox({
+  formik,
+  valueName,
+  expanded = false,
+  items = [],
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+  items?: any[];
+}) {
   const [isExpanded, setIsExpanded] = useState(expanded);
-  
+
   const sidesOptions = [
     { label: "Vegan", value: "V" },
     { label: "Dairy-Free", value: "DF" },
@@ -197,7 +205,7 @@ export function SidesTypesCheckbox({ formik, valueName, expanded = false, items=
         onPress={() => setIsExpanded(!isExpanded)}
         titleStyle={styles.accordionTitle} // Custom title style
         left={(props) => <List.Icon {...props} icon="glass-mug-variant" color="white" />}
-        right={(props) => <List.Icon {...props} icon="chevron-down" color="white"  />} // Custom right icon
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />} // Custom right icon
         style={styles.accordionBox} // Custom box styling
       >
         <View style={styles.container}>
@@ -227,16 +235,23 @@ export function SidesTypesCheckbox({ formik, valueName, expanded = false, items=
   );
 }
 
-export function ItemsCheckbox({ formik, valueName, expanded = false, items= [] }: { formik: any; valueName: string, expanded?: boolean, items?: any[] }) {
-  
+export function ItemsCheckbox({
+  formik,
+  valueName,
+  expanded = false,
+  items = [],
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+  items?: any[];
+}) {
   const [isExpanded, setIsExpanded] = useState(expanded);
-  
-  
-  const sidesOptions = items.map(item => ({
-    label: item.name, 
+
+  const sidesOptions = items.map((item) => ({
+    label: item.name,
     value: item.name, // Using name as value
   }));
-  
 
   const toggleSelection = (value: string) => {
     let currentValues = formik.values[valueName] || [];
@@ -258,7 +273,7 @@ export function ItemsCheckbox({ formik, valueName, expanded = false, items= [] }
         onPress={() => setIsExpanded(!isExpanded)}
         titleStyle={styles.accordionTitle} // Custom title style
         left={(props) => <List.Icon {...props} icon="food" color="white" />}
-        right={(props) => <List.Icon {...props} icon="chevron-down" color="white"  />} // Custom right icon
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />} // Custom right icon
         style={styles.accordionBox} // Custom box styling
       >
         <View style={styles.container}>
@@ -287,15 +302,23 @@ export function ItemsCheckbox({ formik, valueName, expanded = false, items= [] }
     </View>
   );
 }
-export function SauceCheckbox({ formik, valueName, expanded = false, items= [] }: { formik: any; valueName: string, expanded?: boolean, items?: any[] }) {
-  
+export function SauceCheckbox({
+  formik,
+  valueName,
+  expanded = false,
+  items = [],
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+  items?: any[];
+}) {
   const [isExpanded, setIsExpanded] = useState(expanded);
-  
-  const sauceOptions = items.map(item => ({
-    label: item.name, 
-    value: item.name, 
+
+  const sauceOptions = items.map((item) => ({
+    label: item.name,
+    value: item.name,
   }));
-  
 
   const toggleSelection = (value: string) => {
     let currentValues = formik.values[valueName] || [];
@@ -317,7 +340,7 @@ export function SauceCheckbox({ formik, valueName, expanded = false, items= [] }
         onPress={() => setIsExpanded(!isExpanded)}
         titleStyle={styles.accordionTitle} // Custom title style
         left={(props) => <List.Icon {...props} icon="food" color="white" />}
-        right={(props) => <List.Icon {...props} icon="chevron-down" color="white"  />} // Custom right icon
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />} // Custom right icon
         style={styles.accordionBox} // Custom box styling
       >
         <View style={styles.container}>
@@ -347,15 +370,23 @@ export function SauceCheckbox({ formik, valueName, expanded = false, items= [] }
   );
 }
 
-export function BevragesCheckbox({ formik, valueName, expanded = false, items= [] }: { formik: any; valueName: string, expanded?: boolean, items?: any[] }) {
-  
+export function BevragesCheckbox({
+  formik,
+  valueName,
+  expanded = false,
+  items = [],
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+  items?: any[];
+}) {
   const [isExpanded, setIsExpanded] = useState(expanded);
-  
-  const sidesOptions = items.map(item => ({
-    label: item.name, 
+
+  const sidesOptions = items.map((item) => ({
+    label: item.name,
     value: item.name, // Using name as value
   }));
-  
 
   const toggleSelection = (value: string) => {
     let currentValues = formik.values[valueName] || [];
@@ -377,7 +408,7 @@ export function BevragesCheckbox({ formik, valueName, expanded = false, items= [
         onPress={() => setIsExpanded(!isExpanded)}
         titleStyle={styles.accordionTitle} // Custom title style
         left={(props) => <List.Icon {...props} icon="glass-mug-variant" color="white" />}
-        right={(props) => <List.Icon {...props} icon="chevron-down" color="white"  />} // Custom right icon
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />} // Custom right icon
         style={styles.accordionBox} // Custom box styling
       >
         <View style={styles.container}>
@@ -407,15 +438,23 @@ export function BevragesCheckbox({ formik, valueName, expanded = false, items= [
   );
 }
 
-export function MeatsCheckbox({ formik, valueName, expanded = false, items= [] }: { formik: any; valueName: string, expanded?: boolean, items?: any[] }) {
-  
+export function MeatsCheckbox({
+  formik,
+  valueName,
+  expanded = false,
+  items = [],
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+  items?: any[];
+}) {
   const [isExpanded, setIsExpanded] = useState(expanded);
-  
-  const sidesOptions = items.map(item => ({
-    label: item.name, 
+
+  const sidesOptions = items.map((item) => ({
+    label: item.name,
     value: item.name, // Using name as value
   }));
-  
 
   const toggleSelection = (value: string) => {
     let currentValues = formik.values[valueName] || [];
@@ -437,7 +476,7 @@ export function MeatsCheckbox({ formik, valueName, expanded = false, items= [] }
         onPress={() => setIsExpanded(!isExpanded)}
         titleStyle={styles.accordionTitle} // Custom title style
         left={(props) => <List.Icon {...props} icon="cow" color="white" />}
-        right={(props) => <List.Icon {...props} icon="chevron-down" color="white"  />} // Custom right icon
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />} // Custom right icon
         style={styles.accordionBox} // Custom box styling
       >
         <View style={styles.container}>
@@ -467,6 +506,71 @@ export function MeatsCheckbox({ formik, valueName, expanded = false, items= [] }
   );
 }
 
+export function GenericItemsRadioButton({
+  formik,
+  valueName,
+  expanded = false,
+  items = [],
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+  items?: any[];
+}) {
+  const [isExpanded, setIsExpanded] = useState(expanded);
+
+  const sidesOptions = items.map((item) => ({
+    label: item.name,
+    value: item.name,
+  }));
+
+  const selectedValue = formik.values[valueName] || "";
+
+  const handleChange = (value: string) => {
+    formik.setFieldValue(valueName, value);
+  };
+
+  return (
+    <View style={styles.accordionContainer}>
+      <List.Accordion
+        title="Add Generic name"
+        expanded={isExpanded}
+        onPress={() => setIsExpanded(!isExpanded)}
+        titleStyle={styles.accordionTitle}
+        left={(props) => <List.Icon {...props} icon="food" color="white" />}
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />}
+        style={styles.accordionBox}
+      >
+        <RadioButton.Group onValueChange={handleChange} value={selectedValue}>
+          {sidesOptions.map((option) => (
+            <View key={option.value} style={styles.checkboxContainer}>
+              <RadioButton.Item
+                label={option.label}
+                value={option.value}
+                mode="android"
+                labelStyle={styles.checkboxLabel}
+                color="#ff9900"
+                uncheckedColor="#ccc"
+                position="leading"
+                style={{ paddingVertical: 1, marginVertical: 0 }}
+              />
+            </View>
+          ))}
+        </RadioButton.Group>
+
+        {/* ✅ Display selected item */}
+        <Text style={styles.selectedText}>
+          Selected: {selectedValue || "None"}
+        </Text>
+      </List.Accordion>
+
+      {/* ✅ Display error message if validation fails */}
+      {formik.touched[valueName] && formik.errors[valueName] ? (
+        <Text style={styles.errorText}>{formik.errors[valueName]}</Text>
+      ) : null}
+    </View>
+  );
+}
 interface DatePickerFieldProps {
   formik: any;
   valueName: string;
@@ -478,21 +582,19 @@ export function DatePickerField({ formik, valueName, title = "Select Expiry Date
 
   const handleChange = (_event: any, selectedDate?: Date) => {
     setShowPicker(false);
-  
+
     if (selectedDate) {
       // Format manually to YYYY-MM-DD to avoid timezone issues
       const year = selectedDate.getFullYear();
-      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getDate()).padStart(2, '0');
-  
+      const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+      const day = String(selectedDate.getDate()).padStart(2, "0");
+
       const formatted = `${year}-${month}-${day}`; // 👈 "2025-03-23"
       formik.setFieldValue(valueName, formatted);
     }
   };
 
-  const formattedDate = formik.values[valueName]
-    ? new Date(formik.values[valueName]).toLocaleDateString()
-    : "No date selected";
+  const formattedDate = formik.values[valueName] ? new Date(formik.values[valueName]).toLocaleDateString() : "No date selected";
 
   return (
     <View style={styles.accordionContainer}>
@@ -503,14 +605,7 @@ export function DatePickerField({ formik, valueName, title = "Select Expiry Date
           titleStyle={styles.accordionTitle}
           descriptionStyle={{ color: "#ccc" }}
           left={(props) => <List.Icon {...props} icon="calendar" color="white" />}
-          right={(props) => (
-            <MaterialIcons
-              name="edit-calendar"
-              size={24}
-              color="white"
-              style={{ alignSelf: "center", marginRight: 10 }}
-            />
-          )}
+          right={(props) => <MaterialIcons name="edit-calendar" size={24} color="white" style={{ alignSelf: "center", marginRight: 10 }} />}
           style={styles.accordionBox}
         />
       </TouchableOpacity>
@@ -518,11 +613,7 @@ export function DatePickerField({ formik, valueName, title = "Select Expiry Date
       {/* Date picker only shown when toggled */}
       {showPicker && (
         <DateTimePicker
-          value={
-            formik.values[valueName]
-              ? new Date(formik.values[valueName])
-              : new Date()
-          }
+          value={formik.values[valueName] ? new Date(formik.values[valueName]) : new Date()}
           mode="date"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={handleChange}
@@ -531,13 +622,10 @@ export function DatePickerField({ formik, valueName, title = "Select Expiry Date
       )}
 
       {/* Show validation error if touched and error exists */}
-      {formik.touched[valueName] && formik.errors[valueName] ? (
-        <Text style={styles.errorText}>{formik.errors[valueName]}</Text>
-      ) : null}
+      {formik.touched[valueName] && formik.errors[valueName] ? <Text style={styles.errorText}>{formik.errors[valueName]}</Text> : null}
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   accordionContainer: {
@@ -555,7 +643,7 @@ const styles = StyleSheet.create({
   accordionTitle: {
     fontSize: 20,
     fontWeight: "400",
-    color: "white", 
+    color: "white",
   },
   container: {
     flex: 1,
@@ -564,7 +652,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1f24",
     borderRadius: 10,
     borderWidth: 2,
-    
+
     borderColor: "#fff",
   },
   accordion: {
@@ -597,6 +685,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 20,
     color: "#fff",
-
   },
 });

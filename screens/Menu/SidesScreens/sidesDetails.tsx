@@ -49,10 +49,10 @@ export default function SidesDetailsScreens({ navigation }: { navigation: any })
             itemId={itemDetails.id}
             title={itemDetails.name}
             description={itemDetails.description}
-            foodTypes={itemDetails.drinkTypes}
+            foodTypes={itemDetails.sidesTypes}
             meats={itemDetails.meats}
             sauces={itemDetails.sauces}
-            bevrages={itemDetails.bevrages}
+            bevrages={itemDetails.beverages}
             items={itemDetails.items}
             icon="usd"
             price={itemDetails.price}

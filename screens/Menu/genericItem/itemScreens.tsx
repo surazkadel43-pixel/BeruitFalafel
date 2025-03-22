@@ -5,24 +5,25 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getSide, searchSide } from "../../../api/sides";
-import { CustomeMenuCard } from "../../../components/customeCard";
+import { getItem, searchItem } from "../../../api/genericItem";
+import { CustomeGenericCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
 import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
 import CreateGroupModal from "./createGroupModal";
-export default function SidesScreens({ navigation }: { navigation: any }) {
-  const [apiInUse, setApiInUse] = useState(false);
+
+export default function GenericItemScreens({ navigation }: { navigation: any }) {
+  const [apiInUse, setApiInUse] = useState(true);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [sides, setSides] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const route = useRoute() as { params?: { refresh?: boolean } };
+  const [refreshing, setRefreshing] = useState(false);
   const [refreshes, setRefreshes] = useState<number>(0);
+  const route = useRoute() as { params?: { refresh?: boolean } };
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
@@ -31,7 +32,7 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
 
-    const itemResponse = await getSide();
+    const itemResponse = await getItem();
 
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
@@ -39,9 +40,8 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
       setApiInUse(false);
       return;
     }
-
     setPages(itemResponse.data.pages);
-    setSides(itemResponse.data.results);
+    setItems(itemResponse.data.items);
 
     setApiInUse(false);
     setRefreshing(false);
@@ -50,10 +50,11 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   useEffect(() => {
     prepare();
   }, []);
+  // 2. Refresh only after modal closes with new data
 
   useEffect(() => {
     if (shouldRefresh) {
-      prepare();
+      prepare(); // ✅ Refresh after creation
       setShouldRefresh(false);
     }
   }, [shouldRefresh]);
@@ -62,7 +63,7 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
     useCallback(() => {
       if (route.params?.refresh) {
         prepare();
-        navigation.setParams({ refresh: false });
+        navigation.setParams({ refresh: false }); // Reset the flag
       }
     }, [route.params?.refresh])
   );
@@ -73,16 +74,16 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   };
   const formik = useFormik({
     initialValues: {
-      sideName: "",
+      itemName: "",
     },
     validationSchema: null,
     onSubmit: async (values) => {
       setButtonVisible(false);
-      fetchSides(values.sideName);
+      fetchItem(values.itemName);
     },
   });
 
-  const fetchSides = async (query: string) => {
+  const fetchItem = async (query: string) => {
     if (query.trim() === "") {
       prepare(true);
       return;
@@ -90,9 +91,9 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
     try {
-      const itemSearchRes = await searchSide(query);
+      const itemSearchRes = await searchItem(query);
       if (itemSearchRes.data.success === true) {
-        setSides(itemSearchRes.data.results);
+        setItems(itemSearchRes.data.items);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
@@ -101,16 +102,6 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
   };
-  // Debounced search to prevent excessive API calls
-  useEffect(() => {
-    setButtonVisible(true);
-    const delayDebounce = setTimeout(() => {
-      fetchSides(formik.values.sideName);
-    }, 500);
-
-    return () => clearTimeout(delayDebounce); // Cleanup function
-  }, [formik.values.sideName]);
-
   async function loadMore() {
     if (apiInUse) {
       return;
@@ -118,24 +109,32 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
 
-    const itemResponse = await getSide(currentPage + 1, sides[sides.length - 1].id);
-    if (itemResponse.data.success !== true) {
-      Toast.error(parseError(itemResponse));
+    const postReq = await getItem(currentPage + 1, items[items.length - 1].id);
+    if (postReq.data.success !== true) {
+      Toast.error(parseError(postReq));
     } else {
-      setSides([...sides, ...itemResponse.data.results] as []);
+      setItems([...items, ...postReq.data.results] as []);
       setCurrentPage(currentPage + 1);
     }
 
     setApiInUse(false);
   }
+  // Debounced search to prevent excessive API calls
+  useEffect(() => {
+    setButtonVisible(true);
+    const delayDebounce = setTimeout(() => {
+      fetchItem(formik.values.itemName);
+    }, 500); // Delay search by 500ms after user stops typing
+
+    return () => clearTimeout(delayDebounce); // Cleanup function
+  }, [formik.values.itemName]);
+
   function onScroll(event: any) {
     if (apiInUse || currentPage === pages) {
       return;
     }
-
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 900) {
-      console.log("loading more, 1000", apiInUse, currentPage, pages);
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
       loadMore();
     }
   }
@@ -143,7 +142,6 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView key={refreshes} style={recycledStyles.safeAreaView}>
-        <ToastManager {...toastManagerProps} />
         <ScrollView
           onScroll={onScroll}
           scrollEventThrottle={16}
@@ -151,30 +149,28 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "sideName")}</View>
+          <ToastManager {...toastManagerProps} />
+          <View style={{}}>{searchContainer(formik, buttonVisible, apiInUse, "itemName")}</View>
 
           <ScrollView>
-            {sides.length > 0 ? (
-              sides.map((item) => (
-                <CustomeMenuCard
+            {items.length > 0 ? (
+              items.map((item) => (
+                <CustomeGenericCard
                   key={item.id}
+                  itemId={item.id}
                   title={item.name}
                   description={item.description}
-                  menuTypes={item.sidesTypes}
+                  foodTypes={item.foodPreferences}
                   onPress={() => {
-                    navigation.navigate("SidesDetails", { itemDetails: item });
+                    navigation.navigate("GenericItemDetail", { itemDetails: item });
                   }}
-                  icon="usd"
                   buttonName="manage"
                   buttonIsActive={true}
-                  price={item.price}
-                  files={item.files}
-                  isSmall={true}
                 />
               ))
             ) : (
               <NoResultsCard
-                message={"Sorry, No Item found In the Sides."}
+                message={"Sorry, No Item found In the Menu."}
                 additionalProps={{ icon: <FontAwesome name="cutlery" size={30} color="white" /> }}
               />
             )}
@@ -198,6 +194,4 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   );
 }
 
-const styles = StyleSheet.create({
-  //recycledStyles
-});
+const styles = StyleSheet.create({});

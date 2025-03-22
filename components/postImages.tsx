@@ -1,47 +1,50 @@
 import React, { useState } from "react";
-import { Image, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
-import PagerView from "react-native-pager-view";
+import { Dimensions, FlatList, Image, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import ZoomImageModal from "./zoomImageModals";
 
+const { width } = Dimensions.get("window");
+
 interface PostImageProps {
-  files: any[] ;
+  files: any[];
   isSmall?: boolean;
 }
 
 export const PostImages: React.FC<PostImageProps> = ({ files, isSmall }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(width); // default fallback
 
 
   return (
-    <View style={styles.container}>
-      {/* Image Carousel */}
-      <PagerView
-        style={[styles.pagerView, { height: isSmall ? 200 : 400 }]}
-        initialPage={0}
-        onPageSelected={(event) => setCurrentIndex(event.nativeEvent.position)}
-      >
-        {files.map((item, index) => (
-          <TouchableWithoutFeedback key={index} onPress={() => setModalVisible(true)}>
-            <View style={styles.page}>
-              <Image
-                source={{ uri: item.presignedURL }}
-                style={[styles.postImage, isSmall && styles.reducedImageSize]}
-                resizeMode="contain"
-              />
+    <View onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
+      <FlatList
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        data={files}
+        keyExtractor={(_, index) => index.toString()}
+        onMomentumScrollEnd={(event) => {
+          const newIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+          setCurrentIndex(newIndex);
+        }}
+        renderItem={({ item }) => (
+          <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
+            <View
+              style={{
+                width: containerWidth,
+                height: isSmall ? 200 : 400,
+              }}
+            >
+              <Image source={{ uri: item.presignedURL }} style={[isSmall ? styles.reducedImageSize : styles.image]} resizeMode="contain" />
             </View>
           </TouchableWithoutFeedback>
-        ))}
-      </PagerView>
-
-      {/* Zoom Image Modal (Single instance) */}
-      <ZoomImageModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        source={files[currentIndex]} // Shows the currently selected image
+        )}
       />
 
-      {/* Pagination Dots */}
+      {/* Zoom Image Modal */}
+      <ZoomImageModal visible={modalVisible} onClose={() => setModalVisible(false)} source={files[currentIndex]} />
+
+      {/* Pagination */}
       {files.length > 1 && (
         <View style={styles.pagination}>
           {files.map((_, index) => (
@@ -54,16 +57,21 @@ export const PostImages: React.FC<PostImageProps> = ({ files, isSmall }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 10,
+  image: {
+    width: "100%",
+    height: "100%",
+    alignSelf: "center",
   },
-  pagerView: {
-    height: 400,
-    flex: 1,
+  reducedImageSize: {
+    width: "50%",
+    height: "100%",
+    alignSelf: "center",
   },
-  page: {
+  pagination: {
+    flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
+    marginTop: 5,
+    marginBottom: 10,
   },
   dot: {
     width: 8,
@@ -74,17 +82,5 @@ const styles = StyleSheet.create({
   },
   activeDot: {
     backgroundColor: "white",
-  },
-  postImage: {
-    width: "100%",
-    height: "100%",
-  },
-  reducedImageSize: {
-    width: "50%",
-  },
-  pagination: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 8,
   },
 });

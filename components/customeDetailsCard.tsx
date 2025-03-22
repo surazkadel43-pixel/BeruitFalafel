@@ -62,7 +62,7 @@ export const CustomeDetailsCard: React.FC<CustomeCardProps> = ({
   description = "No description available",
   price = "$0.00",
   foodTypes = [],
-  icon,
+  icon = "usd",
 }) => {
   const formattedFoodTypes = foodTypes.map((type) => foodOptions.find((option) => option.value === type)?.label || type).join(", ");
   return (
@@ -85,6 +85,39 @@ export const CustomeDetailsCard: React.FC<CustomeCardProps> = ({
           <FontAwesome name={icon} size={18} color="white" />
           <Text style={styles.followers}>{price}</Text>
         </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>
+            <Text style={styles.groupName}>Item Description :</Text> {description}
+          </Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}> Food Types: </Text>
+          <Text style={[styles.followers, { fontWeight: "bold" }]}>{formattedFoodTypes.length > 0 ? formattedFoodTypes : "None"}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+export const CustomeGenericDetailsCard: React.FC<CustomeCardProps> = ({
+  itemId = "N/A",
+  title = "Untitled",
+  description = "No description available",
+  foodTypes = [],
+}) => {
+  const formattedFoodTypes = foodTypes.map((type) => foodOptions.find((option) => option.value === type)?.label || type).join(", ");
+  return (
+    <TouchableOpacity style={styles.groupCard} activeOpacity={1}>
+      <View style={styles.groupInfo}>
+        <View style={[styles.followerContainer, { flexDirection: "column", alignItems: "flex-start" }]}>
+          <Text style={styles.followers}>
+            {" "}
+            <Text style={styles.groupName}>Item Id :</Text> {itemId}
+          </Text>
+          <Text style={styles.followers}>
+            <Text style={styles.groupName}>Item Name :</Text> {title}
+          </Text>
+        </View>
+
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>
             <Text style={styles.groupName}>Item Description :</Text> {description}

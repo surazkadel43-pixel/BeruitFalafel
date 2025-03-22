@@ -7,11 +7,23 @@ import { Dimensions, Image, Keyboard, ScrollView, Text, TouchableOpacity, Toucha
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
+import { getAllBevrages } from "../../../api/bevrages";
 import { editCateringProduct } from "../../../api/cateringProduct";
+import { getAllGenericItems } from "../../../api/genericItem";
+import { getAllItems } from "../../../api/item";
+import { getAllMeats } from "../../../api/meats";
+import { getAllSauces } from "../../../api/sauce";
 import { createProductSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { BevragesCheckbox, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import {
+  BevragesCheckbox,
+  GenericItemsRadioButton,
+  ItemsCheckbox,
+  MeatsCheckbox,
+  SauceCheckbox,
+  SidesTypesCheckbox,
+} from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -19,17 +31,79 @@ import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
 import { popWithParams } from "../../../utils/routes";
 
+const genericNames = [
+  { id: "1", name: "Bowl" },
+  { id: "2", name: "Falafel Wrap" },
+  { id: "3", name: "Meat Wrap" },
+  { id: "4", name: "Plates" },
+];
+
 const EditCatering = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+  const [items, setitems] = useState<any[]>([]);
+  const [bevrages, setBevrages] = useState<any[]>([]);
+  const [sauces, setSauces] = useState<any[]>([]);
+  const [meats, setMeats] = useState<any[]>([]);
+  const [genericItems, setGenericItems] = useState<any[]>(genericNames);
+
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
 
-  const route = useRoute(); // ✅ Get the route object
+  const route = useRoute();
   const { itemDetails } = route.params as { itemDetails: any };
 
   async function prepare() {
+    setApiInUse(false);
+    const itemRes = await getAllItems();
+
+    if (itemRes.data.success !== true) {
+      Toast.error(parseError(itemRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setitems(itemRes.data.items);
+
+    const sauceRes = await getAllSauces();
+    if (sauceRes.data.success !== true) {
+      Toast.error(parseError(sauceRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setSauces(sauceRes.data.sauces);
+
+    const bevrageRes = await getAllBevrages();
+    if (bevrageRes.data.success !== true) {
+      Toast.error(parseError(bevrageRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setBevrages(bevrageRes.data.results);
+
+    const MeatRes = await getAllMeats();
+    if (MeatRes.data.success !== true) {
+      Toast.error(parseError(MeatRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setMeats(MeatRes.data.results);
+
+    const genericItemRes = await getAllGenericItems();
+    if (genericItemRes.data.success !== true) {
+      Toast.error(parseError(genericItemRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setGenericItems(genericItemRes.data.results);
+  }
+
+  async function setValues() {
     setApiInUse(false);
     const formattedImages = itemDetails.files?.map((file: any) => ({ uri: file.presignedURL })) || [];
     formik.setValues({
@@ -38,17 +112,19 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
       description: itemDetails.description,
       discountedPrice: itemDetails.discountedPrice.toString().toCurrency(),
       image: formattedImages,
-      foodTypes: itemDetails.sidesTypes,
+      foodTypes: itemDetails.productTypes,
       items: itemDetails.items,
       sauces: itemDetails.sauces,
-      bevrages: itemDetails.bevrages,
+      bevrages: itemDetails.beverages,
       meats: itemDetails.meats,
+      genericName: itemDetails.genericName,
     });
     setSelectedImages(formattedImages);
   }
 
   useEffect(() => {
     prepare();
+    setValues();
   }, []);
 
   const formik = useFormik({
@@ -63,6 +139,7 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
       sauces: [],
       bevrages: [],
       meats: [],
+      genericName: "",
     },
     validationSchema: createProductSchema,
     onSubmit: async (values) => {
@@ -85,12 +162,13 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
         numericPrice, // Ensure price is a number
         numericDiscountPrice,
         values.description,
-        values.foodTypes,
         values.image || [],
+        values.foodTypes,
         values.items,
         values.sauces,
         values.bevrages,
-        values.meats
+        values.meats,
+        values.genericName
       );
 
       if (response.data.success !== true) {
@@ -99,8 +177,7 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-  
-      showAlert("Sucess", `Successfully Product created  `, async () => {
+      showAlert("Sucess", `Successfully Product Edited  `, async () => {
         popWithParams(navigation, 2, { refresh: true });
       });
       setApiInUse(false);
@@ -209,11 +286,12 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
+              <GenericItemsRadioButton formik={formik} valueName="genericName" items={genericItems} />
               <SidesTypesCheckbox formik={formik} valueName="foodTypes" />
-              <ItemsCheckbox formik={formik} valueName="items" items={formik.values.items} />
-              <SauceCheckbox formik={formik} valueName="sauces" items={formik.values.sauces} />
-              <BevragesCheckbox formik={formik} valueName="bevrages" items={formik.values.bevrages} />
-              <MeatsCheckbox formik={formik} valueName="meats" items={formik.values.meats} />
+              <ItemsCheckbox formik={formik} valueName="items" items={items} />
+              <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
+              <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
+              <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
 
               {inputBuilder("Enter your Product Description", "description", formik, {
                 multiline: true,

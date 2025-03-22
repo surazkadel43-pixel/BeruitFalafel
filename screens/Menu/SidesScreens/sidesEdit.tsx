@@ -7,6 +7,10 @@ import { Dimensions, Image, Keyboard, ScrollView, Text, TouchableOpacity, Toucha
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
+import { getAllBevrages } from "../../../api/bevrages";
+import { getAllItems } from "../../../api/item";
+import { getAllMeats } from "../../../api/meats";
+import { getAllSauces } from "../../../api/sauce";
 import { editSide } from "../../../api/sides";
 import { createSideSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
@@ -23,7 +27,10 @@ const EditSides = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-
+  const [items, setitems] = useState<any[]>([]);
+  const [bevrages, setBevrages] = useState<any[]>([]);
+  const [sauces, setSauces] = useState<any[]>([]);
+  const [meats, setMeats] = useState<any[]>([]);
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
 
   const route = useRoute(); // ✅ Get the route object
@@ -31,6 +38,45 @@ const EditSides = ({ navigation }: { navigation: any }) => {
 
   async function prepare() {
     setApiInUse(false);
+    const itemRes = await getAllItems();
+
+    if (itemRes.data.success !== true) {
+      Toast.error(parseError(itemRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setitems(itemRes.data.items);
+
+    const sauceRes = await getAllSauces();
+    if (sauceRes.data.success !== true) {
+      Toast.error(parseError(sauceRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setSauces(sauceRes.data.sauces);
+
+    const bevrageRes = await getAllBevrages();
+    if (bevrageRes.data.success !== true) {
+      Toast.error(parseError(bevrageRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setBevrages(bevrageRes.data.results);
+
+    const MeatRes = await getAllMeats();
+    if (MeatRes.data.success !== true) {
+      Toast.error(parseError(MeatRes));
+      setApiInUse(false);
+      return;
+    }
+
+    setMeats(MeatRes.data.results);
+  }
+
+  function setFieldValue() {
     const formattedImages = itemDetails.files?.map((file: any) => ({ uri: file.presignedURL })) || [];
     formik.setValues({
       name: itemDetails.name,
@@ -38,10 +84,10 @@ const EditSides = ({ navigation }: { navigation: any }) => {
       description: itemDetails.description,
       discountedPrice: itemDetails.discountedPrice.toString().toCurrency(),
       image: formattedImages,
-      sidesTypes: itemDetails.sidesTypes,
+      foodTypes: itemDetails.sidesTypes,
       items: itemDetails.items,
       sauces: itemDetails.sauces,
-      bevrages: itemDetails.bevrages,
+      bevrages: itemDetails.beverages,
       meats: itemDetails.meats,
     });
     setSelectedImages(formattedImages);
@@ -49,6 +95,7 @@ const EditSides = ({ navigation }: { navigation: any }) => {
 
   useEffect(() => {
     prepare();
+    setFieldValue();
   }, []);
 
   const formik = useFormik({
@@ -58,7 +105,7 @@ const EditSides = ({ navigation }: { navigation: any }) => {
       description: "",
       discountedPrice: "",
       image: null,
-      sidesTypes: [],
+      foodTypes: [],
       items: [],
       sauces: [],
       bevrages: [],
@@ -85,8 +132,8 @@ const EditSides = ({ navigation }: { navigation: any }) => {
         numericPrice, // Ensure price is a number
         numericDiscountPrice,
         values.description,
-        values.sidesTypes,
         values.image || [],
+        values.foodTypes,
         values.items,
         values.sauces,
         values.bevrages,
@@ -99,7 +146,6 @@ const EditSides = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      
       showAlert("Sucess", `Successfully Sides edited  `, async () => {
         popWithParams(navigation, 2, { refresh: true });
       });
@@ -211,10 +257,10 @@ const EditSides = ({ navigation }: { navigation: any }) => {
                 style: createItemPropsStyles.itemPrice,
               })}
               <SidesTypesCheckbox formik={formik} valueName="sidesTypes" />
-              <ItemsCheckbox formik={formik} valueName="items" items={formik.values.items} />
-              <SauceCheckbox formik={formik} valueName="sauces" items={formik.values.sauces} />
-              <BevragesCheckbox formik={formik} valueName="bevrages" items={formik.values.bevrages} />
-              <MeatsCheckbox formik={formik} valueName="meats" items={formik.values.meats} />
+              <ItemsCheckbox formik={formik} valueName="items" items={items} />
+              <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
+              <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
+              <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
 
               {inputBuilder("Enter your Side Description", "description", formik, {
                 multiline: true,

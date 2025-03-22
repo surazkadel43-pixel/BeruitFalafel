@@ -116,13 +116,15 @@ export const createSideSchema = Yup.object().shape({
 
   foodTypes: Yup.array().min(1, "Please select at least one option").required("Side type is required"),
   items: Yup.array().min(1, "Please select at least one item").required("Items are required"),
+  sauces: Yup.array().min(1, "Please select at least one item").required("sauces are required"),
+  meats: Yup.array().min(1, "Please select at least one item").required("meats are required"),
 
   image: Yup.mixed<File | ImagePickerAsset>().required("Image is required"),
 });
 
 export const createProductSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
-
+  genericName: Yup.string().required("Generic name is required").min(2, "Generic name must be at least 2 characters"),
   price: Yup.string()
     .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
     .required("Price is required"),
@@ -183,4 +185,11 @@ export const changePasswordSchema = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword")], "Passwords must match")
     .required("Confirm Password is required"),
+});
+
+export const createGenericItemSchema = Yup.object().shape({
+  name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
+
+  description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
+  foodTypes: Yup.array().min(1, "Please select at least one option"),
 });
