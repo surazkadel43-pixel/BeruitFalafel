@@ -1,9 +1,9 @@
 import showAlert from "../../components/showAlert";
-
+import { useRoute } from "@react-navigation/core";
 import { CommonActions } from "@react-navigation/core";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import { Keyboard, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
 import { dispose } from "../../api/store";
@@ -15,7 +15,8 @@ import { recycledStyles, toastManagerProps } from "../../components/recycled-sty
 import { parseError } from "../../components/toasts";
 export default function EditPassword({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-
+  const route = useRoute();
+  const { currentUser } = route.params as { currentUser: any };
   async function prepare() {
     setApiInUse(false);
   }
@@ -33,7 +34,7 @@ export default function EditPassword({ navigation }: { navigation: any }) {
     onSubmit: async (values) => {
       setApiInUse(true);
 
-      const updatedUser = await changePassword(values.newPassword, values.confirmPassword);
+      const updatedUser = await changePassword(values.newPassword, values.confirmPassword, currentUser.id);
       if (updatedUser.status !== 200 && updatedUser.data.success !== true) {
         Toast.error(parseError(updatedUser));
         setApiInUse(false);
@@ -57,7 +58,7 @@ export default function EditPassword({ navigation }: { navigation: any }) {
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
-      <TouchableWithoutFeedback >
+      <TouchableWithoutFeedback>
         <View style={{ flex: 1 }}>
           <ToastManager {...toastManagerProps} />
 

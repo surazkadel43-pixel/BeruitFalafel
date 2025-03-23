@@ -34,7 +34,7 @@ export default function EditName({ navigation }: { navigation: any }) {
     onSubmit: async (values) => {
       setApiInUse(true);
 
-      const updatedUser = await changeName(values.firstName, values.lastName);
+      const updatedUser = await changeName(values.firstName, values.lastName, currentUser.id);
       if (updatedUser.status !== 200 && updatedUser.data.success !== true) {
         Toast.error(parseError(updatedUser));
         setApiInUse(false);

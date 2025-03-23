@@ -33,7 +33,7 @@ export default function EditPhoneNumber({ navigation }: { navigation: any }) {
     onSubmit: async (values) => {
       setApiInUse(true);
 
-      const updatedUser = await changePhoneNumber(values.newPhoneNumber);
+      const updatedUser = await changePhoneNumber(values.newPhoneNumber, currentUser.id);
       if (updatedUser.status !== 200 && updatedUser.data.success !== true) {
         Toast.error(parseError(updatedUser));
         setApiInUse(false);
@@ -62,8 +62,8 @@ export default function EditPhoneNumber({ navigation }: { navigation: any }) {
                  </Text>
             </View>
             <View style={styles.inputs}>
-              {inputBuilder("Enter your new  password", "newPhoneNumber", formik)}
-              {inputBuilder("Confrim your new password", "confirmPhoneNumber", formik)}
+              {inputBuilder("Enter your new  phone number", "newPhoneNumber", formik)}
+              {inputBuilder("Confrim your phone number", "confirmPhoneNumber", formik)}
             </View>
             <View style={styles.buttons}>
               {buttonBuilder("Save", formik.handleSubmit, apiInUse, undefined, true)}

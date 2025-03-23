@@ -33,6 +33,7 @@ export const PostImages: React.FC<PostImageProps> = ({ files, isSmall }) => {
               style={{
                 width: containerWidth,
                 height: isSmall ? 200 : 400,
+                paddingVertical: 10,
               }}
             >
               <Image source={{ uri: item.presignedURL }} style={[isSmall ? styles.reducedImageSize : styles.image]} resizeMode="contain" />
