@@ -28,6 +28,7 @@ import "../../extension/extension";
 
 interface CreatePromotionModal {
   onClose: () => void;
+  onRefresh: () => void; 
 }
 
 const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
@@ -73,6 +74,7 @@ const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
       Toast.success("Successfully Promotion created in!");
       showAlert("Sucess", `Successfully Promotion created  `, async () => {
         props.onClose();
+        props.onRefresh();
       });
       setApiInUse(false);
     },

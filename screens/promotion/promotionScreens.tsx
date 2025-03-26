@@ -1,32 +1,34 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
 
-import { CustomeCard, CustomePromotionCard } from "../../components/customeCard";
+import { getPromotion, searchPromotion } from "../../api/promotion";
+import { CustomePromotionCard } from "../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
 import searchContainer from "../../components/searchContainer";
 import NoResultsCard from "../../components/searchNotFound";
 import { parseError } from "../../components/toasts";
 import CreatePromotionModal from "./createGroupModal";
-import { getPromotion, searchPromotion } from "../../api/promotion";
+
+import { useFocusEffect, useRoute } from "@react-navigation/core";
 
 export default function PromotionScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(true);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  
-  const [promotions, setPromotions] = useState<any[]>([])
+  const [refresh, setRefresh] = useState(false);
+  const [promotions, setPromotions] = useState<any[]>([]);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshes, setRefreshes] = useState<number>(0);
+   const route = useRoute() as { params?: { refresh?: boolean } };
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
-     
       setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
@@ -50,6 +52,21 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
   useEffect(() => {
     prepare();
   }, []);
+  useEffect(() => {
+    if (refresh) {
+      prepare();
+      setRefresh(false);
+    }
+  }, [refresh]);
+
+  useFocusEffect(
+      useCallback(() => {
+        if (route.params?.refresh) {
+          prepare();
+          navigation.setParams({ refresh: false });
+        }
+      }, [route.params?.refresh])
+    );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -119,7 +136,7 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
       loadMore();
-    } 
+    }
   }
 
   return (
@@ -145,9 +162,9 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
                   description={item.description}
                   code={item.code}
                   onPress={() => {
-                    navigation.navigate("PromotionDetail", { itemDetails: item });
+                    navigation.navigate("PromotionDetails", { PromotionDetails: item });
                   }}
-                  icon="date-range"
+                  icon="clock-o"
                   buttonName="manage"
                   buttonIsActive={true}
                   expiryDate={item.expiryDate}
@@ -169,7 +186,7 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreatePromotionModal onClose={() => setModalVisible(false)} />
+          <CreatePromotionModal onClose={() => setModalVisible(false)} onRefresh={() => setRefresh(true)} />
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />
@@ -179,6 +196,4 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
   );
 }
 
-const styles = StyleSheet.create({
-  
-});
+const styles = StyleSheet.create({});

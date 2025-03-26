@@ -20,6 +20,7 @@ export const ProfileHeader = ({
   createdAt = "Unknown Date",
   phoneNumber = "N/A",
 }: User) => {
+  const { text, isFuture } = createdAt.timeAgo();
   return (
     <View style={styles.header}>
       <View style={styles.imageAndReport}>
@@ -41,7 +42,7 @@ export const ProfileHeader = ({
             {firstName} {lastName}
           </Text>
         </View>
-        <Text style={[recycledStyles.normalText, { fontWeight: "300" }]}>Since {createdAt ? createdAt.timeAgo() : "Unknown Year"}</Text>
+        <Text style={[recycledStyles.normalText, { fontWeight: "300" }]}>Since {createdAt ? text : "Unknown Year"}</Text>
         <View style={styles.content}>
           <Text style={recycledStyles.normalText}>
             <Text style={styles.followers}>email: </Text>

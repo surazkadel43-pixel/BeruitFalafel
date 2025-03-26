@@ -42,22 +42,33 @@ String.prototype.toCurrency = function (): string {
   return `$${formattedValue}`;
 };
 
-String.prototype.timeAgo = function (): string {
+String.prototype.timeAgo = function (): { text: string; isFuture: boolean } {
   const date = new Date(this.toString());
   const now = new Date();
   const diff = now.getTime() - date.getTime();
 
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(diff / (1000 * 60));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const isFuture = diff < 0;
+  const absDiff = Math.abs(diff);
+
+  const seconds = Math.floor(absDiff / 1000);
+  const minutes = Math.floor(absDiff / (1000 * 60));
+  const hours = Math.floor(absDiff / (1000 * 60 * 60));
+  const days = Math.floor(absDiff / (1000 * 60 * 60 * 24));
   const months = Math.floor(days / 30);
   const years = Math.floor(days / 365);
 
-  if (seconds < 60) return `${seconds} second${seconds !== 1 ? "s" : ""} ago`;
-  if (minutes < 60) return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
-  if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
-  if (days < 30) return `${days} day${days !== 1 ? "s" : ""} ago`;
-  if (months < 12) return `${months} month${months !== 1 ? "s" : ""} ago`;
-  return `${years} year${years !== 1 ? "s" : ""} ago`;
+  const format = (value: number, unit: string) => {
+    const plural = value !== 1 ? "s" : "";
+    return `${value} ${unit}${plural}`;
+  };
+
+  let text = "";
+  if (seconds < 60) text = format(seconds, "second");
+  else if (minutes < 60) text = format(minutes, "minute");
+  else if (hours < 24) text = format(hours, "hour");
+  else if (days < 30) text = format(days, "day");
+  else if (months < 12) text = format(months, "month");
+  else text = format(years, "year");
+
+  return { text, isFuture };
 };

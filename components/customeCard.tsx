@@ -231,7 +231,7 @@ export const CustomePromotionCard = ({
   code = "$0.00",
   expiryDate = "N/A",
   onPress = () => {},
-  icon = "date-range",
+  icon = "calendar",
   buttonName = "Manage",
   buttonIsActive = true,
 }: {
@@ -240,11 +240,12 @@ export const CustomePromotionCard = ({
   description: string;
   code: string;
   expiryDate: string;
-  onPress: () => void;
+  onPress?: () => void;
   icon: any;
   buttonName: string;
   buttonIsActive: boolean;
 }) => {
+  const { text, isFuture } = expiryDate.timeAgo();
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
       <View style={styles.groupInfo}>
@@ -255,7 +256,7 @@ export const CustomePromotionCard = ({
 
         <View style={styles.followerContainer}>
           <FontAwesome name={icon} size={18} color="white" />
-          <Text style={styles.followers}>{expiryDate}</Text>
+          <Text style={styles.followers}>{isFuture ? `Expires in ${text}` : `Expired ${text} ago`}</Text>
         </View>
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>{code}</Text>
@@ -265,6 +266,49 @@ export const CustomePromotionCard = ({
         </View>
 
         {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export const PromotionDetailsCard = ({
+  itemId = "N/A",
+  title = "Untitled",
+  description = "No description available",
+  code = "$0.00",
+  expiryDate = "N/A",
+  icon = "calendar",
+  files = [],
+}: {
+  itemId: string;
+  title: string;
+  description: string;
+  code: string;
+  expiryDate: string;
+  icon: any;
+  files?: any[];
+}) => {
+  const { text, isFuture } = expiryDate.timeAgo();
+  return (
+    <TouchableOpacity style={styles.groupCard} activeOpacity={1}>
+      <View style={styles.groupInfo}>
+        <View style={styles.followerContainer}>
+          {/* <Text style={styles.groupName}>{itemId}</Text> */}
+          <Text style={styles.groupName}>{title}</Text>
+        </View>
+
+        <View style={styles.followerContainer}>
+          <FontAwesome name={icon} size={18} color="white" />
+          <Text style={styles.followers}>{isFuture ? `Expires in ${text}` : `Expired ${text} ago`}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>{code}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>{description}</Text>
+        </View>
+        {/* Image Carousel */}
+        {files.length > 0 && <PostImages files={files} isSmall={false} />}
       </View>
     </TouchableOpacity>
   );
