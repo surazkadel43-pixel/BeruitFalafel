@@ -32,7 +32,7 @@ export default function BottomNavigation(navigation: any) {
             case "Profile":
               iconName = focused ? "person" : "person-outline";
               break;
-            case "Sucribed":
+            case "Report":
               iconName = focused ? "notifications" : "notifications-outline";
               break;
             default:
@@ -66,7 +66,20 @@ export default function BottomNavigation(navigation: any) {
           headerTitleStyle: { backgroundColor: "skyblue" },
         }}
       />
-      <Tab.Screen name="Sucribed" component={Subcribed} options={{ title: "Stats" }} />
+      <Tab.Screen
+        name="Report"
+        component={Subcribed}
+        options={{
+          title: "Reports",
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: "skyblue",
+          },
+          headerTitle: () => <NavigationHeader title="Reports" navigation={navigation} />,
+          headerTitleAlign: "center",
+          headerTitleStyle: { backgroundColor: "skyblue" },
+        }}
+      />
       <Tab.Screen
         name="Profile"
         component={ProfileStackNavigator}

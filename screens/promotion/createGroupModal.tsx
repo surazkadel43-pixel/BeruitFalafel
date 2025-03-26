@@ -28,7 +28,7 @@ import "../../extension/extension";
 
 interface CreatePromotionModal {
   onClose: () => void;
-  onRefresh: () => void; 
+  onRefresh: () => void;
 }
 
 const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
@@ -50,18 +50,19 @@ const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
       code: "",
       description: "",
       image: [],
-      expiry: undefined,
+      expiry: "",
     },
     validationSchema: createPromotionSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
       console.log(values);
 
+      const espiryDate = new Date(values.expiry);
       const response = await createPromotion(
         values.name,
         values.code, // Ensure price is a number
         values.description,
-        values.expiry,
+        espiryDate,
         values.image
       );
 

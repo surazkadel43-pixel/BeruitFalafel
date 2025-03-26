@@ -157,8 +157,8 @@ export const createPromotionSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
   code: Yup.string()
     .required("Code is required")
-    .min(2, "Code must be at least 2 characters")
-    .max(20, "Code cannot be longer than 20 characters")
+    .min(6, "Code must be at least 6 characters")
+    .max(10, "Code cannot be longer than 10 characters")
     .matches(/^[A-Z0-9]+$/, "Code must be uppercase and contain only letters or numbers"),
 
   description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),

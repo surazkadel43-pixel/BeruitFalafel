@@ -41,7 +41,7 @@ export default function GenericItemScreens({ navigation }: { navigation: any }) 
       return;
     }
     setPages(itemResponse.data.pages);
-    setItems(itemResponse.data.items);
+    setItems(itemResponse.data.results);
 
     setApiInUse(false);
     setRefreshing(false);
@@ -93,7 +93,7 @@ export default function GenericItemScreens({ navigation }: { navigation: any }) 
     try {
       const itemSearchRes = await searchItem(query);
       if (itemSearchRes.data.success === true) {
-        setItems(itemSearchRes.data.items);
+        setItems(itemSearchRes.data.results);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
