@@ -30,6 +30,7 @@ import {
   ItemsCheckbox,
   MeatsCheckbox,
   SauceCheckbox,
+  SidesCheckbox,
   SidesTypesCheckbox,
 } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
@@ -37,6 +38,7 @@ import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
+import { getAllSides } from "../../../api/sides";
 const genericNames = [
   { id: "1", name: "Bowl" },
   { id: "2", name: "Falafel Wrap" },
@@ -59,6 +61,7 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
   const [bevrages, setBevrages] = useState<any[]>([]);
   const [sauces, setSauces] = useState<any[]>([]);
   const [meats, setMeats] = useState<any[]>([]);
+  const [sides, setSides] = useState<any[]>([]);
   const [genericItems, setGenericItems] = useState<any[]>(genericNames);
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
 
@@ -109,6 +112,17 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
     }
 
     setGenericItems(genericItemRes.data.results);
+
+    //const [sides, setSides] = useState<any[]>([]);
+    //sides: [],
+    //<SidesCheckbox formik={formik} valueName="sides" items={sides} />
+    const sidesRes = await getAllSides();
+    if (sidesRes.data.success !== true) {
+      Toast.error(parseError(sidesRes));
+      setApiInUse(false);
+      return;
+    }
+    setSides(sidesRes.data.results);
     
   }
 
@@ -129,6 +143,7 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
       bevrages: [],
       meats: [],
       genericName: "",
+      sides: [],
     },
     validationSchema: createProductSchema,
     onSubmit: async (values) => {
@@ -155,7 +170,8 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
         values.sauces,
         values.bevrages,
         values.meats,
-        values.genericName
+        values.genericName,
+        values.sides
       );
 
       if (response.data.success !== true) {
@@ -291,6 +307,7 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
               <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
               <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
+              <SidesCheckbox formik={formik} valueName="sides" items={sides} />
 
               {inputBuilder("Enter your Product Description", "description", formik, {
                 multiline: true,

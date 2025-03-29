@@ -115,9 +115,9 @@ export const createSideSchema = Yup.object().shape({
   description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
 
   foodTypes: Yup.array().min(1, "Please select at least one option").required("Side type is required"),
-  items: Yup.array().min(1, "Please select at least one item").required("Items are required"),
-  sauces: Yup.array().min(1, "Please select at least one item").required("sauces are required"),
-  meats: Yup.array().min(1, "Please select at least one item").required("meats are required"),
+  items: Yup.array().of(Yup.string()),
+  sauces: Yup.array().of(Yup.string()),
+  meats: Yup.array().of(Yup.string()),
 
   image: Yup.mixed<File | ImagePickerAsset>().required("Image is required"),
 });

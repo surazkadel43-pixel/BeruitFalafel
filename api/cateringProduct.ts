@@ -13,7 +13,8 @@ export async function createCateringProduct(
   sauces: string[] = [],
   beverages: string[] = [],
   meats: string[] = [],
-  genericName: string = ""
+  genericName: string = "",
+  sides: string[] = []
 ) {
   const formData = new FormData();
 
@@ -27,6 +28,7 @@ export async function createCateringProduct(
   formData.append("beverages", JSON.stringify(beverages));
   formData.append("meats", JSON.stringify(meats));
   formData.append("genericName", genericName);
+  formData.append("sides", JSON.stringify(sides));
 
   if (image && image.length > 0) {
     for (const img of image) {
@@ -60,7 +62,8 @@ export async function editCateringProduct(
   sauces: string[] = [],
   beverages: string[] = [],
   meats: string[] = [],
-  genericName: string = ""
+  genericName: string = "",
+  sides: string[] = []
 ) {
   const formData = new FormData();
 
@@ -75,6 +78,7 @@ export async function editCateringProduct(
   formData.append("beverages", JSON.stringify(beverages));
   formData.append("meats", JSON.stringify(meats));
   formData.append("genericName", genericName);
+  formData.append("sides", JSON.stringify(sides));
 
   if (image && image.length > 0) {
     for (const img of image) {

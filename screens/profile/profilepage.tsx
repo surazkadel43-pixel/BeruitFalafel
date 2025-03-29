@@ -34,12 +34,14 @@ export default function ProfileScreens({ navigation }: { navigation: any }) {
   const getUser = async () => {
     setApiInUse(true);
     const userResponse = await getCurrentUser();
+  
     if (userResponse.status !== 200) {
       Toast.error(parseError(userResponse));
       setApiInUse(false);
       return;
     }
     setCurrentUser(userResponse.data.user);
+    console.log(userResponse.data.user);
 
     setApiInUse(false);
   };

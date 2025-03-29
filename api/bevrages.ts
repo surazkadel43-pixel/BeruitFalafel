@@ -9,6 +9,7 @@ export async function createBevrage(name: string, price: number, description: st
   formData.append('price', price.toString());
   formData.append('description', description);
   formData.append('drinkTypes', JSON.stringify(drinkTypes));
+  formData.append('genericName', "Bevrages");
   
   // Append each image to the FormData
   if (images && images.length > 0) {
@@ -41,6 +42,7 @@ export async function editBevrage(itemId: number, name: string, price: number, d
   formData.append('price', price.toString());
   formData.append('description', description);
   formData.append('drinkTypes', JSON.stringify(drinkTypes));
+  formData.append('genericName', "Bevrages");
   
   // Append each image to the FormData
   if (images && images.length > 0) {

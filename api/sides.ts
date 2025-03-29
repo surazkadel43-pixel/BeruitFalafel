@@ -25,6 +25,7 @@ export async function createSide(
   formData.append('sauces', JSON.stringify(sauces));
   formData.append('beverages', JSON.stringify(beverages));
   formData.append('meats', JSON.stringify(meats));
+  formData.append('genericName', "Sides");
 
   if (image && image.length > 0) {
     for (const img of image) {
@@ -72,6 +73,7 @@ export async function editSide(
   formData.append('sauces', JSON.stringify(sauces));
   formData.append('beverages', JSON.stringify(beverages));
   formData.append('meats', JSON.stringify(meats));
+  formData.append('genericName', "Sides");
 
   if (image && image.length > 0) {
     for (const img of image) {

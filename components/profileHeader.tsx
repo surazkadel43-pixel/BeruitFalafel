@@ -21,6 +21,7 @@ export const ProfileHeader = ({
   phoneNumber = "N/A",
 }: User) => {
   const { text, isFuture } = createdAt.timeAgo();
+  console.log(createdAt);	
   return (
     <View style={styles.header}>
       <View style={styles.imageAndReport}>

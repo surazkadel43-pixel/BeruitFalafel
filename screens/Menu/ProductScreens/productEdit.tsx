@@ -13,6 +13,7 @@ import { getAllItems } from "../../../api/item";
 import { getAllMeats } from "../../../api/meats";
 import { editProduct } from "../../../api/product";
 import { getAllSauces } from "../../../api/sauce";
+import { getAllSides } from "../../../api/sides";
 import { createProductSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
@@ -22,6 +23,7 @@ import {
   ItemsCheckbox,
   MeatsCheckbox,
   SauceCheckbox,
+  SidesCheckbox,
   SidesTypesCheckbox,
 } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
@@ -38,7 +40,6 @@ const genericNames = [
   { id: "4", name: "Plates" },
 ];
 
-
 const EditProduct = ({ navigation }: { navigation: any }) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
@@ -53,6 +54,8 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
   const [sauces, setSauces] = useState<any[]>([]);
   const [meats, setMeats] = useState<any[]>([]);
   const [genericItems, setGenericItems] = useState<any[]>(genericNames);
+
+  const [sides, setSides] = useState<any[]>([]);
 
   async function prepare() {
     setApiInUse(false);
@@ -101,6 +104,14 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
     }
 
     setGenericItems(genericItemRes.data.results);
+
+    const sidesRes = await getAllSides();
+    if (sidesRes.data.success !== true) {
+      Toast.error(parseError(sidesRes));
+      setApiInUse(false);
+      return;
+    }
+    setSides(sidesRes.data.results);
   }
 
   async function setValues() {
@@ -118,6 +129,7 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
       bevrages: itemDetails.beverages,
       meats: itemDetails.meats,
       genericName: itemDetails.genericName,
+      sides: itemDetails.sides,
     });
     setSelectedImages(formattedImages);
   }
@@ -140,6 +152,7 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
       bevrages: [],
       meats: [],
       genericName: "",
+      sides: [],
     },
     validationSchema: createProductSchema,
     onSubmit: async (values) => {
@@ -149,7 +162,6 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
         setApiInUse(false);
         return;
       }
-     
 
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
@@ -166,7 +178,8 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
         values.sauces,
         values.bevrages,
         values.meats,
-        values.genericName
+        values.genericName,
+        values.sides
       );
 
       if (response.data.success !== true) {
@@ -291,6 +304,7 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
               <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
               <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
+              <SidesCheckbox formik={formik} valueName="sides" items={sides} />
 
               {inputBuilder("Enter your Product Description", "description", formik, {
                 multiline: true,

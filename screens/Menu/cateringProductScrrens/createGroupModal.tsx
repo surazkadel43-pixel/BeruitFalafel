@@ -21,10 +21,19 @@ import { getAllGenericItems } from "../../../api/genericItem";
 import { getAllItems } from "../../../api/item";
 import { getAllMeats } from "../../../api/meats";
 import { getAllSauces } from "../../../api/sauce";
+import { getAllSides } from "../../../api/sides";
 import { createProductSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { BevragesCheckbox, GenericItemsRadioButton, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import {
+  BevragesCheckbox,
+  GenericItemsRadioButton,
+  ItemsCheckbox,
+  MeatsCheckbox,
+  SauceCheckbox,
+  SidesCheckbox,
+  SidesTypesCheckbox,
+} from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -52,6 +61,7 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
   const [meats, setMeats] = useState<any[]>([]);
   const [genericItems, setGenericItems] = useState<any[]>(genericNames);
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
+  const [sides, setSides] = useState<any[]>([]);
 
   async function prepare() {
     setApiInUse(false);
@@ -100,6 +110,14 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
     }
 
     setGenericItems(genericItemRes.data.results);
+
+    const sidesRes = await getAllSides();
+    if (sidesRes.data.success !== true) {
+      Toast.error(parseError(sidesRes));
+      setApiInUse(false);
+      return;
+    }
+    setSides(sidesRes.data.results);
   }
 
   useEffect(() => {
@@ -119,6 +137,7 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
       bevrages: [],
       meats: [],
       genericName: "",
+      sides: [],
     },
     validationSchema: createProductSchema,
     onSubmit: async (values) => {
@@ -145,7 +164,8 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
         values.sauces,
         values.bevrages,
         values.meats,
-        values.genericName
+        values.genericName,
+        values.sides
       );
 
       if (response.data.success !== true) {
@@ -280,6 +300,7 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
               <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
               <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
+              <SidesCheckbox formik={formik} valueName="sides" items={sides} />
 
               {inputBuilder("Enter your Product Description", "description", formik, {
                 multiline: true,

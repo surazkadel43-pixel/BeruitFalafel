@@ -13,6 +13,7 @@ import { getAllGenericItems } from "../../../api/genericItem";
 import { getAllItems } from "../../../api/item";
 import { getAllMeats } from "../../../api/meats";
 import { getAllSauces } from "../../../api/sauce";
+import { getAllSides } from "../../../api/sides";
 import { createProductSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
@@ -22,6 +23,7 @@ import {
   ItemsCheckbox,
   MeatsCheckbox,
   SauceCheckbox,
+  SidesCheckbox,
   SidesTypesCheckbox,
 } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
@@ -48,7 +50,7 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
   const [sauces, setSauces] = useState<any[]>([]);
   const [meats, setMeats] = useState<any[]>([]);
   const [genericItems, setGenericItems] = useState<any[]>(genericNames);
-
+  const [sides, setSides] = useState<any[]>([]);
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
 
   const route = useRoute();
@@ -101,6 +103,14 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
     }
 
     setGenericItems(genericItemRes.data.results);
+
+    const sidesRes = await getAllSides();
+    if (sidesRes.data.success !== true) {
+      Toast.error(parseError(sidesRes));
+      setApiInUse(false);
+      return;
+    }
+    setSides(sidesRes.data.results);
   }
 
   async function setValues() {
@@ -118,6 +128,7 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
       bevrages: itemDetails.beverages,
       meats: itemDetails.meats,
       genericName: itemDetails.genericName,
+      sides: itemDetails.sides,
     });
     setSelectedImages(formattedImages);
   }
@@ -140,6 +151,7 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
       bevrages: [],
       meats: [],
       genericName: "",
+      sides: [],
     },
     validationSchema: createProductSchema,
     onSubmit: async (values) => {
@@ -168,7 +180,8 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
         values.sauces,
         values.bevrages,
         values.meats,
-        values.genericName
+        values.genericName,
+        values.sides
       );
 
       if (response.data.success !== true) {
@@ -292,7 +305,7 @@ const EditCatering = ({ navigation }: { navigation: any }) => {
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
               <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
               <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
-
+              <SidesCheckbox formik={formik} valueName="sides" items={sides} />
               {inputBuilder("Enter your Product Description", "description", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemDescription,
