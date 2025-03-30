@@ -14,7 +14,7 @@ import { parseError } from "../../components/toasts";
 
 export default function ProfileScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<any>({});
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   function prepare() {

@@ -16,7 +16,7 @@ import { parseError } from "../../components/toasts";
 export default function EditPassword({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const route = useRoute();
-  const { currentUser } = route.params as { currentUser: any };
+  const { currentUser } = route.params as { currentUser: any } || {};
   async function prepare() {
     setApiInUse(false);
   }
