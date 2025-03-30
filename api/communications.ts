@@ -2,13 +2,12 @@ import axios, { AxiosResponse } from "axios";
 import { snatch } from "./store";
 
 
-//const apiUrl = "http://192.168.1.124:8080/";
+
 //192.168.1.124 this is my computer ipv4 address 
 // const apiUrl = "http://127.0.0.1:8080/"; for expom app this refers to own computer i have to use this
 //const apiUrl = "http://192.168.1.124:8080/";
-const apiUrl = "http://192.168.1.124:8080/";
-//const apiUrl = "https://beruit-falafel-backend.vercel.app/";
-//const apiUrl = "https://beruitfalafebackend-jnzyfof16-suraj-kandels-projects.vercel.app/";
+const apiUrl = "http://192.168.162.4:8080/";
+
 
 
 async function getOptions() {
