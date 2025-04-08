@@ -15,7 +15,7 @@ import { editSide } from "../../../api/sides";
 import { createSideSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { BevragesCheckbox, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { BevragesCheckbox, ItemsCheckbox, ItemTypeRadioButtons, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -89,6 +89,8 @@ const EditSides = ({ navigation }: { navigation: any }) => {
       sauces: itemDetails.sauces,
       bevrages: itemDetails.beverages,
       meats: itemDetails.meats,
+      quantity: itemDetails.quantity.toString(),
+      itemType: itemDetails.itemType.toString(),
     });
     setSelectedImages(formattedImages);
   }
@@ -110,6 +112,8 @@ const EditSides = ({ navigation }: { navigation: any }) => {
       sauces: [],
       bevrages: [],
       meats: [],
+      quantity: "",
+      itemType: "",
     },
     validationSchema: createSideSchema,
     onSubmit: async (values) => {
@@ -125,7 +129,8 @@ const EditSides = ({ navigation }: { navigation: any }) => {
        */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
-
+      const numericQuantity = parseInt(values.quantity) || 0;
+      const numericItemType = parseInt(values.itemType) || 0;
       const response = await editSide(
         itemDetails.id,
         values.name,
@@ -137,7 +142,9 @@ const EditSides = ({ navigation }: { navigation: any }) => {
         values.items,
         values.sauces,
         values.bevrages,
-        values.meats
+        values.meats,
+        numericQuantity,
+        numericItemType
       );
 
       if (response.data.success !== true) {
@@ -256,6 +263,12 @@ const EditSides = ({ navigation }: { navigation: any }) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
+              {inputBuilder("Enter your Quantity", "quantity", formik, {
+                keyboardType: "numeric", // Only numeric input
+                maxLength: 2, // Limit the input to 6 digits
+                style: createItemPropsStyles.itemPrice,
+              })}
+               <ItemTypeRadioButtons formik={formik} valueName="itemType"  />
               <SidesTypesCheckbox formik={formik} valueName="sidesTypes" />
               <ItemsCheckbox formik={formik} valueName="items" items={items} />
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />

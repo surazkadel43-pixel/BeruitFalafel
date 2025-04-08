@@ -15,6 +15,8 @@ export const PostImages: React.FC<PostImageProps> = ({ files, isSmall }) => {
   const [containerWidth, setContainerWidth] = useState(width); // default fallback
 
 
+
+
   return (
     <View onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
       <FlatList

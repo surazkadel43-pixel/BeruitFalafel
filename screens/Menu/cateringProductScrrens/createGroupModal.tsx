@@ -138,6 +138,7 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
       meats: [],
       genericName: "",
       sides: [],
+      quantity: undefined
     },
     validationSchema: createProductSchema,
     onSubmit: async (values) => {
@@ -165,7 +166,8 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
         values.bevrages,
         values.meats,
         values.genericName,
-        values.sides
+        values.sides,
+        values.quantity
       );
 
       if (response.data.success !== true) {
@@ -292,6 +294,11 @@ const CreateCateringModal: React.FC<CreateCateringModal> = (props) => {
                 onChangeText: (text: string) => {
                   formik.setFieldValue("discountedPrice", text.toCurrency());
                 },
+                style: createItemPropsStyles.itemPrice,
+              })}
+              {inputBuilder("Enter your Quantity", "quantity", formik, {
+                keyboardType: "numeric", // Only numeric input
+                maxLength: 2, // Limit the input to 6 digits
                 style: createItemPropsStyles.itemPrice,
               })}
               <GenericItemsRadioButton formik={formik} valueName="genericName" items={genericItems} />

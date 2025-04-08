@@ -6,7 +6,8 @@ export async function createPromotion(
   code: string = "",
   description: string = "",
   expiry: Date = new Date(Date.now() + 24 * 60 * 60 * 1000),
-  image: any[] = []
+  image: any[] = [],
+  discount: number = 0
 ) {
   const formData = new FormData();
 
@@ -14,6 +15,7 @@ export async function createPromotion(
   formData.append('code', code);
   formData.append('description', description);
   formData.append('expiry', expiry.toISOString()); // Use ISO string for date format
+  formData.append('discount', discount.toString());
 
   if (image && image.length > 0) {
     for (const img of image) {

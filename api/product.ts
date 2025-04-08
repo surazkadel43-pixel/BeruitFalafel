@@ -14,7 +14,9 @@ export async function createProduct(
   beverages: string[] = [],
   meats: string[] = [],
   genericName: string = '',
-  sides: string[] = []
+  sides: string[] = [],
+  quantity: number = 0,
+  itemType: number = 3
 ) {
   
   const formData = new FormData();
@@ -30,6 +32,8 @@ export async function createProduct(
   formData.append('meats', JSON.stringify(meats));
   formData.append('genericName', genericName);
   formData.append('sides', JSON.stringify(sides));
+  formData.append('quantity', quantity.toString());
+  formData.append('itemType', itemType.toString()); 
 
   if (image && image.length > 0) {
     for (const img of image) {
@@ -46,10 +50,7 @@ export async function createProduct(
   return response;
 }
 
-export async function getAllProducts() {
-  const response = await get(`${endpoint}all`);
-  return response;
-}
+
 
 export async function editProduct(
   productId: number,
@@ -64,7 +65,9 @@ export async function editProduct(
   beverages: string[] = [],
   meats: string[] = [],
   genericName: string = '',
-  sides: string[] = []
+  sides: string[] = [],
+  quantity: number = 0,
+  itemType: number = 3
 ) {
   const formData = new FormData();
 
@@ -80,6 +83,8 @@ export async function editProduct(
   formData.append('meats', JSON.stringify(meats));
   formData.append('genericName', genericName);
   formData.append('sides', JSON.stringify(sides));
+  formData.append('quantity', quantity.toString());
+  formData.append('itemType', itemType.toString()); // Assuming itemType is a number
 
   if (image && image.length > 0) {
     for (const img of image) {
@@ -96,7 +101,10 @@ export async function editProduct(
   return response;
 }
 
-
+export async function getAllProducts(ItemType: number = 3) {
+  const response = await get(`${endpoint}all?itemType=${ItemType}`);
+  return response;
+}
 export async function deleteProduct(productId: string) {
   const response = await del(`${endpoint}delete/${productId}`);
   return response;

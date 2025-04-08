@@ -93,7 +93,7 @@ export const createBeverageSchema = Yup.object().shape({
 
 export const createSideSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
-
+  quantity: Yup.number().min(0, "Quantity cannot be negative").required("Quantity is required"),
   price: Yup.string()
     .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
     .required("Price is required"),
@@ -124,6 +124,9 @@ export const createSideSchema = Yup.object().shape({
 
 export const createProductSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
+  quantity: Yup.number().min(0, "Quantity cannot be negative").required("Quantity is required"),
+
+  itemType: Yup.number().min(0, "You must choose item Type").required("Item type is required"),
   genericName: Yup.string().required("Generic name is required").min(2, "Generic name must be at least 2 characters"),
   price: Yup.string()
     .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
@@ -155,6 +158,7 @@ export const createProductSchema = Yup.object().shape({
 
 export const createPromotionSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
+  discount: Yup.number().min(1, "Discount cannot be negative").required("Discount is required"),
   code: Yup.string()
     .required("Code is required")
     .min(6, "Code must be at least 6 characters")

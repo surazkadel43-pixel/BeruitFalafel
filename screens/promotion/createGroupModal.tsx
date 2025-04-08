@@ -51,6 +51,7 @@ const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
       description: "",
       image: [],
       expiry: "",
+      discount: undefined,
     },
     validationSchema: createPromotionSchema,
     onSubmit: async (values) => {
@@ -63,7 +64,8 @@ const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
         values.code, // Ensure price is a number
         values.description,
         espiryDate,
-        values.image
+        values.image,
+        values.discount
       );
 
       if (response.data.success !== true) {
@@ -181,6 +183,11 @@ const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
                 multiline: true,
                 autoCapitalize: "characters",
                 style: createItemPropsStyles.itemPrice, // You can rename this style to something more semantic like `itemCode`
+              })}
+              {inputBuilder("Enter Promotion Discount Precenteage", "discount", formik, {
+                keyboardType: "numeric", // Only numeric input
+                maxLength: 2, // Limit the input to 6 digits
+                style: createItemPropsStyles.itemPrice,
               })}
 
               <DatePickerField formik={formik} valueName="expiry" />

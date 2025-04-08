@@ -51,6 +51,7 @@ export default function PromotionDetailsScreens({ navigation }: { navigation: an
             icon="clock-o"
             expiryDate={PromotionDetails.expiryDate}
             files={PromotionDetails.files}
+            discount={PromotionDetails.discount}
           />
           <View style={recycledStyles.buttons}>{buttonBuilder("Remove Promotion", handelDeletePromotion, apiInUse, undefined, true)}</View>
         </ScrollView>

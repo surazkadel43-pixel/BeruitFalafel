@@ -12,7 +12,9 @@ export async function createSide(
   items: string[] = [], 
   sauces: string[] = [], 
   beverages: string[] = [],
-  meats: string[] = []
+  meats: string[] = [],
+  quantity: number = 0,
+  itemType: number = 3
 ) {
   const formData = new FormData();
 
@@ -26,6 +28,8 @@ export async function createSide(
   formData.append('beverages', JSON.stringify(beverages));
   formData.append('meats', JSON.stringify(meats));
   formData.append('genericName', "Sides");
+  formData.append('quantity', quantity.toString())
+  formData.append('itemType', itemType.toString()); // Assuming itemType is a number
 
   if (image && image.length > 0) {
     for (const img of image) {
@@ -43,8 +47,8 @@ export async function createSide(
 }
 
 
-export async function getAllSides() {
-  const response = await get(`${endpoint}all`);
+export async function getAllSides(ItemType: number = 3 ) {
+  const response = await get(`${endpoint}all?itemType=${ItemType}`);
   return response;
 }
 
@@ -59,7 +63,9 @@ export async function editSide(
   items: string[] = [],
   sauces: string[] = [],
   beverages: string[] = [],
-  meats: string[] = []
+  meats: string[] = [],
+  quantity: number = 0,
+  itemType: number = 3
 ) {
   const formData = new FormData();
 
@@ -74,6 +80,8 @@ export async function editSide(
   formData.append('beverages', JSON.stringify(beverages));
   formData.append('meats', JSON.stringify(meats));
   formData.append('genericName', "Sides");
+  formData.append('quantity', quantity.toString())
+  formData.append('itemType', itemType.toString()); // Assuming itemType is a number
 
   if (image && image.length > 0) {
     for (const img of image) {

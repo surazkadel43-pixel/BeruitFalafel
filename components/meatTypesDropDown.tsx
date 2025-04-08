@@ -638,6 +638,73 @@ export function GenericItemsRadioButton({
     </View>
   );
 }
+
+export function ItemTypeRadioButtons({
+  formik,
+  valueName,
+  expanded = false,
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+}) {
+  const [isExpanded, setIsExpanded] = useState(expanded);
+
+  // Manually create the options and labels
+  const typesOptions = [
+    { label: "Product", value: 1 },
+    { label: "Catering", value: 2 },
+    { label: "Both", value: 3 },
+  ];
+
+  const selectedValue = formik.values[valueName] || "";
+
+  const handleChange = (value: string) => {
+    formik.setFieldValue(valueName, value);
+  };
+
+  return (
+    <View style={styles.accordionContainer}>
+      <List.Accordion
+        title="Select Item Type"
+        expanded={isExpanded}
+        onPress={() => setIsExpanded(!isExpanded)}
+        titleStyle={styles.accordionTitle}
+        left={(props) => <List.Icon {...props} icon="food" color="white" />}
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />}
+        style={styles.accordionBox}
+      >
+        <RadioButton.Group onValueChange={handleChange} value={selectedValue}>
+          {typesOptions.map((option) => (
+            <View key={option.value} style={styles.checkboxContainer}>
+              <RadioButton.Item
+                label={option.label} // Display string label
+                value={option.value.toString()} // Store the numeric value as string
+                mode="android"
+                labelStyle={styles.checkboxLabel}
+                color="#ff9900"
+                uncheckedColor="#ccc"
+                position="leading"
+                style={{ paddingVertical: 1, marginVertical: 0 }}
+              />
+            </View>
+          ))}
+        </RadioButton.Group>
+
+        {/* Display selected item */}
+        <Text style={styles.selectedText}>
+          Selected: {selectedValue || "None"}
+        </Text>
+      </List.Accordion>
+
+      {/* Display error message if validation fails */}
+      {formik.touched[valueName] && formik.errors[valueName] ? (
+        <Text style={styles.errorText}>{formik.errors[valueName]}</Text>
+      ) : null}
+    </View>
+  );
+}
+
 interface DatePickerFieldProps {
   formik: any;
   valueName: string;

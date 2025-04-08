@@ -72,6 +72,33 @@ export const recycledStyles = StyleSheet.create({
     paddingHorizontal: 15,
     rowGap: 5,
   },
+  actionButtons: { flexDirection: "row", justifyContent: "space-around", gap: 10, paddingHorizontal: 9 },
+  buttonContainer: {
+    elevation: 8,
+    width: (width * 2) / 5,
+    borderRadius: 10,
+    padding: 10,
+   // marginBottom: 10,
+  },
+  stickyScrollViewWrapper: {
+    position: "absolute",
+    backgroundColor: "#12193D",
+    justifyContent: "flex-end",
+    paddingVertical: 5,
+    top: 0,
+    left: 0,
+    right: 0,
+    elevation: 10,
+    opacity: 0,
+  },
+  postUsername: {
+    backgroundColor: "#27468a",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+    color: "white",
+    fontSize: 20,
+  },
 });
 
 export const createItemPropsStyles = {

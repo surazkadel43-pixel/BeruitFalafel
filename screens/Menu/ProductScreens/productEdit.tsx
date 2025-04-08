@@ -21,6 +21,7 @@ import {
   BevragesCheckbox,
   GenericItemsRadioButton,
   ItemsCheckbox,
+  ItemTypeRadioButtons,
   MeatsCheckbox,
   SauceCheckbox,
   SidesCheckbox,
@@ -130,7 +131,10 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
       meats: itemDetails.meats,
       genericName: itemDetails.genericName,
       sides: itemDetails.sides,
+      quantity: itemDetails.quantity.toString(),
+      itemType: itemDetails.itemType.toString(),
     });
+    console.log( typeof itemDetails.quantity);
     setSelectedImages(formattedImages);
   }
 
@@ -153,6 +157,8 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
       meats: [],
       genericName: "",
       sides: [],
+      quantity: "",
+      itemType: "",
     },
     validationSchema: createProductSchema,
     onSubmit: async (values) => {
@@ -165,6 +171,8 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
 
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
+      const numericQuantity = parseInt(values.quantity) || 0;
+      const numericItemType = parseInt(values.itemType) || 0;
 
       const response = await editProduct(
         itemDetails.id,
@@ -179,7 +187,9 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
         values.bevrages,
         values.meats,
         values.genericName,
-        values.sides
+        values.sides,
+        numericQuantity,
+        numericItemType
       );
 
       if (response.data.success !== true) {
@@ -298,6 +308,12 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
+              {inputBuilder("Enter your Quantity", "quantity", formik, {
+                keyboardType: "numeric", // Only numeric input
+                maxLength: 2, // Limit the input to 6 digits
+                style: createItemPropsStyles.itemPrice,
+              })}
+              <ItemTypeRadioButtons formik={formik} valueName="itemType"  />
               <GenericItemsRadioButton formik={formik} valueName="genericName" items={genericItems} />
               <SidesTypesCheckbox formik={formik} valueName="foodTypes" />
               <ItemsCheckbox formik={formik} valueName="items" items={items} />

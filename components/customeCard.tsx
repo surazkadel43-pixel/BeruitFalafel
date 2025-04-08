@@ -3,6 +3,9 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { buttonBuilder } from "./button";
 import { PostImages } from "./postImages";
+import { recycledStyles } from "./recycled-style";
+
+import { getProductType, ItemType } from "../utils/enums";
 
 export const CustomeCard = ({
   itemId = "N/A",
@@ -147,25 +150,23 @@ export const CustomeMenuCard = ({
   description = "",
   price = "",
   menuTypes = [],
-
+  quantity = "N/A", 
   onPress = () => {},
   icon = "usd",
   buttonName = "Manage",
   buttonIsActive = true,
-  files = [],
-  isSmall = true,
+  productType = ItemType.Both,
 }: {
   title: string;
   description: string;
   price: string;
   menuTypes: string[];
-
+  quantity: string;
   onPress: () => void;
   icon: any;
   buttonName: string;
   buttonIsActive: boolean;
-  files: any[];
-  isSmall: boolean;
+  productType: ItemType;
 }) => {
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
@@ -173,12 +174,19 @@ export const CustomeMenuCard = ({
         <View style={styles.followerContainer}>
           {/* <Text style={styles.groupName}>{itemId}</Text> */}
           <Text style={styles.groupName}>{title}</Text>
+          <Text style={recycledStyles.postUsername}>{getProductType(productType).toUpperCase() || "N/A"}</Text>
         </View>
 
         <View style={styles.followerContainer}>
           <FontAwesome name={icon} size={18} color="white" />
-          <Text style={styles.followers}>{price}</Text>
+          <Text style={styles.followers}>Price: {price}</Text>
         </View>
+        {quantity && (
+          <View style={styles.followerContainer}>
+            <Text style={styles.followers}>Quantity: {quantity}</Text>
+          </View>
+        )}
+
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>{description}</Text>
         </View>
@@ -186,8 +194,6 @@ export const CustomeMenuCard = ({
           <Text style={styles.followers}> Food Types: </Text>
           <Text style={[styles.followers, { fontWeight: "bold" }]}>{menuTypes.join(", ")}</Text>
         </View>
-
-        {files.length > 0 && <PostImages files={files || []} isSmall={isSmall} />}
 
         {buttonBuilder(buttonName, onPress, false, undefined, buttonIsActive)}
       </View>
@@ -234,6 +240,7 @@ export const CustomePromotionCard = ({
   icon = "calendar",
   buttonName = "Manage",
   buttonIsActive = true,
+  discount = "N/A",
 }: {
   itemId: string;
   title: string;
@@ -244,6 +251,7 @@ export const CustomePromotionCard = ({
   icon: any;
   buttonName: string;
   buttonIsActive: boolean;
+  discount: string;
 }) => {
   const { text, isFuture } = expiryDate.timeAgo();
   return (
@@ -260,6 +268,9 @@ export const CustomePromotionCard = ({
         </View>
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>{code}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>{discount} %</Text>
         </View>
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>{description}</Text>
@@ -279,6 +290,7 @@ export const PromotionDetailsCard = ({
   expiryDate = "N/A",
   icon = "calendar",
   files = [],
+  discount = "N/A",
 }: {
   itemId: string;
   title: string;
@@ -287,6 +299,7 @@ export const PromotionDetailsCard = ({
   expiryDate: string;
   icon: any;
   files?: any[];
+  discount: string;
 }) => {
   const { text, isFuture } = expiryDate.timeAgo();
   return (
@@ -303,6 +316,9 @@ export const PromotionDetailsCard = ({
         </View>
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>{code}</Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>{discount} %</Text>
         </View>
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>{description}</Text>

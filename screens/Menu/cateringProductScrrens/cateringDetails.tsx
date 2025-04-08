@@ -59,6 +59,8 @@ export default function CateringDetailsScreens({ navigation }: { navigation: any
             price={itemDetails.price}
             files={itemDetails.files || []}
             isSmall={false}
+            quantity={itemDetails.quantity}
+            productType={itemDetails.itemType}
           />
           <View style={recycledStyles.buttons}>
             {buttonBuilder(

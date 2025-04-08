@@ -1,31 +1,28 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { useFormik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-
-import { getPromotion, searchPromotion } from "../../api/promotion";
-import { CustomePromotionCard } from "../../components/customeCard";
-import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
-import searchContainer from "../../components/searchContainer";
-import NoResultsCard from "../../components/searchNotFound";
-import { parseError } from "../../components/toasts";
-import CreatePromotionModal from "./createGroupModal";
-
-import { useFocusEffect, useRoute } from "@react-navigation/core";
-
-export default function PromotionScreens({ navigation }: { navigation: any }) {
-  const [apiInUse, setApiInUse] = useState(true);
+import { getSide, searchSide } from "../../../api/cateringSides";
+import { CustomeMenuCard } from "../../../components/customeCard";
+import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
+import searchContainer from "../../../components/searchContainer";
+import NoResultsCard from "../../../components/searchNotFound";
+import { parseError } from "../../../components/toasts";
+import CreateGroupModal from "./createGroupModal";
+export default function CateringSidesScreens({ navigation }: { navigation: any }) {
+  const [apiInUse, setApiInUse] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [refresh, setRefresh] = useState(false);
-  const [promotions, setPromotions] = useState<any[]>([]);
+  const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [sides, setSides] = useState<any[]>([]);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [refreshing, setRefreshing] = useState(false);
+  const route = useRoute() as { params?: { refresh?: boolean } };
   const [refreshes, setRefreshes] = useState<number>(0);
-   const route = useRoute() as { params?: { refresh?: boolean } };
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
@@ -34,7 +31,7 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
 
-    const itemResponse = await getPromotion();
+    const itemResponse = await getSide();
 
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
@@ -42,8 +39,9 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
       setApiInUse(false);
       return;
     }
+
     setPages(itemResponse.data.pages);
-    setPromotions(itemResponse.data.results);
+    setSides(itemResponse.data.results);
 
     setApiInUse(false);
     setRefreshing(false);
@@ -52,38 +50,40 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
   useEffect(() => {
     prepare();
   }, []);
+
   useEffect(() => {
-    if (refresh) {
+    if (shouldRefresh) {
       prepare();
-      setRefresh(false);
+      setShouldRefresh(false);
     }
-  }, [refresh]);
+  }, [shouldRefresh]);
 
   useFocusEffect(
-      useCallback(() => {
-        if (route.params?.refresh) {
-          prepare();
-          navigation.setParams({ refresh: false });
-        }
-      }, [route.params?.refresh])
-    );
+    useCallback(() => {
+      if (route.params?.refresh) {
+        prepare();
+        navigation.setParams({ refresh: false });
+      }
+    }, [route.params?.refresh])
+  );
 
   const onRefresh = async () => {
+    
     setRefreshing(true);
     prepare(true);
   };
   const formik = useFormik({
     initialValues: {
-      promotionCode: "",
+      sideName: "",
     },
     validationSchema: null,
     onSubmit: async (values) => {
       setButtonVisible(false);
-      fetchItem(values.promotionCode);
+      fetchSides(values.sideName);
     },
   });
 
-  const fetchItem = async (query: string) => {
+  const fetchSides = async (query: string) => {
     if (query.trim() === "") {
       prepare(true);
       return;
@@ -91,9 +91,9 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
     try {
-      const itemSearchRes = await searchPromotion(query);
+      const itemSearchRes = await searchSide(query);
       if (itemSearchRes.data.success === true) {
-        setPromotions(itemSearchRes.data.results);
+        setSides(itemSearchRes.data.results);
       } else {
         Toast.error(parseError(itemSearchRes));
       }
@@ -102,6 +102,16 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
   };
+  // Debounced search to prevent excessive API calls
+  useEffect(() => {
+    setButtonVisible(true);
+    const delayDebounce = setTimeout(() => {
+      fetchSides(formik.values.sideName);
+    }, 500);
+
+    return () => clearTimeout(delayDebounce); // Cleanup function
+  }, [formik.values.sideName]);
+
   async function loadMore() {
     if (apiInUse) {
       return;
@@ -109,32 +119,24 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
 
     setApiInUse(true);
 
-    const postReq = await getPromotion(currentPage + 1, promotions[promotions.length - 1].id);
-    if (postReq.data.success !== true) {
-      Toast.error(parseError(postReq));
+    const itemResponse = await getSide(currentPage + 1, sides[sides.length - 1].id);
+    if (itemResponse.data.success !== true) {
+      Toast.error(parseError(itemResponse));
     } else {
-      setPromotions([...promotions, ...postReq.data.results] as []);
+      setSides([...sides, ...itemResponse.data.results] as []);
       setCurrentPage(currentPage + 1);
     }
 
     setApiInUse(false);
   }
-  // Debounced search to prevent excessive API calls
-  useEffect(() => {
-    setButtonVisible(true);
-    const delayDebounce = setTimeout(() => {
-      fetchItem(formik.values.promotionCode);
-    }, 500); // Delay search by 500ms after user stops typing
-
-    return () => clearTimeout(delayDebounce); // Cleanup function
-  }, [formik.values.promotionCode]);
-
   function onScroll(event: any) {
     if (apiInUse || currentPage === pages) {
       return;
     }
+
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000) {
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 900) {
+      console.log("loading more, 1000", apiInUse, currentPage, pages);
       loadMore();
     }
   }
@@ -142,6 +144,7 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView key={refreshes} style={recycledStyles.safeAreaView}>
+        <ToastManager {...toastManagerProps} />
         <ScrollView
           onScroll={onScroll}
           scrollEventThrottle={16}
@@ -149,31 +152,31 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-          <ToastManager {...toastManagerProps} />
-          <View style={{}}>{searchContainer(formik, buttonVisible, apiInUse, "promotionCode")}</View>
+          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "sideName")}</View>
 
           <ScrollView>
-            {promotions.length > 0 ? (
-              promotions.map((item) => (
-                <CustomePromotionCard
+            {sides.length > 0 ? (
+              sides.map((item) => (
+                <CustomeMenuCard
                   key={item.id}
-                  itemId={item.id}
                   title={item.name}
                   description={item.description}
-                  code={item.code}
+                  menuTypes={item.sidesTypes}
                   onPress={() => {
-                    navigation.navigate("PromotionDetails", { PromotionDetails: item });
+                    navigation.navigate("CateringSidesDetails", { itemDetails: item });
                   }}
-                  icon="clock-o"
+                  icon="usd"
                   buttonName="manage"
                   buttonIsActive={true}
-                  expiryDate={item.expiryDate}
-                  discount={item.discount}
+                  price={item.price}
+                  files={item.files}
+                  isSmall={true}
+                  quantity={item.quantity}
                 />
               ))
             ) : (
               <NoResultsCard
-                message={"Sorry, No promotions found In the Menu."}
+                message={"Sorry, No Item found In the Sides."}
                 additionalProps={{ icon: <FontAwesome name="cutlery" size={30} color="white" /> }}
               />
             )}
@@ -187,7 +190,7 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreatePromotionModal onClose={() => setModalVisible(false)} onRefresh={() => setRefresh(true)} />
+          <CreateGroupModal onClose={() => setModalVisible(false)} onRefresh={() => setShouldRefresh(true)} />
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />
@@ -197,4 +200,6 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  //recycledStyles
+});

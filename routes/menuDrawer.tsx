@@ -5,17 +5,15 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import NavigationHeader from "../components/navigationHeader";
 import { recycledStyles } from "../components/recycled-style";
 
-
-
 import BevrageStackNavigator from "./bevrageNavigation/bevrageStackNavigator";
+import CateringStackNavigator from "./cateringNavigation/cateringStackNavigator";
+import CateringSidesStackNavigator from "./cateringSideNavigation/sideStackNavigator";
+import GenericItemStackNavigator from "./genericNavigation/genericStackNavigator";
 import ItemStackNavigator from "./itemNavigation/itemStackNavigation";
 import MeatStackNavigator from "./meatNavigation/meatStackNavigator";
 import ProductStackNavigator from "./productNavigation/productStackNavigator";
 import SauceStackNavigator from "./sauceNavigation/sauceStackNavigation";
 import SidesStackNavigator from "./sidesNavigation/sideStackNavigator";
-import CateringStackNavigator from "./cateringNavigation/cateringStackNavigator";
-
-import GenericItemStackNavigator from "./genericNavigation/genericStackNavigator";
 
 const RootDrawerNavigator = createDrawerNavigator();
 export default function MenuDrawer(navigation: any) {
@@ -46,7 +44,15 @@ export default function MenuDrawer(navigation: any) {
           headerStyle: { backgroundColor: "skyblue" },
         }}
       />
-
+      <RootDrawerNavigator.Screen
+        name="CateringProduct"
+        component={CateringStackNavigator}
+        options={{
+          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
+          headerTitle: () => <NavigationHeader title="Catering" navigation={navigation} />,
+          headerStyle: { backgroundColor: "skyblue" },
+        }}
+      />
       <RootDrawerNavigator.Screen
         name="Item"
         component={ItemStackNavigator}
@@ -57,33 +63,6 @@ export default function MenuDrawer(navigation: any) {
         }}
       />
 
-      <RootDrawerNavigator.Screen
-        name="Bevrage"
-        component={BevrageStackNavigator}
-        options={{
-          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
-          headerTitle: () => <NavigationHeader title="Bevrages" navigation={navigation} />,
-          headerStyle: { backgroundColor: "skyblue" },
-        }}
-      />
-      <RootDrawerNavigator.Screen
-        name="Sides"
-        component={SidesStackNavigator}
-        options={{
-          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
-          headerTitle: () => <NavigationHeader title="Sides" navigation={navigation} />,
-          headerStyle: { backgroundColor: "skyblue" },
-        }}
-      />
-      <RootDrawerNavigator.Screen
-        name="CateringProduct"
-        component={CateringStackNavigator}
-        options={{
-          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
-          headerTitle: () => <NavigationHeader title="Catering" navigation={navigation} />,
-          headerStyle: { backgroundColor: "skyblue" },
-        }}
-      />
       <RootDrawerNavigator.Screen
         name="Sauce"
         component={SauceStackNavigator}
@@ -102,13 +81,41 @@ export default function MenuDrawer(navigation: any) {
           headerStyle: { backgroundColor: "skyblue" },
         }}
       />
-      
+
+      <RootDrawerNavigator.Screen
+        name="Sides"
+        component={SidesStackNavigator}
+        options={{
+          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
+          headerTitle: () => <NavigationHeader title="Sides" navigation={navigation} />,
+          headerStyle: { backgroundColor: "skyblue" },
+        }}
+      />
+      <RootDrawerNavigator.Screen
+        name="CateringSides"
+        component={CateringSidesStackNavigator}
+        options={{
+          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
+          headerTitle: () => <NavigationHeader title="Catering Sides" navigation={navigation} />,
+          headerStyle: { backgroundColor: "skyblue" },
+        }}
+      />
+
       <RootDrawerNavigator.Screen
         name="Generic"
         component={GenericItemStackNavigator}
         options={{
           drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
           headerTitle: () => <NavigationHeader title="Generic" navigation={navigation} />,
+          headerStyle: { backgroundColor: "skyblue" },
+        }}
+      />
+      <RootDrawerNavigator.Screen
+        name="Bevrage"
+        component={BevrageStackNavigator}
+        options={{
+          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
+          headerTitle: () => <NavigationHeader title="Bevrages" navigation={navigation} />,
           headerStyle: { backgroundColor: "skyblue" },
         }}
       />

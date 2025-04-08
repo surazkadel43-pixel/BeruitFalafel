@@ -15,20 +15,20 @@ import {
   View,
 } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
-import { createBevrage, getAllBevrages } from "../../../api/bevrages";
+import { getAllBevrages } from "../../../api/bevrages";
 import { getAllItems } from "../../../api/item";
 import { getAllMeats } from "../../../api/meats";
 import { getAllSauces } from "../../../api/sauce";
+import { createSide } from "../../../api/sides";
 import { createSideSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { BevragesCheckbox, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { BevragesCheckbox, ItemsCheckbox, ItemTypeRadioButtons, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
-import { createSide } from "../../../api/sides";
 
 interface CreateSidesModal {
   onClose: () => void;
@@ -101,6 +101,9 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
       sauces: [],
       bevrages: [],
       meats: [],
+      quantity: "",
+      itemType: "",
+
     },
     validationSchema: createSideSchema,
     onSubmit: async (values) => {
@@ -116,19 +119,23 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
        */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
+      const numericQuantity = parseInt(values.quantity) || 0;
+      const numericItemType = parseInt(values.itemType) || 0;
       const response = await createSide(
         values.name,
         numericPrice, // Ensure price is a number
         numericDiscountPrice,
         values.description,
-        
+
         values.image || [],
         values.foodTypes,
         values.items,
-        values.sauces,  
-        
+        values.sauces,
+
         values.bevrages,
         values.meats,
+        numericQuantity, // Ensure quantity is a number
+        numericItemType
       );
 
       if (response.data.success !== true) {
@@ -258,12 +265,17 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
+              {inputBuilder("Enter your Quantity", "quantity", formik, {
+                keyboardType: "numeric", // Only numeric input
+                maxLength: 2, // Limit the input to 6 digits
+                style: createItemPropsStyles.itemPrice,
+              })}
+              <ItemTypeRadioButtons formik={formik} valueName="itemType"  />
               <SidesTypesCheckbox formik={formik} valueName="foodTypes" />
               <ItemsCheckbox formik={formik} valueName="items" items={items} />
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
               <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
               <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
-
               {inputBuilder("Enter your Side Description", "description", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemDescription,

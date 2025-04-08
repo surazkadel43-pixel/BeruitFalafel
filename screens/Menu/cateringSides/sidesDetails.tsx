@@ -3,15 +3,16 @@ import React, { useEffect, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
+
 import { buttonBuilder } from "../../../components/button";
 
-import { deleteProduct } from "../../../api/product";
+import { deleteSide } from "../../../api/cateringSides";
 import { CustomeMenuCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import { popWithParams } from "../../../utils/routes";
-export default function ProductDetailsScreens({ navigation }: { navigation: any }) {
+export default function CateringSidesDetailsScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
 
   const route = useRoute(); // ✅ Get the route object
@@ -24,17 +25,16 @@ export default function ProductDetailsScreens({ navigation }: { navigation: any 
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeleteProduct = async () => {
+  const handelDeleteSide = async () => {
     setApiInUse(true);
-    const deltedRes = await deleteProduct(itemDetails.id);
+    const deltedRes = await deleteSide(itemDetails.id);
     if (deltedRes.data.success !== true) {
       Toast.error(parseError(deltedRes));
       setApiInUse(false);
       return;
     }
     setApiInUse(false);
-
-    showAlert("Sucess", `Product deleted successfully  `, async () => {
+    showAlert("Sucess", `Sides deleted successfully  `, async () => {
       popWithParams(navigation, 1, { refresh: true });
     });
   };
@@ -49,7 +49,7 @@ export default function ProductDetailsScreens({ navigation }: { navigation: any 
             itemId={itemDetails.id}
             title={itemDetails.name}
             description={itemDetails.description}
-            foodTypes={itemDetails.productTypes}
+            foodTypes={itemDetails.sidesTypes}
             meats={itemDetails.meats}
             sauces={itemDetails.sauces}
             bevrages={itemDetails.beverages}
@@ -58,20 +58,19 @@ export default function ProductDetailsScreens({ navigation }: { navigation: any 
             price={itemDetails.price}
             files={itemDetails.files || []}
             isSmall={false}
-            quantity = {itemDetails.quantity}
-            productType={itemDetails.itemType as number}
+            quantity={itemDetails.quantity}
           />
           <View style={recycledStyles.buttons}>
             {buttonBuilder(
-              "Edit Product",
+              "Edit Catering Side",
               () => {
-                navigation.navigate("ProductEdit", { itemDetails });
+                navigation.navigate("CateringSideEdit", { itemDetails });
               },
               apiInUse,
               undefined,
               true
             )}
-            {buttonBuilder("Delete Product", handelDeleteProduct, apiInUse)}
+            {buttonBuilder("Delete Side", handelDeleteSide, apiInUse)}
           </View>
         </ScrollView>
       </SafeAreaView>

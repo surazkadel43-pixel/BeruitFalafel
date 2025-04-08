@@ -1,16 +1,30 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { useFormik } from "formik";
-import React, { useCallback, useEffect, useState } from "react";
-import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  FlatList,
+  Keyboard,
+  Modal,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getSide, searchSide } from "../../../api/sides";
+import { getAllSides, searchSide } from "../../../api/sides";
+import { buttonBuilder } from "../../../components/button";
 import { CustomeMenuCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
 import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
+import { useStickyScroll } from "../../../hooks/useStickyScroll";
+import { getProductTypeById, ItemType } from "../../../utils/enums";
 import CreateGroupModal from "./createGroupModal";
 export default function SidesScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(false);
@@ -23,15 +37,16 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const route = useRoute() as { params?: { refresh?: boolean } };
   const [refreshes, setRefreshes] = useState<number>(0);
+  const itemType = useRef<number>(1);
+  let { onScroll, scrollY, stickyTop, stickyOpacity, resetScroll } = useStickyScroll();
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
-      setCurrentPage(1);
       setRefreshes(refreshes + 1);
     }
     setApiInUse(false);
 
-    const itemResponse = await getSide();
+    const itemResponse = await getAllSides(itemType.current);
 
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
@@ -40,12 +55,18 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
       return;
     }
 
-    setPages(itemResponse.data.pages);
     setSides(itemResponse.data.results);
 
     setApiInUse(false);
     setRefreshing(false);
   }
+
+  const handleItemTypeChange = (type: number) => {
+    setApiInUse(true);
+    resetScroll();
+    itemType.current = type;
+    onRefresh();
+  };
 
   useEffect(() => {
     prepare();
@@ -68,8 +89,9 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   );
 
   const onRefresh = async () => {
+   
     setRefreshing(true);
-    prepare(true);
+    prepare(true); // Pass itemType to prepare function
   };
   const formik = useFormik({
     initialValues: {
@@ -111,75 +133,98 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
     return () => clearTimeout(delayDebounce); // Cleanup function
   }, [formik.values.sideName]);
 
-  async function loadMore() {
-    if (apiInUse) {
-      return;
-    }
-
-    setApiInUse(true);
-
-    const itemResponse = await getSide(currentPage + 1, sides[sides.length - 1].id);
-    if (itemResponse.data.success !== true) {
-      Toast.error(parseError(itemResponse));
-    } else {
-      setSides([...sides, ...itemResponse.data.results] as []);
-      setCurrentPage(currentPage + 1);
-    }
-
-    setApiInUse(false);
-  }
-  function onScroll(event: any) {
-    if (apiInUse || currentPage === pages) {
-      return;
-    }
-
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 900) {
-      console.log("loading more, 1000", apiInUse, currentPage, pages);
-      loadMore();
-    }
-  }
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView key={refreshes} style={recycledStyles.safeAreaView}>
         <ToastManager {...toastManagerProps} />
-        <ScrollView
-          onScroll={onScroll}
-          scrollEventThrottle={16}
-          contentContainerStyle={{ flexGrow: 1 }}
-          showsVerticalScrollIndicator={false}
+        <FlatList
+          data={sides} // Your array of products
+          keyExtractor={(item) => item.id.toString()} // Provide a unique key for each item
+          renderItem={({ item }) => (
+            <CustomeMenuCard
+              key={item.id}
+              title={item.name}
+              description={item.description}
+              menuTypes={item.sidesTypes}
+              onPress={() => {
+                navigation.navigate("SidesDetails", { itemDetails: item });
+              }}
+              icon="usd"
+              buttonName="manage"
+              buttonIsActive={true}
+              price={item.price}
+              productType={getProductTypeById(item.itemType)}
+              quantity={item.quantity}
+            />
+          )}
+          ListEmptyComponent={() => (
+            <NoResultsCard
+              message={"Sorry, No Item found In the Products."}
+              additionalProps={{
+                icon: <FontAwesome name="cutlery" size={30} color="white" />,
+              }}
+            />
+          )}
+          ListHeaderComponent={
+            <View style={{ marginBottom: 10 }}>
+              {searchContainer(formik, buttonVisible, apiInUse, "sideName")}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false} // Optionally hide the scroll indicator
+                contentContainerStyle={{ flexDirection: "row" }}
+              >
+                <View style={recycledStyles.actionButtons}>
+                  {buttonBuilder("Product", () => handleItemTypeChange(ItemType.Product), apiInUse, undefined, itemType.current === ItemType.Product, {
+                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
+                  })}
+                  {buttonBuilder("Catering", () => handleItemTypeChange(ItemType.Catering), apiInUse, undefined, itemType.current === ItemType.Catering, {
+                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
+                  })}
+                  {buttonBuilder("Both", () => handleItemTypeChange(ItemType.Both), apiInUse, undefined, itemType.current === ItemType.Both, {
+                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Both ? "green" : "#4C5BD4" }],
+                  })}
+                </View>
+              </ScrollView>
+            </View>
+          }
+          contentContainerStyle={{ paddingBottom: 20 }} // Optional: Add some padding at the bottom if needed
+          showsVerticalScrollIndicator={false} // Hide the scroll indicator if needed
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          // onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+          onScroll={onScroll}
+        
+        />
+        {/* Animated Action Buttons that appear on top of the list */}
+        <Animated.View
+          style={[
+            recycledStyles.stickyScrollViewWrapper,
+            {
+              top: stickyTop,
+              opacity: stickyOpacity,
+            },
+          ]}
         >
-          <View style={{ marginBottom: 10 }}>{searchContainer(formik, buttonVisible, apiInUse, "sideName")}</View>
-
-          <ScrollView>
-            {sides.length > 0 ? (
-              sides.map((item) => (
-                <CustomeMenuCard
-                  key={item.id}
-                  title={item.name}
-                  description={item.description}
-                  menuTypes={item.sidesTypes}
-                  onPress={() => {
-                    navigation.navigate("SidesDetails", { itemDetails: item });
-                  }}
-                  icon="usd"
-                  buttonName="manage"
-                  buttonIsActive={true}
-                  price={item.price}
-                  files={item.files}
-                  isSmall={true}
-                />
-              ))
-            ) : (
-              <NoResultsCard
-                message={"Sorry, No Item found In the Sides."}
-                additionalProps={{ icon: <FontAwesome name="cutlery" size={30} color="white" /> }}
-              />
-            )}
-          </ScrollView>
-        </ScrollView>
+          <View style={{ marginBottom: 10 }}>
+            <ScrollView
+              bounces={false}
+              horizontal
+              showsHorizontalScrollIndicator={false} // Optionally hide the scroll indicator
+              contentContainerStyle={{ flexDirection: "row" }}
+            >
+              <View style={recycledStyles.actionButtons}>
+                {buttonBuilder("Product", () => handleItemTypeChange(ItemType.Product), apiInUse, undefined, itemType.current === ItemType.Product, {
+                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
+                })}
+                {buttonBuilder("Catering", () => handleItemTypeChange(ItemType.Catering), apiInUse, undefined, itemType.current === ItemType.Catering, {
+                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
+                })}
+                {buttonBuilder("Both", () => handleItemTypeChange(ItemType.Both), apiInUse, undefined, itemType.current === ItemType.Both, {
+                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Both ? "green" : "#4C5BD4" }],
+                })}
+              </View>
+            </ScrollView>
+          </View>
+        </Animated.View>
         {/* Modal */}
         <Modal
           visible={modalVisible}

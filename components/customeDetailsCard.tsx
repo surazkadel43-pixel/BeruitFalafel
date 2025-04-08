@@ -2,6 +2,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { PostImages } from "./postImages";
+import { recycledStyles } from "./recycled-style";
+import { getProductText, getProductType, ItemType } from "../utils/enums";
 
 interface CustomeCardProps {
   itemId?: number;
@@ -36,6 +38,8 @@ interface CustomeMenuCardProps {
   icon?: any;
   files?: any[];
   isSmall?: boolean;
+  quantity: string;
+  productType?: number;
 }
 
 // Food type options (Label mapping)
@@ -276,6 +280,9 @@ export const CustomeMenuCard: React.FC<CustomeMenuCardProps> = ({
   icon = "usd",
   files = [],
   isSmall = false,
+  quantity = "0",
+  productType = 3,
+  
 }) => {
   const formattedFoodTypes = foodTypes.map((type) => foodOptions.find((option) => option.value === type)?.label || type).join(", ");
   return (
@@ -288,7 +295,9 @@ export const CustomeMenuCard: React.FC<CustomeMenuCardProps> = ({
           </Text>
           <Text style={styles.followers}>
             <Text style={styles.groupName}> Name: </Text> {title}
+             
           </Text>
+          <Text style={recycledStyles.postUsername}>{getProductText(productType).toUpperCase() || "N/A"}</Text>
         </View>
 
         {/* Price Section */}
@@ -304,6 +313,13 @@ export const CustomeMenuCard: React.FC<CustomeMenuCardProps> = ({
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>
             <Text style={styles.groupName}>Description: </Text> {description}
+          </Text>
+        </View>
+
+        
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>
+            <Text style={styles.groupName}>Quantity: </Text> {quantity}
           </Text>
         </View>
 

@@ -18,6 +18,7 @@ export default function SidesDetailsScreens({ navigation }: { navigation: any })
   const route = useRoute(); // ✅ Get the route object
   const { itemDetails } = route.params as { itemDetails: any };
 
+  console.log("itemDetails", itemDetails);
   async function prepare() {
     setApiInUse(false);
   }
@@ -58,6 +59,7 @@ export default function SidesDetailsScreens({ navigation }: { navigation: any })
             price={itemDetails.price}
             files={itemDetails.files || []}
             isSmall={false}
+            quantity={itemDetails.quantity}
           />
           <View style={recycledStyles.buttons}>
             {buttonBuilder(

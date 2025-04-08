@@ -5,12 +5,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Keyboard, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getCateringProduct, searchCateringProduct } from "../../../api/cateringProduct";
+import { getAllCateringProducts, searchCateringProduct } from "../../../api/cateringProduct";
 import { CustomeMenuCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
 import searchContainer from "../../../components/searchContainer";
 import NoResultsCard from "../../../components/searchNotFound";
 import { parseError } from "../../../components/toasts";
+import { ItemType } from "../../../utils/enums";
 import CreateGroupModal from "./createGroupModal";
 
 export default function CateringScreens({ navigation }: { navigation: any }) {
@@ -20,20 +21,13 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [products, setProduct] = useState<any[]>([]);
-  const [pages, setPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+
   const route = useRoute() as { params?: { refresh?: boolean } };
 
-  const [refreshes, setRefreshes] = useState<number>(0);
-
-  async function prepare(isRefreshing: boolean = false) {
-    if (isRefreshing) {
-      setCurrentPage(1);
-      setRefreshes(refreshes + 1);
-    }
+  async function prepare() {
     setApiInUse(false);
 
-    const itemResponse = await getCateringProduct();
+    const itemResponse = await getAllCateringProducts();
 
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
@@ -42,7 +36,6 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
       return;
     }
 
-    setPages(itemResponse.data.pages);
     setProduct(itemResponse.data.results);
 
     setApiInUse(false);
@@ -53,11 +46,9 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
     prepare();
   }, []);
 
-
-
   useEffect(() => {
     if (shouldRefresh) {
-      prepare(); 
+      prepare();
       setShouldRefresh(false);
     }
   }, [shouldRefresh]);
@@ -66,14 +57,14 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
     useCallback(() => {
       if (route.params?.refresh) {
         prepare();
-        navigation.setParams({ refresh: false }); 
+        navigation.setParams({ refresh: false });
       }
     }, [route.params?.refresh])
   );
 
   const onRefresh = async () => {
     setRefreshing(true);
-    prepare(true);
+    prepare();
   };
   const formik = useFormik({
     initialValues: {
@@ -88,7 +79,7 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
 
   const fetchProduct = async (query: string) => {
     if (query.trim() === "") {
-      prepare(true);
+      prepare();
       return;
     }
 
@@ -115,41 +106,11 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
     return () => clearTimeout(delayDebounce); // Cleanup function
   }, [formik.values.productName]);
 
-  async function loadMore() {
-    if (apiInUse) {
-      return;
-    }
-
-    setApiInUse(true);
-
-    const itemResponse = await getCateringProduct(currentPage + 1, products[products.length - 1].id);
-    if (itemResponse.data.success !== true) {
-      Toast.error(parseError(itemResponse));
-    } else {
-      setProduct([...products, ...itemResponse.data.results] as []);
-      setCurrentPage(currentPage + 1);
-    }
-
-    setApiInUse(false);
-  }
-  function onScroll(event: any) {
-    if (apiInUse || currentPage === pages) {
-      return;
-    }
-
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 900) {
-      console.log("loading more, 1000", apiInUse, currentPage, pages);
-      loadMore();
-    }
-  }
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView key={refreshes} style={recycledStyles.safeAreaView}>
+      <SafeAreaView style={recycledStyles.safeAreaView}>
         <ToastManager {...toastManagerProps} />
         <ScrollView
-          onScroll={onScroll}
           scrollEventThrottle={16}
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
@@ -168,12 +129,12 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
                   onPress={() => {
                     navigation.navigate("CateringDetails", { itemDetails: item });
                   }}
+                  productType={ItemType.Catering}
                   icon="usd"
                   buttonName="manage"
                   buttonIsActive={true}
                   price={item.price}
-                  files={item.files}
-                  isSmall={true}
+                  quantity={item.quantity}
                 />
               ))
             ) : (
@@ -192,7 +153,7 @@ export default function CateringScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreateGroupModal onClose={() => setModalVisible(false)} onRefresh={() => setShouldRefresh(true)}/>
+          <CreateGroupModal onClose={() => setModalVisible(false)} onRefresh={() => setShouldRefresh(true)} />
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />

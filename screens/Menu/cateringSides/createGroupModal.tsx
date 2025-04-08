@@ -16,44 +16,26 @@ import {
 } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
 import { getAllBevrages } from "../../../api/bevrages";
-import { getAllGenericItems } from "../../../api/genericItem";
 import { getAllItems } from "../../../api/item";
 import { getAllMeats } from "../../../api/meats";
-import { createProduct } from "../../../api/product";
 import { getAllSauces } from "../../../api/sauce";
-import { getAllSides } from "../../../api/sides";
-import { createProductSchema } from "../../../api/validations";
+import { createSide } from "../../../api/cateringSides";
+import { createSideSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import {
-  BevragesCheckbox,
-  GenericItemsRadioButton,
-  ItemsCheckbox,
-  ItemTypeRadioButtons,
-  MeatsCheckbox,
-  SauceCheckbox,
-  SidesCheckbox,
-  SidesTypesCheckbox,
-} from "../../../components/meatTypesDropDown";
+import { BevragesCheckbox, ItemsCheckbox, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import ZoomImageModal from "../../../components/zoomImageModals";
 import "../../../extension/extension";
-const genericNames = [
-  { id: "1", name: "Bowl" },
-  { id: "2", name: "Falafel Wrap" },
-  { id: "3", name: "Meat Wrap" },
-  { id: "4", name: "Plates" },
-];
 
-interface CreateProductModal {
+interface CreateSidesModal {
   onClose: () => void;
-
   onRefresh: () => void;
 }
 
-const CreateProductModal: React.FC<CreateProductModal> = (props) => {
+const CreateCateringSidesModal: React.FC<CreateSidesModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -61,8 +43,6 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
   const [bevrages, setBevrages] = useState<any[]>([]);
   const [sauces, setSauces] = useState<any[]>([]);
   const [meats, setMeats] = useState<any[]>([]);
-  const [sides, setSides] = useState<any[]>([]);
-  const [genericItems, setGenericItems] = useState<any[]>(genericNames);
   const [canAttachMultipleImages, setCanAttachMultipleImages] = useState<boolean>(true);
 
   async function prepare() {
@@ -103,26 +83,6 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
     }
 
     setMeats(MeatRes.data.results);
-
-    const genericItemRes = await getAllGenericItems();
-    if (genericItemRes.data.success !== true) {
-      Toast.error(parseError(genericItemRes));
-      setApiInUse(false);
-      return;
-    }
-
-    setGenericItems(genericItemRes.data.results);
-
-    //const [sides, setSides] = useState<any[]>([]);
-    //sides: [],
-    //<SidesCheckbox formik={formik} valueName="sides" items={sides} />
-    const sidesRes = await getAllSides();
-    if (sidesRes.data.success !== true) {
-      Toast.error(parseError(sidesRes));
-      setApiInUse(false);
-      return;
-    }
-    setSides(sidesRes.data.results);
   }
 
   useEffect(() => {
@@ -141,12 +101,9 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
       sauces: [],
       bevrages: [],
       meats: [],
-      genericName: "",
-      sides: [],
-      quantity: "",
-      itemType: "",
+      quantity: undefined
     },
-    validationSchema: createProductSchema,
+    validationSchema: createSideSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
       if (selectedImages.length === 0) {
@@ -160,24 +117,20 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
        */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
-      const numericQuantity = parseInt(values.quantity) || 0;
-      const numericItemType = parseInt(values.itemType) || 0;
-      const response = await createProduct(
+      const response = await createSide(
         values.name,
-        numericPrice,
+        numericPrice, // Ensure price is a number
         numericDiscountPrice,
         values.description,
+
         values.image || [],
         values.foodTypes,
         values.items,
         values.sauces,
+
         values.bevrages,
         values.meats,
-        values.genericName,
-        values.sides,
-        numericQuantity,
-        numericItemType,
-
+        values.quantity
       );
 
       if (response.data.success !== true) {
@@ -186,8 +139,8 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
         return;
       }
 
-      Toast.success("Successfully Product created in!");
-      showAlert("Sucess", `Successfully Product created  `, async () => {
+      Toast.success("Successfully Sides created in!");
+      showAlert("Sucess", `Successfully Sides created  `, async () => {
         props.onRefresh();
         props.onClose();
       });
@@ -279,7 +232,7 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             {/* Header Section */}
             <View style={createModalStyles.header}>
-              <Text style={createModalStyles.title}>Create Product</Text>
+              <Text style={createModalStyles.title}>Create Catering Sides</Text>
 
               <TouchableOpacity onPress={props.onClose} style={createModalStyles.closeButton}>
                 <Text style={createModalStyles.closeButtonText}>✖</Text>
@@ -287,11 +240,11 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
             </View>
 
             <View style={createModalStyles.card}>
-              {inputBuilder("Enter your Product Name", "name", formik, {
+              {inputBuilder("Enter your Side Name", "name", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemName,
               })}
-              {inputBuilder("Enter your Product Price", "price", formik, {
+              {inputBuilder("Enter your Side Price", "price", formik, {
                 multiline: true,
                 keyboardType: "numeric",
                 onChangeText: (text: string) => {
@@ -312,16 +265,13 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
                 maxLength: 2, // Limit the input to 6 digits
                 style: createItemPropsStyles.itemPrice,
               })}
-              <ItemTypeRadioButtons formik={formik} valueName="itemType"  />
-              <GenericItemsRadioButton formik={formik} valueName="genericName" items={genericItems} />
               <SidesTypesCheckbox formik={formik} valueName="foodTypes" />
               <ItemsCheckbox formik={formik} valueName="items" items={items} />
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
               <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
               <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
-              <SidesCheckbox formik={formik} valueName="sides" items={sides} />
 
-              {inputBuilder("Enter your Product Description", "description", formik, {
+              {inputBuilder("Enter your Side Description", "description", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemDescription,
               })}
@@ -368,6 +318,6 @@ const CreateProductModal: React.FC<CreateProductModal> = (props) => {
   );
 };
 
-export default CreateProductModal;
+export default CreateCateringSidesModal;
 
 const { width, height } = Dimensions.get("window");
