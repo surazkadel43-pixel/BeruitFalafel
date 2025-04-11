@@ -8,4 +8,17 @@ const showAlert = (title: string, message: string, onPress?: () => void) => {
   );
 };
 
+export const yesOrNoAlert = (title: string, message: string, onPressYes: () => void, onPressNo: () => void) => {
+  Alert.alert(
+    title,
+    message,
+    [
+      { text: "No", style: "cancel", onPress: onPressNo || (() => {}) },
+      { text: "Yes", style: "default", onPress: onPressYes || (() => {}) },
+      
+    ]
+  );
+}
+
+
 export default showAlert;

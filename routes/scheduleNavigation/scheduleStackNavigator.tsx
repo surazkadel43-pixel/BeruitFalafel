@@ -1,32 +1,34 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 
-import PromotionDetailsScreens from "../../screens/promotion/promotionDetails";
-import PromotionScreens from "../../screens/promotion/promotionScreens";
 import { MyNavigationHeader } from "../../components/navigationHeader";
+import EditSchedule from "../../screens/Schedule/editSchedule";
+import ScheduleScreens from "../../screens/Schedule/scheduleScreens";
 const Stack = createStackNavigator();
 
-export default function PromotionStackNavigator({ navigation }: { navigation: any }) {
+export default function ScheduleStackNavigator({ navigation }: { navigation: any }) {
   return (
     <Stack.Navigator
-      initialRouteName="PromotionScreens"
+      initialRouteName="ScheduleScreens"
       screenOptions={{
         headerStyle: { backgroundColor: "#12193D" },
         headerTintColor: "#fff",
         headerTitleStyle: { fontWeight: "bold" },
       }}
     >
-      <Stack.Screen name="PromotionScreens" component={PromotionScreens} options={{ title: "Promotion", 
-        headerTitle: () => <MyNavigationHeader title="Promotion" navigation={navigation} />,
-       }} />
+      <Stack.Screen
+        name="ScheduleScreens"
+        component={ScheduleScreens}
+        options={{ title: "Schedule", headerTitle: () => <MyNavigationHeader title="Schedule" navigation={navigation} /> }}
+      />
 
       <Stack.Screen
-        name="PromotionDetails"
-        component={PromotionDetailsScreens}
+        name="EditSchedule"
+        component={EditSchedule}
         options={{
           presentation: "modal",
           headerShown: true,
-          headerTitle: "Promotion Details",
+          headerTitle: "Edit Schedule",
           headerStyle: {
             backgroundColor: "#1C2237", // Change header background color
           },

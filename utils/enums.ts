@@ -2,6 +2,7 @@ export enum ItemType  {
   Product =  1,
   Catering = 2,
   Both = 3,
+  None = 4
 };
 
 export const getProductType = (product: ItemType) => {
@@ -13,7 +14,7 @@ export const getProductType = (product: ItemType) => {
     case ItemType.Both:
       return "Both";
     default:
-      return "Unknown";
+      return "None";
   }
 }
   
@@ -26,7 +27,7 @@ export const getProductTypeById = (productId: number) => {
     case 3:
       return ItemType.Both;
     default:
-      return ItemType.Both;
+      return ItemType.None;
   }
 }
 
@@ -39,6 +40,6 @@ export const getProductText = (productId: number) => {
     case 3:
       return "Both";
     default:
-      return "Unknown";
+      return "None";
   }
 }

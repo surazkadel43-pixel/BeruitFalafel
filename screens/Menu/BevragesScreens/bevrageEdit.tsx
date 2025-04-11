@@ -11,7 +11,7 @@ import { editBevrage } from "../../../api/bevrages";
 import { createBeverageSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { BevragesTypesCheckbox, ItemTypeRadioButtons } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -38,6 +38,8 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
       description: itemDetails.description,
       image: formattedImages,
       drinkTypes: itemDetails.drinkTypes,
+      quantity: itemDetails.quantity.toString(),
+      itemType: itemDetails.itemType.toString(),
     });
     setSelectedImages(formattedImages);
   }, []);
@@ -53,6 +55,8 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
       description: "",
       image: null,
       drinkTypes: [],
+      quantity: "",
+      itemType: "",
     },
     validationSchema: createBeverageSchema,
     onSubmit: async (values) => {
@@ -62,37 +66,19 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
         setApiInUse(false);
         return;
       }
-      /**
-       * Handles image uploads
-       */
 
-      // let uploadedImages: any[] = [];
-
-      // if (selectedImages.length > 0) {
-      //   try {
-      //     const uploadedImagesResp = await uploadImages(selectedImages);
-
-      //     for (const image of uploadedImagesResp) {
-      //       uploadedImages.push({ id: image.id });
-      //     }
-      //   } catch (error: any) {
-      //     Toast.error(error.message);
-      //     setApiInUse(false);
-      //     return;
-      //   }
-      // }
-
-      /**
-       * save bevrage to server
-       */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
+      const numericQuantity = parseInt(values.quantity) || 0;
+      const numericItemType = parseInt(values.itemType) || 0;
       const response = await editBevrage(
         itemDetails.id,
         values.name,
         numericPrice, // Ensure price is a number
         values.description,
         values.drinkTypes,
-        values.image || []
+        values.image || [],
+        numericQuantity,
+        numericItemType
       );
 
       if (response.data.success !== true) {
@@ -101,7 +87,6 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
         return;
       }
 
-      
       showAlert("Sucess", `Successfully Edited created  `, async () => {
         popWithParams(navigation, 2, { refresh: true });
       });
@@ -204,8 +189,14 @@ const CreateBevrageModal = ({ navigation }: { navigation: any }) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
+              {inputBuilder("Enter your Quantity", "quantity", formik, {
+                keyboardType: "numeric", // Only numeric input
+                maxLength: 2, // Limit the input to 6 digits
+                style: createItemPropsStyles.itemPrice,
+              })}
+              <ItemTypeRadioButtons formik={formik} valueName="itemType" />
+              <BevragesTypesCheckbox formik={formik} valueName="drinkTypes" />
 
-              <SidesTypesCheckbox formik={formik} valueName="drinkTypes" expanded={true} />
               {inputBuilder("Enter your Bevrage Description", "description", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemDescription,

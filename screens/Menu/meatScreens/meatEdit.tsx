@@ -8,7 +8,7 @@ import { editMeat } from "../../../api/meats";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import CheckBoxExample from "../../../components/meatTypesDropDown";
+import CheckBoxExample, { ItemTypeRadioButtons } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -32,6 +32,7 @@ const EditMeat = ({ navigation }: { navigation: any }) => {
       price: itemDetails.price.toString().toCurrency(),
       description: itemDetails.description,
       foodTypes: itemDetails.foodPreferences,
+      itemType: itemDetails.itemType.toString(),
     });
   }
 
@@ -41,18 +42,14 @@ const EditMeat = ({ navigation }: { navigation: any }) => {
       price: "",
       description: "",
       foodTypes: [],
+      itemType: "",
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
-      const itemResponse = await editMeat(
-        itemDetails.id,
-        values.name,
-        numericPrice, // Ensure price is a number
-        values.description,
-        values.foodTypes
-      );
+      const numericItemType = parseInt(values.itemType) || 0;
+      const itemResponse = await editMeat(itemDetails.id, values.name, numericPrice, values.description, values.foodTypes, numericItemType);
       if (itemResponse.data.success !== true) {
         Toast.error(parseError(itemResponse));
         setApiInUse(false);
@@ -85,6 +82,7 @@ const EditMeat = ({ navigation }: { navigation: any }) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
+              <ItemTypeRadioButtons formik={formik} valueName="itemType" />
               <CheckBoxExample formik={formik} valueName="foodTypes" />
               {inputBuilder("Enter your Item Description", "description", formik, {
                 multiline: true,

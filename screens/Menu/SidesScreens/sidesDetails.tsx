@@ -9,7 +9,7 @@ import { buttonBuilder } from "../../../components/button";
 import { deleteSide } from "../../../api/sides";
 import { CustomeMenuCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
-import showAlert from "../../../components/showAlert";
+import showAlert, { yesOrNoAlert } from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import { popWithParams } from "../../../utils/routes";
 export default function SidesDetailsScreens({ navigation }: { navigation: any }) {
@@ -17,8 +17,6 @@ export default function SidesDetailsScreens({ navigation }: { navigation: any })
 
   const route = useRoute(); // ✅ Get the route object
   const { itemDetails } = route.params as { itemDetails: any };
-
-  console.log("itemDetails", itemDetails);
   async function prepare() {
     setApiInUse(false);
   }
@@ -26,19 +24,30 @@ export default function SidesDetailsScreens({ navigation }: { navigation: any })
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeleteSide = async () => {
-    setApiInUse(true);
-    const deltedRes = await deleteSide(itemDetails.id);
-    if (deltedRes.data.success !== true) {
-      Toast.error(parseError(deltedRes));
-      setApiInUse(false);
-      return;
-    }
-    setApiInUse(false);
-    showAlert("Sucess", `Sides deleted successfully  `, async () => {
-      popWithParams(navigation, 1, { refresh: true });
-    });
-  };
+  
+
+  async function handelDeleteSide() {
+    yesOrNoAlert(
+      "Delete Side",
+      "Are you sure you want to delete this Side?",
+      async () => {
+        setApiInUse(true);
+        const deltedRes = await deleteSide(itemDetails.id);
+        if (deltedRes.data.success !== true) {
+          Toast.error(parseError(deltedRes));
+          setApiInUse(false);
+          return;
+        }
+        setApiInUse(false);
+        showAlert("Sucess", `Sides deleted successfully  `, async () => {
+          popWithParams(navigation, 1, { refresh: true });
+        });
+      },
+      () => {
+        return;
+      }
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -55,6 +64,7 @@ export default function SidesDetailsScreens({ navigation }: { navigation: any })
             sauces={itemDetails.sauces}
             bevrages={itemDetails.beverages}
             items={itemDetails.items}
+            productType={itemDetails.itemType}
             icon="usd"
             price={itemDetails.price}
             files={itemDetails.files || []}

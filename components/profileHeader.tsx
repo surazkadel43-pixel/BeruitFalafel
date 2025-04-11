@@ -21,13 +21,11 @@ export const ProfileHeader = ({
   phoneNumber = "N/A",
 }: User) => {
   const { text, isFuture } = createdAt.timeAgo();
-  console.log(createdAt);	
+ 
   return (
     <View style={styles.header}>
       <View style={styles.imageAndReport}>
-        {/*this is for image */}
-
-        {/* <Image source={require("../assets/images/MountEverest.jpg")} style={[styles.postImage]} /> */}
+        
       </View>
       <View>
         {/*this is for content */}

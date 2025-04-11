@@ -169,8 +169,7 @@ export default function CateringSidesScreens({ navigation }: { navigation: any }
                   buttonName="manage"
                   buttonIsActive={true}
                   price={item.price}
-                  files={item.files}
-                  isSmall={true}
+                 productType={item.itemType}
                   quantity={item.quantity}
                 />
               ))

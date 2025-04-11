@@ -1,17 +1,22 @@
-import { Image, StyleSheet, Text, View } from "react-native";
-
+import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-
-type name = {
-  name?: string | null;
-  age?: number | null;
-};
-
-let suraj: string | undefined;
+import { Image, StyleSheet, Text, View } from "react-native";
 
 export default function NavigationHeader({ title, navigation }: { title: string; navigation?: any }) {
   return (
     <View style={styles.header}>
+      <View style={styles.headerView}>
+        <Image source={require("../assets/favicon.png")} style={{ alignItems: "center" }} />
+        <Text style={styles.title}> {title} </Text>
+      </View>
+    </View>
+  );
+}
+
+export function MyNavigationHeader({ title, navigation }: { title: string; navigation?: any }) {
+  return (
+    <View style={styles.header}>
+      <MaterialIcons name="menu" size={24} style={styles.icon} onPress={() => navigation.openDrawer()} />
       <View style={styles.headerView}>
         <Image source={require("../assets/favicon.png")} style={{ alignItems: "center" }} />
         <Text style={styles.title}> {title} </Text>

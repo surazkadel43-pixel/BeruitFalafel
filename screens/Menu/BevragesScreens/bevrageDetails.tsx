@@ -7,7 +7,7 @@ import { deleteBevrage } from "../../../api/bevrages";
 import { buttonBuilder } from "../../../components/button";
 import { CustomeBevrageCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
-import showAlert from "../../../components/showAlert";
+import showAlert, { yesOrNoAlert } from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import { popWithParams } from "../../../utils/routes";
 export default function BevrageDetailsScreens({ navigation }: { navigation: any }) {
@@ -23,19 +23,30 @@ export default function BevrageDetailsScreens({ navigation }: { navigation: any 
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeleteBevrage = async () => {
-    setApiInUse(true);
-    const deltedRes = await deleteBevrage(itemDetails.id);
-    if (deltedRes.data.success !== true) {
-      Toast.error(parseError(deltedRes));
-      setApiInUse(false);
-      return;
-    }
-    setApiInUse(false);
-    showAlert("Sucess", `Bevrages deleted successfully  `, async () => {
-      popWithParams(navigation, 1, { refresh: true });
-    });
-  };
+  
+
+  async function handelDeleteBevrage() {
+    yesOrNoAlert(
+      "Delete Bevrage",
+      "Are you sure you want to delete this Beverage?",
+      async () => {
+        setApiInUse(true);
+        const deltedRes = await deleteBevrage(itemDetails.id);
+        if (deltedRes.data.success !== true) {
+          Toast.error(parseError(deltedRes));
+          setApiInUse(false);
+          return;
+        }
+        setApiInUse(false);
+        showAlert("Sucess", `Bevrages deleted successfully  `, async () => {
+          popWithParams(navigation, 1, { refresh: true });
+        });
+      },
+      () => {
+        return;
+      }
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -52,6 +63,8 @@ export default function BevrageDetailsScreens({ navigation }: { navigation: any 
             price={itemDetails.price}
             files={itemDetails.files || []}
             isSmall={false}
+            quantity={itemDetails.quantity}
+            itemType={itemDetails.itemType}
           />
           <View style={recycledStyles.buttons}>
             {buttonBuilder(

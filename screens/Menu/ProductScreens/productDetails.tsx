@@ -8,7 +8,7 @@ import { buttonBuilder } from "../../../components/button";
 import { deleteProduct } from "../../../api/product";
 import { CustomeMenuCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
-import showAlert from "../../../components/showAlert";
+import showAlert, { yesOrNoAlert } from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 import { popWithParams } from "../../../utils/routes";
 export default function ProductDetailsScreens({ navigation }: { navigation: any }) {
@@ -24,20 +24,30 @@ export default function ProductDetailsScreens({ navigation }: { navigation: any 
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeleteProduct = async () => {
-    setApiInUse(true);
-    const deltedRes = await deleteProduct(itemDetails.id);
-    if (deltedRes.data.success !== true) {
-      Toast.error(parseError(deltedRes));
-      setApiInUse(false);
-      return;
-    }
-    setApiInUse(false);
+  
+  async function handelDeleteProduct() {
+    yesOrNoAlert(
+      "Delete Product",
+      "Are you sure you want to delete this Product?",
+      async () => {
+        setApiInUse(true);
+        const deltedRes = await deleteProduct(itemDetails.id);
+        if (deltedRes.data.success !== true) {
+          Toast.error(parseError(deltedRes));
+          setApiInUse(false);
+          return;
+        }
+        setApiInUse(false);
 
-    showAlert("Sucess", `Product deleted successfully  `, async () => {
-      popWithParams(navigation, 1, { refresh: true });
-    });
-  };
+        showAlert("Sucess", `Product deleted successfully  `, async () => {
+          popWithParams(navigation, 1, { refresh: true });
+        });
+      },
+      () => {
+        return;
+      }
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -58,7 +68,7 @@ export default function ProductDetailsScreens({ navigation }: { navigation: any 
             price={itemDetails.price}
             files={itemDetails.files || []}
             isSmall={false}
-            quantity = {itemDetails.quantity}
+            quantity={itemDetails.quantity}
             productType={itemDetails.itemType as number}
           />
           <View style={recycledStyles.buttons}>

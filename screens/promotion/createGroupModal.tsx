@@ -19,7 +19,7 @@ import { createPromotion } from "../../api/promotion";
 import { createPromotionSchema } from "../../api/validations";
 import { buttonBuilder } from "../../components/button";
 import { inputBuilder } from "../../components/input";
-import { DatePickerField } from "../../components/meatTypesDropDown";
+import { DatePickerField, ItemTypeRadioButtons } from "../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../components/recycled-style";
 import showAlert from "../../components/showAlert";
 import { parseError } from "../../components/toasts";
@@ -51,21 +51,24 @@ const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
       description: "",
       image: [],
       expiry: "",
-      discount: undefined,
+      discount: "",
+      itemType: "",
     },
     validationSchema: createPromotionSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
-      console.log(values);
 
       const espiryDate = new Date(values.expiry);
+      const pasrseDiscount = parseInt(values.discount) || 0;
+      const numericItemType = parseInt(values.itemType) || 0;
       const response = await createPromotion(
         values.name,
-        values.code, // Ensure price is a number
+        values.code.toUpperCase(),
         values.description,
         espiryDate,
         values.image,
-        values.discount
+        pasrseDiscount,
+        numericItemType
       );
 
       if (response.data.success !== true) {
@@ -189,6 +192,7 @@ const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
                 maxLength: 2, // Limit the input to 6 digits
                 style: createItemPropsStyles.itemPrice,
               })}
+              <ItemTypeRadioButtons formik={formik} valueName="itemType" />
 
               <DatePickerField formik={formik} valueName="expiry" />
               {inputBuilder("Enter your Promotion Description", "description", formik, {
@@ -225,8 +229,8 @@ const CreatePromotionModal: React.FC<CreatePromotionModal> = (props) => {
               </View>
 
               <View style={imagePickerStyles.chooseImage}>
-                {buttonBuilder("Choose Image", pickImage, false, <Ionicons name="image" size={24} color="white" />)}
-                {buttonBuilder("Camera", openCamera, false, <Ionicons name="camera" size={24} color="white" />)}
+                {buttonBuilder("Choose Image", pickImage, apiInUse, <Ionicons name="image" size={24} color="white" />)}
+                {buttonBuilder("Camera", openCamera, apiInUse, <Ionicons name="camera" size={24} color="white" />)}
               </View>
 
               {buttonBuilder("Create", formik.handleSubmit, apiInUse)}

@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getAllSides, searchSide } from "../../../api/sides";
+import { getAllSidesByType, searchSide } from "../../../api/sides";
 import { buttonBuilder } from "../../../components/button";
 import { CustomeMenuCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
@@ -33,8 +33,6 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [sides, setSides] = useState<any[]>([]);
-  const [pages, setPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const route = useRoute() as { params?: { refresh?: boolean } };
   const [refreshes, setRefreshes] = useState<number>(0);
   const itemType = useRef<number>(1);
@@ -46,7 +44,7 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
 
-    const itemResponse = await getAllSides(itemType.current);
+    const itemResponse = await getAllSidesByType(itemType.current);
 
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
@@ -89,7 +87,6 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
   );
 
   const onRefresh = async () => {
-   
     setRefreshing(true);
     prepare(true); // Pass itemType to prepare function
   };
@@ -174,14 +171,31 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
                 contentContainerStyle={{ flexDirection: "row" }}
               >
                 <View style={recycledStyles.actionButtons}>
-                  {buttonBuilder("Product", () => handleItemTypeChange(ItemType.Product), apiInUse, undefined, itemType.current === ItemType.Product, {
-                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
-                  })}
-                  {buttonBuilder("Catering", () => handleItemTypeChange(ItemType.Catering), apiInUse, undefined, itemType.current === ItemType.Catering, {
-                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
-                  })}
+                  {buttonBuilder(
+                    "Product",
+                    () => handleItemTypeChange(ItemType.Product),
+                    apiInUse,
+                    undefined,
+                    itemType.current === ItemType.Product,
+                    {
+                      style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
+                    }
+                  )}
+                  {buttonBuilder(
+                    "Catering",
+                    () => handleItemTypeChange(ItemType.Catering),
+                    apiInUse,
+                    undefined,
+                    itemType.current === ItemType.Catering,
+                    {
+                      style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
+                    }
+                  )}
                   {buttonBuilder("Both", () => handleItemTypeChange(ItemType.Both), apiInUse, undefined, itemType.current === ItemType.Both, {
                     style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Both ? "green" : "#4C5BD4" }],
+                  })}
+                  {buttonBuilder("None", () => handleItemTypeChange(ItemType.None), apiInUse, undefined, itemType.current === ItemType.None, {
+                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.None ? "green" : "#4C5BD4" }],
                   })}
                 </View>
               </ScrollView>
@@ -192,7 +206,6 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           // onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
           onScroll={onScroll}
-        
         />
         {/* Animated Action Buttons that appear on top of the list */}
         <Animated.View
@@ -215,11 +228,21 @@ export default function SidesScreens({ navigation }: { navigation: any }) {
                 {buttonBuilder("Product", () => handleItemTypeChange(ItemType.Product), apiInUse, undefined, itemType.current === ItemType.Product, {
                   style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
                 })}
-                {buttonBuilder("Catering", () => handleItemTypeChange(ItemType.Catering), apiInUse, undefined, itemType.current === ItemType.Catering, {
-                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
-                })}
+                {buttonBuilder(
+                  "Catering",
+                  () => handleItemTypeChange(ItemType.Catering),
+                  apiInUse,
+                  undefined,
+                  itemType.current === ItemType.Catering,
+                  {
+                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
+                  }
+                )}
                 {buttonBuilder("Both", () => handleItemTypeChange(ItemType.Both), apiInUse, undefined, itemType.current === ItemType.Both, {
                   style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Both ? "green" : "#4C5BD4" }],
+                })}
+                {buttonBuilder("None", () => handleItemTypeChange(ItemType.None), apiInUse, undefined, itemType.current === ItemType.None, {
+                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.None ? "green" : "#4C5BD4" }],
                 })}
               </View>
             </ScrollView>

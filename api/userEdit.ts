@@ -13,7 +13,7 @@ export async function changePassword(newPassword: any, confirmPassword: any, use
 }
 
 export async function changeName(firstName: any, lastName: any, userId: any) {
-  console.log(firstName, lastName, userId);
+  
   const response = await post(`${endpoint}changeName`, {
     firstName: firstName,
     lastName: lastName,

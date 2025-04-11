@@ -1,17 +1,13 @@
 import { del, get, patch, post } from "./communications";
 
 const endpoint = "api/v1/items/";
-export async function createItem(
-  name: string,
-  price: number,
-  description: string,
-  foodPreferences: string[] // Array of dietary preferences
-) {
+export async function createItem(name: string, price: number, description: string, foodPreferences: string[], itemType: number = 3) {
   const response = await post(`${endpoint}create`, {
     name: name,
     price: price,
     description: description,
     foodPreferences: foodPreferences,
+    itemType: itemType.toString(),
   });
 
   return response;
@@ -21,13 +17,18 @@ export async function getAllItems() {
   const response = await get(`${endpoint}all`);
   return response;
 }
+export async function getAllItemsByType(type: number = 3) {
+  const response = await get(`${endpoint}allByTypes?itemType=${type}`);
+  return response;
+}
 
-export async function editItem(itemId: number, name: string, price: number, description: string, foodPreferences: string[]) {
+export async function editItem(itemId: number, name: string, price: number, description: string, foodPreferences: string[], itemType: number = 3) {
   return await patch(`${endpoint}update/${itemId}`, {
     name,
     price,
     description,
     foodPreferences,
+    itemType: itemType.toString(),
   });
 }
 

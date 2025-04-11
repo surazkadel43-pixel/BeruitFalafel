@@ -7,7 +7,7 @@ import { removePromotion } from "../../api/promotion";
 import { buttonBuilder } from "../../components/button";
 import { PromotionDetailsCard } from "../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
-import showAlert from "../../components/showAlert";
+import showAlert, { yesOrNoAlert } from "../../components/showAlert";
 import { parseError } from "../../components/toasts";
 import { popWithParams } from "../../utils/routes";
 export default function PromotionDetailsScreens({ navigation }: { navigation: any }) {
@@ -23,19 +23,29 @@ export default function PromotionDetailsScreens({ navigation }: { navigation: an
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeletePromotion = async () => {
-    setApiInUse(true);
-    const deltedRes = await removePromotion(PromotionDetails.id);
-    if (deltedRes.data.success !== true) {
-      Toast.error(parseError(deltedRes));
-      setApiInUse(false);
-      return;
-    }
-    setApiInUse(false);
-    showAlert("Sucess", `Promotion deleted successfully  `, async () => {
-      popWithParams(navigation, 1, { refresh: true });
-    });
-  };
+
+  async function handelDeletePromotion() {
+    yesOrNoAlert(
+      "Delete Promotion",
+      "Are you sure you want to delete this Promotion?",
+      async () => {
+        setApiInUse(true);
+        const deltedRes = await removePromotion(PromotionDetails.id);
+        if (deltedRes.data.success !== true) {
+          Toast.error(parseError(deltedRes));
+          setApiInUse(false);
+          return;
+        }
+        setApiInUse(false);
+        showAlert("Sucess", `Promotion deleted successfully  `, async () => {
+          popWithParams(navigation, 1, { refresh: true });
+        });
+      },
+      () => {
+        return;
+      }
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -52,6 +62,7 @@ export default function PromotionDetailsScreens({ navigation }: { navigation: an
             expiryDate={PromotionDetails.expiryDate}
             files={PromotionDetails.files}
             discount={PromotionDetails.discount}
+            itemType={PromotionDetails.itemType}
           />
           <View style={recycledStyles.buttons}>{buttonBuilder("Remove Promotion", handelDeletePromotion, apiInUse, undefined, true)}</View>
         </ScrollView>

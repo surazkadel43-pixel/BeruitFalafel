@@ -1,5 +1,4 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import { useFormik } from "formik";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -16,30 +15,29 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
 
-import { getAllPromotionByTypes, searchPromotion } from "../../api/promotion";
-import { CustomePromotionCard } from "../../components/customeCard";
+import { CustomeScheduleCard } from "../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../components/recycled-style";
-import searchContainer from "../../components/searchContainer";
 import NoResultsCard from "../../components/searchNotFound";
 import { parseError } from "../../components/toasts";
-import CreatePromotionModal from "./createGroupModal";
+import CreateScheduleModal from "./createModal";
 
 import { useFocusEffect, useRoute } from "@react-navigation/core";
+import { deleteSchedule, getAllSchedulesByType } from "../../api/schedules";
 import { buttonBuilder } from "../../components/button";
+import showAlert, { yesOrNoAlert } from "../../components/showAlert";
 import { useStickyScroll } from "../../hooks/useStickyScroll";
 import { ItemType } from "../../utils/enums";
 
-export default function PromotionScreens({ navigation }: { navigation: any }) {
+export default function ScheduleScreens({ navigation }: { navigation: any }) {
   const [apiInUse, setApiInUse] = useState(true);
-  const [buttonVisible, setButtonVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [refresh, setRefresh] = useState(false);
-  const [promotions, setPromotions] = useState<any[]>([]);
+  const [schedules, setSchedules] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshes, setRefreshes] = useState<number>(0);
   const route = useRoute() as { params?: { refresh?: boolean } };
-  const itemType = useRef<number>(1);
-  let { onScroll, scrollY, stickyTop, stickyOpacity, resetScroll } = useStickyScroll();
+  const scheduleType = useRef<number>(1);
+  let { onScroll, stickyTop, stickyOpacity, resetScroll } = useStickyScroll();
 
   async function prepare(isRefreshing: boolean = false) {
     if (isRefreshing) {
@@ -47,15 +45,15 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
 
-    const itemResponse = await getAllPromotionByTypes(itemType.current);
+    const scheduleResponse = await getAllSchedulesByType(scheduleType.current);
 
-    if (itemResponse.data.success !== true) {
-      Toast.error(parseError(itemResponse));
+    if (scheduleResponse.data.success !== true) {
+      Toast.error(parseError(scheduleResponse));
       setRefreshing(false);
       setApiInUse(false);
       return;
     }
-    setPromotions(itemResponse.data.results);
+    setSchedules(scheduleResponse.data.schedules);
 
     setApiInUse(false);
     setRefreshing(false);
@@ -84,53 +82,36 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
     setRefreshing(true);
     prepare(true);
   };
-  const formik = useFormik({
-    initialValues: {
-      promotionCode: "",
-    },
-    validationSchema: null,
-    onSubmit: async (values) => {
-      setButtonVisible(false);
-      fetchItem(values.promotionCode);
-    },
-  });
-
-  const fetchItem = async (query: string) => {
-    if (query.trim() === "") {
-      prepare(true);
-      return;
-    }
-
-    setApiInUse(true);
-    try {
-      const itemSearchRes = await searchPromotion(query);
-      if (itemSearchRes.data.success === true) {
-        setPromotions(itemSearchRes.data.results);
-      } else {
-        Toast.error(parseError(itemSearchRes));
-      }
-    } catch (error) {
-      Toast.error("Something went wrong.");
-    }
-    setApiInUse(false);
-  };
-
-  // Debounced search to prevent excessive API calls
-  useEffect(() => {
-    setButtonVisible(true);
-    const delayDebounce = setTimeout(() => {
-      fetchItem(formik.values.promotionCode);
-    }, 500); // Delay search by 500ms after user stops typing
-
-    return () => clearTimeout(delayDebounce); // Cleanup function
-  }, [formik.values.promotionCode]);
 
   const handleItemTypeChange = (type: number) => {
     setApiInUse(true);
     resetScroll();
-    itemType.current = type;
+    scheduleType.current = type;
     onRefresh();
   };
+
+  async function handelDeleteSchedule(id: string) {
+    yesOrNoAlert(
+      "Delete Promotion",
+      "Are you sure you want to delete this Promotion?",
+      async () => {
+        setApiInUse(true);
+        const deltedRes = await deleteSchedule(id);
+        if (deltedRes.data.success !== true) {
+          Toast.error(parseError(deltedRes));
+          setApiInUse(false);
+          return;
+        }
+        setApiInUse(false);
+        showAlert("Sucess", `Schedule deleted successfully `, async () => {
+          onRefresh( );
+        } );
+      },
+      () => {
+        return;
+      }
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -138,29 +119,28 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
         <ToastManager {...toastManagerProps} />
 
         <FlatList
-          data={promotions}
+          data={schedules}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <CustomePromotionCard
-              key={item.id}
+            <CustomeScheduleCard
               itemId={item.id}
-              title={item.name}
+              day={item.day}
+              scheduleType={item.scheduleType}
+              isOpen={item.isOpen}
+              openingTime={item.openTime}
+              closingTime={item.closeTime}
               description={item.description}
-              code={item.code}
-              onPress={() => {
-                navigation.navigate("PromotionDetails", { PromotionDetails: item });
+              onEditPress={() => {
+                navigation.navigate("EditSchedule", { scheduleDetails: item });
               }}
-              icon="clock-o"
-              buttonName="manage"
-              buttonIsActive={true}
-              expiryDate={item.expiryDate}
-              discount={item.discount}
-              itemType={item.itemType}
+              onDeletePress={() => {
+                handelDeleteSchedule(item.id);
+              }}
             />
           )}
           ListEmptyComponent={() => (
             <NoResultsCard
-              message={"Sorry, No Item found In the Products."}
+              message={"Sorry, No Schedule Founds."}
               additionalProps={{
                 icon: <FontAwesome name="cutlery" size={30} color="white" />,
               }}
@@ -168,7 +148,6 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
           )}
           ListHeaderComponent={
             <View style={{ marginBottom: 10 }}>
-              {searchContainer(formik, buttonVisible, apiInUse, "promotionCode")}
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false} // Optionally hide the scroll indicator
@@ -180,9 +159,9 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
                     () => handleItemTypeChange(ItemType.Product),
                     apiInUse,
                     undefined,
-                    itemType.current === ItemType.Product,
+                    scheduleType.current === ItemType.Product,
                     {
-                      style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
+                      style: [recycledStyles.buttonContainer, { backgroundColor: scheduleType.current === ItemType.Product ? "green" : "#4C5BD4" }],
                     }
                   )}
                   {buttonBuilder(
@@ -190,17 +169,11 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
                     () => handleItemTypeChange(ItemType.Catering),
                     apiInUse,
                     undefined,
-                    itemType.current === ItemType.Catering,
+                    scheduleType.current === ItemType.Catering,
                     {
-                      style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
+                      style: [recycledStyles.buttonContainer, { backgroundColor: scheduleType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
                     }
                   )}
-                  {buttonBuilder("Both", () => handleItemTypeChange(ItemType.Both), apiInUse, undefined, itemType.current === ItemType.Both, {
-                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Both ? "green" : "#4C5BD4" }],
-                  })}
-                  {buttonBuilder("None", () => handleItemTypeChange(ItemType.None), apiInUse, undefined, itemType.current === ItemType.None, {
-                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.None ? "green" : "#4C5BD4" }],
-                  })}
                 </View>
               </ScrollView>
             </View>
@@ -229,25 +202,26 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
               contentContainerStyle={{ flexDirection: "row" }}
             >
               <View style={recycledStyles.actionButtons}>
-                {buttonBuilder("Product", () => handleItemTypeChange(ItemType.Product), apiInUse, undefined, itemType.current === ItemType.Product, {
-                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
-                })}
+                {buttonBuilder(
+                  "Product",
+                  () => handleItemTypeChange(ItemType.Product),
+                  apiInUse,
+                  undefined,
+                  scheduleType.current === ItemType.Product,
+                  {
+                    style: [recycledStyles.buttonContainer, { backgroundColor: scheduleType.current === ItemType.Product ? "green" : "#4C5BD4" }],
+                  }
+                )}
                 {buttonBuilder(
                   "Catering",
                   () => handleItemTypeChange(ItemType.Catering),
                   apiInUse,
                   undefined,
-                  itemType.current === ItemType.Catering,
+                  scheduleType.current === ItemType.Catering,
                   {
-                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
+                    style: [recycledStyles.buttonContainer, { backgroundColor: scheduleType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
                   }
                 )}
-                {buttonBuilder("Both", () => handleItemTypeChange(ItemType.Both), apiInUse, undefined, itemType.current === ItemType.Both, {
-                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Both ? "green" : "#4C5BD4" }],
-                })}
-                {buttonBuilder("None", () => handleItemTypeChange(ItemType.None), apiInUse, undefined, itemType.current === ItemType.None, {
-                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.None ? "green" : "#4C5BD4" }],
-                })}
               </View>
             </ScrollView>
           </View>
@@ -261,7 +235,7 @@ export default function PromotionScreens({ navigation }: { navigation: any }) {
           transparent={true} // ✅ Keeps background transparent
           style={recycledStyles.modal}
         >
-          <CreatePromotionModal onClose={() => setModalVisible(false)} onRefresh={() => setRefresh(true)} />
+          <CreateScheduleModal onClose={() => setModalVisible(false)} onRefresh={() => setRefresh(true)} />
         </Modal>
         <TouchableOpacity style={recycledStyles.addButton} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
           <Ionicons name="add" size={40} color="white" />

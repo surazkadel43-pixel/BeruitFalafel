@@ -15,7 +15,14 @@ import { editSide } from "../../../api/sides";
 import { createSideSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { BevragesCheckbox, ItemsCheckbox, ItemTypeRadioButtons, MeatsCheckbox, SauceCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import {
+  BevragesCheckbox,
+  ItemsCheckbox,
+  ItemTypeRadioButtons,
+  MeatsCheckbox,
+  SauceCheckbox,
+  SidesTypesCheckbox,
+} from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -268,7 +275,7 @@ const EditSides = ({ navigation }: { navigation: any }) => {
                 maxLength: 2, // Limit the input to 6 digits
                 style: createItemPropsStyles.itemPrice,
               })}
-               <ItemTypeRadioButtons formik={formik} valueName="itemType"  />
+              <ItemTypeRadioButtons formik={formik} valueName="itemType" />
               <SidesTypesCheckbox formik={formik} valueName="sidesTypes" />
               <ItemsCheckbox formik={formik} valueName="items" items={items} />
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />

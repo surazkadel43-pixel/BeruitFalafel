@@ -114,9 +114,6 @@ const CreateSidesModal: React.FC<CreateSidesModal> = (props) => {
         return;
       }
 
-      /**
-       * save sides  to server
-       */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
       const numericDiscountPrice = parseFloat(values.discountedPrice.replace(/[^0-9.]/g, "")) || 0;
       const numericQuantity = parseInt(values.quantity) || 0;

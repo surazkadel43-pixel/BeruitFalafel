@@ -7,7 +7,7 @@ import Subcribed from "../screens/subcribedPage";
 import Drawer from "./drawer";
 import MenuDrawer from "./menuDrawer";
 import ProfileStackNavigator from "./profileNavigation/profileStacknavigator";
-import PromotionStackNavigator from "./promotionNavigation/promotionStackNavigator";
+import SchedulePromotionDrawer from "./SchedulepromotionDrawer";
 
 const Tab = createBottomTabNavigator();
 
@@ -54,14 +54,13 @@ export default function BottomNavigation(navigation: any) {
       <Tab.Screen name="Menu" component={MenuDrawer} options={{ title: "Menu" }} />
       <Tab.Screen
         name="Promotion"
-        component={PromotionStackNavigator}
+        component={SchedulePromotionDrawer}
         options={{
           title: "Promotion",
-          headerShown: true,
+          headerShown: false,
           headerStyle: {
             backgroundColor: "skyblue",
           },
-          headerTitle: () => <NavigationHeader title="Promotion" navigation={navigation} />,
           headerTitleAlign: "center",
           headerTitleStyle: { backgroundColor: "skyblue" },
         }}

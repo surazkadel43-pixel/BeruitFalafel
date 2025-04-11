@@ -47,8 +47,13 @@ export async function createSide(
 }
 
 
-export async function getAllSides(ItemType: number = 3 ) {
-  const response = await get(`${endpoint}all?itemType=${ItemType}`);
+export async function getAllSides( ) {
+  const response = await get(`${endpoint}all`);
+  return response;
+}
+
+export async function getAllSidesByType(type: number = 3) {
+  const response = await get(`${endpoint}allByTypes?itemType=${type}`);
   return response;
 }
 

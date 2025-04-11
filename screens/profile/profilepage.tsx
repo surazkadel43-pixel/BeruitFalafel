@@ -41,7 +41,7 @@ export default function ProfileScreens({ navigation }: { navigation: any }) {
       return;
     }
     setCurrentUser(userResponse.data.user);
-    console.log(userResponse.data.user);
+
 
     setApiInUse(false);
   };

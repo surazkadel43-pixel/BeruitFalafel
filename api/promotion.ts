@@ -7,7 +7,8 @@ export async function createPromotion(
   description: string = "",
   expiry: Date = new Date(Date.now() + 24 * 60 * 60 * 1000),
   image: any[] = [],
-  discount: number = 0
+  discount: number = 0,
+  itemType: number = 3 
 ) {
   const formData = new FormData();
 
@@ -16,6 +17,7 @@ export async function createPromotion(
   formData.append('description', description);
   formData.append('expiry', expiry.toISOString()); // Use ISO string for date format
   formData.append('discount', discount.toString());
+  formData.append('itemType', itemType.toString()); // Assuming itemType is a number
 
   if (image && image.length > 0) {
     for (const img of image) {
@@ -35,6 +37,11 @@ export async function createPromotion(
 
 export async function getAllPromotion() {
   const response = await get(`${endpoint}all`);
+  return response;
+}
+
+export async function getAllPromotionByTypes( itemType: number = 3) {
+  const response = await get(`${endpoint}allByTypes?itemType=${itemType}`);
   return response;
 }
 

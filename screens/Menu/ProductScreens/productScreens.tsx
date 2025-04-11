@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
-import { getAllProducts, searchProduct } from "../../../api/product";
+import { getAllProductsByType, searchProduct } from "../../../api/product";
 import { buttonBuilder } from "../../../components/button";
 import { CustomeMenuCard } from "../../../components/customeCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
@@ -37,7 +37,7 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
 
   const [refreshes, setRefreshes] = useState<number>(0);
   const [shouldRefresh, setShouldRefresh] = useState(false);
-   const itemType = useRef<number>(1);
+  const itemType = useRef<number>(1);
   const scrollY = new Animated.Value(0);
   const stickyTop = scrollY.interpolate({
     inputRange: [180, 300],
@@ -55,8 +55,7 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
     }
     setApiInUse(false);
 
-    console.log("itemType.current", itemType.current);
-    const itemResponse = await getAllProducts(itemType.current);
+    const itemResponse = await getAllProductsByType(itemType.current);
 
     if (itemResponse.data.success !== true) {
       Toast.error(parseError(itemResponse));
@@ -73,7 +72,7 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
 
   const handleItemTypeChange = (type: number) => {
     setApiInUse(true);
-    scrollY.setValue(0); 
+    scrollY.setValue(0);
     itemType.current = type;
     onRefresh();
   };
@@ -167,7 +166,6 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
               buttonName="manage"
               buttonIsActive={true}
               price={item.price}
-              
             />
           )}
           ListEmptyComponent={() => (
@@ -187,14 +185,31 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
                 contentContainerStyle={{ flexDirection: "row" }}
               >
                 <View style={recycledStyles.actionButtons}>
-                  {buttonBuilder("Product", () => handleItemTypeChange(ItemType.Product), apiInUse, undefined, itemType.current === ItemType.Product, {
-                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
-                  })}
-                  {buttonBuilder("Catering", () => handleItemTypeChange(ItemType.Catering), apiInUse, undefined, itemType.current === ItemType.Catering, {
-                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
-                  })}
+                  {buttonBuilder(
+                    "Product",
+                    () => handleItemTypeChange(ItemType.Product),
+                    apiInUse,
+                    undefined,
+                    itemType.current === ItemType.Product,
+                    {
+                      style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
+                    }
+                  )}
+                  {buttonBuilder(
+                    "Catering",
+                    () => handleItemTypeChange(ItemType.Catering),
+                    apiInUse,
+                    undefined,
+                    itemType.current === ItemType.Catering,
+                    {
+                      style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
+                    }
+                  )}
                   {buttonBuilder("Both", () => handleItemTypeChange(ItemType.Both), apiInUse, undefined, itemType.current === ItemType.Both, {
                     style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Both ? "green" : "#4C5BD4" }],
+                  })}
+                  {buttonBuilder("None", () => handleItemTypeChange(ItemType.None), apiInUse, undefined, itemType.current === ItemType.None, {
+                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.None ? "green" : "#4C5BD4" }],
                   })}
                 </View>
               </ScrollView>
@@ -227,11 +242,21 @@ export default function ProductScreens({ navigation }: { navigation: any }) {
                 {buttonBuilder("Product", () => handleItemTypeChange(ItemType.Product), apiInUse, undefined, itemType.current === ItemType.Product, {
                   style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Product ? "green" : "#4C5BD4" }],
                 })}
-                {buttonBuilder("Catering", () => handleItemTypeChange(ItemType.Catering), apiInUse, undefined, itemType.current === ItemType.Catering, {
-                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
-                })}
+                {buttonBuilder(
+                  "Catering",
+                  () => handleItemTypeChange(ItemType.Catering),
+                  apiInUse,
+                  undefined,
+                  itemType.current === ItemType.Catering,
+                  {
+                    style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Catering ? "green" : "#4C5BD4" }],
+                  }
+                )}
                 {buttonBuilder("Both", () => handleItemTypeChange(ItemType.Both), apiInUse, undefined, itemType.current === ItemType.Both, {
                   style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.Both ? "green" : "#4C5BD4" }],
+                })}
+                {buttonBuilder("None", () => handleItemTypeChange(ItemType.None), apiInUse, undefined, itemType.current === ItemType.None, {
+                  style: [recycledStyles.buttonContainer, { backgroundColor: itemType.current === ItemType.None ? "green" : "#4C5BD4" }],
                 })}
               </View>
             </ScrollView>

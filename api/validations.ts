@@ -46,7 +46,7 @@ export const groupSearch = Yup.object({
 
 export const createItemSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
-
+  itemType: Yup.number().min(0, "You must choose item Type").required("Item type is required"),
   price: Yup.string()
     .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
     .required("Price is required"),
@@ -57,7 +57,7 @@ export const createItemSchema = Yup.object().shape({
 
 export const createSauceSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
-
+  itemType: Yup.number().min(0, "You must choose item Type").required("Item type is required"),
   price: Yup.string()
     .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
     .required("Price is required"),
@@ -68,7 +68,7 @@ export const createSauceSchema = Yup.object().shape({
 
 export const createMeatSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
-
+  itemType: Yup.number().min(0, "You must choose item Type").required("Item type is required"),
   price: Yup.string()
     .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
     .required("Price is required"),
@@ -79,7 +79,8 @@ export const createMeatSchema = Yup.object().shape({
 
 export const createBeverageSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
-
+  itemType: Yup.number().min(0, "You must choose item Type").required("Item type is required"),
+  quantity: Yup.number().min(0, "Quantity cannot be negative").required("Quantity is required"),
   price: Yup.string()
     .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
     .required("Price is required"),
@@ -94,6 +95,7 @@ export const createBeverageSchema = Yup.object().shape({
 export const createSideSchema = Yup.object().shape({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
   quantity: Yup.number().min(0, "Quantity cannot be negative").required("Quantity is required"),
+  itemType: Yup.number().min(0, "You must choose item Type").required("Item type is required"),
   price: Yup.string()
     .matches(/^\$\d+(\.\d{1,2})?$/, "Invalid price format (e.g., $10 or $10.50)")
     .required("Price is required"),
@@ -192,8 +194,38 @@ export const changePasswordSchema = Yup.object({
 });
 
 export const createGenericItemSchema = Yup.object().shape({
-  name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
+  name: Yup.string()
+  .min(3, "Name must be at least 3 characters")
+  .required("Name is required")
+  .test(
+    "not-sides-or-beverages",
+    "Name cannot be 'Sides' or 'Beverages'",
+    (value) => !["sides", "beverages"].includes(value?.toLowerCase() ?? "")
+  ),
 
   description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
   foodTypes: Yup.array().min(1, "Please select at least one option"),
+});
+
+export const createOpeningHourSchema = Yup.object().shape({
+  day: Yup.string()
+    .required("Day is required"),
+
+  isOpen: Yup.string()
+    .required("Please specify if it's open"),
+
+  description: Yup.string()
+    .min(5, "Description must be at least 5 characters")
+    .required("Description is required"),
+
+  type: Yup.string()
+    .required("Type is required"),
+
+  openTime: Yup.string()
+    .required("Opening time is required")
+    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Open time must be in HH:mm format"),
+
+  closeTime: Yup.string()
+    .required("Closing time is required")
+    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Close time must be in HH:mm format"),
 });

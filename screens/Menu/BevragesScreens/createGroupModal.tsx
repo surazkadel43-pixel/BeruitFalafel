@@ -19,7 +19,7 @@ import { createBevrage } from "../../../api/bevrages";
 import { createBeverageSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import { BevragesTypesCheckbox, DrinkTypesCheckbox, SidesTypesCheckbox } from "../../../components/meatTypesDropDown";
+import { BevragesTypesCheckbox, ItemTypeRadioButtons } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, imagePickerStyles, toastManagerProps } from "../../../components/recycled-style";
 import showAlert from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
@@ -51,6 +51,8 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
       description: "",
       image: null,
       drinkTypes: [],
+      quantity: "",
+      itemType: "",
     },
     validationSchema: createBeverageSchema,
     onSubmit: async (values) => {
@@ -60,33 +62,19 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
         setApiInUse(false);
         return;
       }
-      /**
-       * Handles image uploads
-       */
 
-      // let uploadedImages: any[] = [];
-
-      // if (selectedImages.length > 0) {
-      //   const uploadedImagesResp = await uploadImages(selectedImages);
-
-      //   for (const image of uploadedImagesResp) {
-      //     uploadedImages.push({ id: image.id });
-      //   }
-      // }
-
-      /**
-       * save bevrage  to server
-       */
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
+      const numericQuantity = parseInt(values.quantity) || 0;
+      const numericItemType = parseInt(values.itemType) || 0;
       const response = await createBevrage(
         values.name,
         numericPrice, // Ensure price is a number
         values.description,
         values.drinkTypes,
-        values.image || []
+        values.image || [],
+        numericQuantity, // Ensure quantity is a number
+        numericItemType
       );
-
-      console.log(response.data);
       if (response.data.success !== true) {
         Toast.error(parseError(response));
         setApiInUse(false);
@@ -206,7 +194,12 @@ const CreateBevrageModal: React.FC<CreateBevrageModal> = (props) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
-              
+              {inputBuilder("Enter your Quantity", "quantity", formik, {
+                keyboardType: "numeric", // Only numeric input
+                maxLength: 2, // Limit the input to 6 digits
+                style: createItemPropsStyles.itemPrice,
+              })}
+              <ItemTypeRadioButtons formik={formik} valueName="itemType" />
               <BevragesTypesCheckbox formik={formik} valueName="drinkTypes" />
               {inputBuilder("Enter your Bevrage Description", "description", formik, {
                 multiline: true,

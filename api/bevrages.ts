@@ -1,29 +1,37 @@
-import { del, get, imagePatch, imagePost, patch, post } from "./communications";
+import { del, get, imagePatch, imagePost } from "./communications";
 
 const endpoint = "api/v1/bevrages/"; //Bevrages // bevrages
 // In your createBevrage function (api/bevrages.js)
-export async function createBevrage(name: string, price: number, description: string, drinkTypes: string[], images: any[] = []) {
+export async function createBevrage(
+  name: string,
+  price: number,
+  description: string,
+  drinkTypes: string[],
+  images: any[] = [],
+  quantity: number = 0,
+  itemType: number = 3
+) {
   const formData = new FormData();
-  
-  formData.append('name', name);
-  formData.append('price', price.toString());
-  formData.append('description', description);
-  formData.append('drinkTypes', JSON.stringify(drinkTypes));
-  formData.append('genericName', "Bevrages");
-  
+
+  formData.append("name", name);
+  formData.append("price", price.toString());
+  formData.append("description", description);
+  formData.append("drinkTypes", JSON.stringify(drinkTypes));
+  formData.append("genericName", "Bevrages");
+  formData.append("quantity", quantity.toString());
+  formData.append("itemType", itemType.toString()); // Assuming itemType is a number
   // Append each image to the FormData
   if (images && images.length > 0) {
     for (const image of images) {
       const imageInfo: any = {
         uri: image.uri,
-        type: image.mimeType || 'image/jpeg',
-        name: image.fileName || 'image.jpg'
+        type: image.mimeType || "image/jpeg",
+        name: image.fileName || "image.jpg",
       };
-      formData.append('images', imageInfo);
+      formData.append("images", imageInfo);
     }
   }
-  
-  
+
   const response = await imagePost(`${endpoint}create`, formData);
 
   return response;
@@ -34,29 +42,44 @@ export async function getAllBevrages() {
   return response;
 }
 
-export async function editBevrage(itemId: number, name: string, price: number, description: string, drinkTypes: string[], images: any[] = []) {
+export async function getAllBevragesByType(type: number = 3) {
+  const response = await get(`${endpoint}allByTypes?itemType=${type}`);
+  return response;
+}
+
+export async function editBevrage(
+  itemId: number,
+  name: string,
+  price: number,
+  description: string,
+  drinkTypes: string[],
+  images: any[] = [],
+  quantity: number = 0,
+  itemType: number = 3
+) {
   const formData = new FormData();
-  
-  formData.append('itemId', itemId.toString());
-  formData.append('name', name);
-  formData.append('price', price.toString());
-  formData.append('description', description);
-  formData.append('drinkTypes', JSON.stringify(drinkTypes));
-  formData.append('genericName', "Bevrages");
-  
+
+  formData.append("itemId", itemId.toString());
+  formData.append("name", name);
+  formData.append("price", price.toString());
+  formData.append("description", description);
+  formData.append("drinkTypes", JSON.stringify(drinkTypes));
+  formData.append("genericName", "Bevrages");
+  formData.append("quantity", quantity.toString());
+  formData.append("itemType", itemType.toString()); // Assuming itemType is a number
+
   // Append each image to the FormData
   if (images && images.length > 0) {
     for (const image of images) {
       const imageInfo: any = {
         uri: image.uri,
-        type: image.mimeType || 'image/jpeg',
-        name: image.fileName || 'image.jpg'
+        type: image.mimeType || "image/jpeg",
+        name: image.fileName || "image.jpg",
       };
-      formData.append('images', imageInfo);
+      formData.append("images", imageInfo);
     }
   }
-  
-  
+
   return await imagePatch(`${endpoint}update/${itemId}`, formData);
 }
 

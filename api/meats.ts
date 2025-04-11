@@ -5,7 +5,8 @@ export async function createMeat(
   name: string,
   price: number,
   description: string,
-  foodPreferences: string[] // Array of dietary preferences
+  foodPreferences: string[], // Array of dietary preferences
+  itemType: number = 3,
 ) {
  
   const response = await post(`${endpoint}create`, {
@@ -13,6 +14,7 @@ export async function createMeat(
     price: price,
     description: description,
     foodPreferences: foodPreferences,
+    itemType: itemType.toString(), 
   });
 
   return response;
@@ -23,13 +25,19 @@ export async function getAllMeats() {
   return response;
 }
 
-export async function editMeat(itemId: number, name: string, price: number, description: string, foodPreferences: string[]) {
-  console.log(itemId, name, price, description, foodPreferences);
+export async function getAllMeatsByType(type: number = 3) {
+  const response = await get(`${endpoint}allByTypes?itemType=${type}`);
+  return response;
+}
+
+export async function editMeat(itemId: number, name: string, price: number, description: string, foodPreferences: string[], itemType: number = 3,) {
+  
   return await patch(`${endpoint}update/${itemId}`, {
     name,
     price,
     description,
     foodPreferences,
+    itemType: itemType.toString(),
   });
 }
 

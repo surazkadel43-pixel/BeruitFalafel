@@ -49,6 +49,7 @@ export default function SauceDetailsScreens({ navigation }: { navigation: any })
             price={itemDetails.price}
             foodTypes={itemDetails.foodPreferences}
             icon="usd"
+            itemType={itemDetails.itemType}
           />
           <View style={recycledStyles.buttons}>
             {buttonBuilder(

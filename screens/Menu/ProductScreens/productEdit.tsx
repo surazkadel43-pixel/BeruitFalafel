@@ -134,7 +134,7 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
       quantity: itemDetails.quantity.toString(),
       itemType: itemDetails.itemType.toString(),
     });
-    console.log( typeof itemDetails.quantity);
+    
     setSelectedImages(formattedImages);
   }
 
@@ -174,6 +174,7 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
       const numericQuantity = parseInt(values.quantity) || 0;
       const numericItemType = parseInt(values.itemType) || 0;
 
+   
       const response = await editProduct(
         itemDetails.id,
         values.name,
@@ -191,6 +192,7 @@ const EditProduct = ({ navigation }: { navigation: any }) => {
         numericQuantity,
         numericItemType
       );
+
 
       if (response.data.success !== true) {
         Toast.error(parseError(response));

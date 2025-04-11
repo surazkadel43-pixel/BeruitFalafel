@@ -20,7 +20,7 @@ import "../../../extension/extension";
 import showAlert from "../../../components/showAlert";
 import { createMeat } from "../../../api/meats";
 import { parseError } from "../../../components/toasts";
-import CheckBoxExample from "../../../components/meatTypesDropDown";
+import CheckBoxExample, { ItemTypeRadioButtons } from "../../../components/meatTypesDropDown";
 interface CreateMeatModal {
   onClose: () => void;
   onRefresh: () => void;
@@ -41,17 +41,20 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
       name: "",
       price: "",
       description: "",
-      foodPreferences: [],
+      foodTypes: [],
+      itemType: "",
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
+      const numericItemType = parseInt(values.itemType) || 0;
       const response = await createMeat(
         values.name,
         numericPrice, // Ensure price is a number
         values.description,
-        values.foodPreferences
+        values.foodTypes,
+        numericItemType,
       );
 
       if (response.data.success !== true) {
@@ -98,7 +101,8 @@ const CreateMeatModal: React.FC<CreateMeatModal> = (props) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
-              <CheckBoxExample formik={formik} valueName="foodPreferences" />
+              <ItemTypeRadioButtons formik={formik} valueName="itemType"  />
+              <CheckBoxExample formik={formik} valueName="foodTypes" />
               {inputBuilder("Enter your Meat Description", "description", formik, {
                 multiline: true,
                 style: createItemPropsStyles.itemDescription,

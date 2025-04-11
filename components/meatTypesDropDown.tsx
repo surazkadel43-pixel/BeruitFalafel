@@ -643,19 +643,25 @@ export function ItemTypeRadioButtons({
   formik,
   valueName,
   expanded = false,
+  lable = "Select Item Type",
+
 }: {
   formik: any;
   valueName: string;
   expanded?: boolean;
+  lable?: string;
+
 }) {
   const [isExpanded, setIsExpanded] = useState(expanded);
 
   // Manually create the options and labels
-  const typesOptions = [
+  let typesOptions = [
     { label: "Product", value: 1 },
     { label: "Catering", value: 2 },
     { label: "Both", value: 3 },
+    { label: "None", value: 4 },
   ];
+  
 
   const selectedValue = formik.values[valueName] || "";
 
@@ -666,7 +672,7 @@ export function ItemTypeRadioButtons({
   return (
     <View style={styles.accordionContainer}>
       <List.Accordion
-        title="Select Item Type"
+        title={lable}
         expanded={isExpanded}
         onPress={() => setIsExpanded(!isExpanded)}
         titleStyle={styles.accordionTitle}
@@ -704,6 +710,73 @@ export function ItemTypeRadioButtons({
     </View>
   );
 }
+
+
+
+
+export function CustomeRadioButtons({
+  formik,
+  valueName,
+  expanded = false,
+  lable = "Custome Radios",
+  typesOptions = [],
+  
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+  lable?: string;
+  typesOptions: { label: string; value: number }[];
+}) {
+  const [isExpanded, setIsExpanded] = useState(expanded);
+  const selectedValue = formik.values[valueName] || "";
+
+  const handleChange = (value: string) => {
+    formik.setFieldValue(valueName, value);
+  };
+
+  return (
+    <View style={styles.accordionContainer}>
+      <List.Accordion
+        title={lable}
+        expanded={isExpanded}
+        onPress={() => setIsExpanded(!isExpanded)}
+        titleStyle={styles.accordionTitle}
+        left={(props) => <List.Icon {...props} icon="food" color="white" />}
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />}
+        style={styles.accordionBox}
+      >
+        <RadioButton.Group onValueChange={handleChange} value={selectedValue}>
+          {typesOptions.map((option) => (
+            <View key={option.value} style={styles.checkboxContainer}>
+              <RadioButton.Item
+                label={option.label} // Display string label
+                value={option.value.toString()} // Store the numeric value as string
+                mode="android"
+                labelStyle={styles.checkboxLabel}
+                color="#ff9900"
+                uncheckedColor="#ccc"
+                position="leading"
+                style={{ paddingVertical: 1, marginVertical: 0 }}
+              />
+            </View>
+          ))}
+        </RadioButton.Group>
+
+        {/* Display selected item */}
+        <Text style={styles.selectedText}>
+          Selected: {selectedValue || "None"}
+        </Text>
+      </List.Accordion>
+
+      {/* Display error message if validation fails */}
+      {formik.touched[valueName] && formik.errors[valueName] ? (
+        <Text style={styles.errorText}>{formik.errors[valueName]}</Text>
+      ) : null}
+    </View>
+  );
+}
+
 
 interface DatePickerFieldProps {
   formik: any;
@@ -757,6 +830,62 @@ export function DatePickerField({ formik, valueName, title = "Select Expiry Date
 
       {/* Show validation error if touched and error exists */}
       {formik.touched[valueName] && formik.errors[valueName] ? <Text style={styles.errorText}>{formik.errors[valueName]}</Text> : null}
+    </View>
+  );
+}
+
+export function TimePickerField({ formik, valueName, title = "Select Time" }: DatePickerFieldProps) {
+  const [showPicker, setShowPicker] = useState(false);
+
+  const handleChange = (_event: any, selectedTime?: Date) => {
+    setShowPicker(false);
+
+    if (selectedTime) {
+      // Format manually to HH:MM to avoid timezone issues
+      const hours = String(selectedTime.getHours()).padStart(2, "0");
+      const minutes = String(selectedTime.getMinutes()).padStart(2, "0");
+      const formatted = `${hours}:${minutes}`; // "14:30"
+      formik.setFieldValue(valueName, formatted);
+    }
+  };
+
+  const formattedTime = formik.values[valueName] || "No time selected";
+
+  return (
+    <View style={styles.accordionContainer}>
+      <TouchableOpacity onPress={() => setShowPicker(true)}>
+        <List.Item
+          title={title}
+          description={formattedTime}
+          titleStyle={styles.accordionTitle}
+          descriptionStyle={{ color: "#ccc" }}
+          left={(props) => <List.Icon {...props} icon="clock" color="white" />}
+          right={(props) => (
+            <MaterialIcons
+              name="access-time"
+              size={24}
+              color="white"
+              style={{ alignSelf: "center", marginRight: 10 }}
+            />
+          )}
+          style={styles.accordionBox}
+        />
+      </TouchableOpacity>
+
+      {/* Time picker only shown when toggled */}
+      {showPicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="time"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={handleChange}
+        />
+      )}
+
+      {/* Show validation error if touched and error exists */}
+      {formik.touched[valueName] && formik.errors[valueName] ? (
+        <Text style={styles.errorText}>{formik.errors[valueName]}</Text>
+      ) : null}
     </View>
   );
 }

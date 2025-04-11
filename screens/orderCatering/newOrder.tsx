@@ -45,7 +45,6 @@ export default function NewOrder() {
     validationSchema: null,
     onSubmit: async (values) => {
       setApiInUse(true);
-      console.log(user);
       values.orderId = "";
       setApiInUse(false);
     },

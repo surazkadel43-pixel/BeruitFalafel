@@ -7,7 +7,7 @@ import ToastManager, { Toast } from "toastify-react-native";
 import { buttonBuilder } from "../../../components/button";
 import { CustomeMeatCard } from "../../../components/customeDetailsCard";
 import { recycledStyles, toastManagerProps } from "../../../components/recycled-style";
-import showAlert from "../../../components/showAlert";
+import showAlert, { yesOrNoAlert } from "../../../components/showAlert";
 import { parseError } from "../../../components/toasts";
 
 import { deleteMeat } from "../../../api/meats";
@@ -26,19 +26,30 @@ export default function MeatDetailsScreens({ navigation }: { navigation: any }) 
   useEffect(() => {
     prepare();
   }, []);
-  const handelDeleteMeat = async () => {
-    setApiInUse(true);
-    const deltedRes = await deleteMeat(itemDetails.id);
-    if (deltedRes.data.success !== true) {
-      Toast.error(parseError(deltedRes));
-      setApiInUse(false);
-      return;
-    }
-    setApiInUse(false);
-    showAlert("Sucess", `Meat deleted successfully  `, async () => {
-      popWithParams(navigation, 1, { refresh: true });
-    });
-  };
+  
+
+  async function handelDeleteMeat() {
+    yesOrNoAlert(
+      "Delete Meat",
+      "Are you sure you want to delete this Meat?",
+      async () => {
+        setApiInUse(true);
+        const deltedRes = await deleteMeat(itemDetails.id);
+        if (deltedRes.data.success !== true) {
+          Toast.error(parseError(deltedRes));
+          setApiInUse(false);
+          return;
+        }
+        setApiInUse(false);
+        showAlert("Sucess", `Meat deleted successfully  `, async () => {
+          popWithParams(navigation, 1, { refresh: true });
+        });
+      },
+      () => {
+        return;
+      }
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -52,6 +63,7 @@ export default function MeatDetailsScreens({ navigation }: { navigation: any }) 
             price={itemDetails.price}
             foodTypes={itemDetails.foodPreferences}
             icon="usd"
+            itemType={itemDetails.itemType}
           />
           <View style={recycledStyles.buttons}>
             {buttonBuilder(

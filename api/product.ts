@@ -101,10 +101,16 @@ export async function editProduct(
   return response;
 }
 
-export async function getAllProducts(ItemType: number = 3) {
-  const response = await get(`${endpoint}all?itemType=${ItemType}`);
+export async function getAllProducts() {
+  const response = await get(`${endpoint}all`);
   return response;
 }
+
+export async function getAllProductsByType(type: number = 3) {
+  const response = await get(`${endpoint}allByTypes?itemType=${type}`);
+  return response;
+}
+
 export async function deleteProduct(productId: string) {
   const response = await del(`${endpoint}delete/${productId}`);
   return response;

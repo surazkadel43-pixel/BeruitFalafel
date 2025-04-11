@@ -16,7 +16,7 @@ import { createItem } from "../../../api/item";
 import { createItemSchema } from "../../../api/validations";
 import { buttonBuilder } from "../../../components/button";
 import { inputBuilder } from "../../../components/input";
-import CheckBoxExample from "../../../components/meatTypesDropDown";
+import CheckBoxExample, { ItemTypeRadioButtons } from "../../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, toastManagerProps } from "../../../components/recycled-style";
 import { parseError } from "../../../components/toasts";
 import "../../../extension/extension";
@@ -43,17 +43,20 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
       price: "",
       description: "",
       foodTypes: [],
+      itemType: "",
     },
     validationSchema: createItemSchema,
     onSubmit: async (values) => {
       
       setApiInUse(true);
       const numericPrice = parseFloat(values.price.replace(/[^0-9.]/g, "")) || 0;
+      const numericItemType = parseInt(values.itemType) || 0;
       const itemResponse = await createItem(
         values.name,
-        numericPrice, // Ensure price is a number
+        numericPrice, 
         values.description,
-        values.foodTypes
+        values.foodTypes,
+        numericItemType, 
       );
       if (itemResponse.data.success !== true) {
         Toast.error(parseError(itemResponse));
@@ -98,6 +101,7 @@ const CreateItemModal: React.FC<CreateItemModal> = (props) => {
                 },
                 style: createItemPropsStyles.itemPrice,
               })}
+              <ItemTypeRadioButtons formik={formik} valueName="itemType"  />
               <CheckBoxExample formik={formik} valueName="foodTypes" />
               {inputBuilder("Enter your Item Description", "description", formik, {
                 multiline: true,

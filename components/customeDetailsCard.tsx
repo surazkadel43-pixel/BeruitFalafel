@@ -1,9 +1,9 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { getProductText } from "../utils/enums";
 import { PostImages } from "./postImages";
 import { recycledStyles } from "./recycled-style";
-import { getProductText, getProductType, ItemType } from "../utils/enums";
 
 interface CustomeCardProps {
   itemId?: number;
@@ -11,7 +11,8 @@ interface CustomeCardProps {
   description?: string;
   price?: number;
   foodTypes?: string[];
-  icon?: any; // Change this to `IconName` if using `@expo/vector-icons`
+  icon?: any;
+  itemType?: number;
 }
 
 interface CustomeBevrageCardProps {
@@ -23,6 +24,8 @@ interface CustomeBevrageCardProps {
   icon?: any;
   files?: any[];
   isSmall?: boolean;
+  quantity: string;
+  itemType?: number;
 }
 interface CustomeMenuCardProps {
   itemId?: string;
@@ -67,6 +70,7 @@ export const CustomeDetailsCard: React.FC<CustomeCardProps> = ({
   price = "$0.00",
   foodTypes = [],
   icon = "usd",
+  itemType = 3,
 }) => {
   const formattedFoodTypes = foodTypes.map((type) => foodOptions.find((option) => option.value === type)?.label || type).join(", ");
   return (
@@ -80,6 +84,7 @@ export const CustomeDetailsCard: React.FC<CustomeCardProps> = ({
           <Text style={styles.followers}>
             <Text style={styles.groupName}>Item Name :</Text> {title}
           </Text>
+          <Text style={recycledStyles.postUsername}>{getProductText(itemType).toUpperCase() || "N/A"}</Text>
         </View>
 
         <View style={styles.followerContainer}>
@@ -142,6 +147,7 @@ export const CustomeSauceCard: React.FC<CustomeCardProps> = ({
   price = "$0.00",
   foodTypes = [],
   icon,
+  itemType = 3,
 }) => {
   const formattedFoodTypes = foodTypes.map((type) => foodOptions.find((option) => option.value === type)?.label || type).join(", ");
   return (
@@ -155,6 +161,7 @@ export const CustomeSauceCard: React.FC<CustomeCardProps> = ({
           <Text style={styles.followers}>
             <Text style={styles.groupName}>Sauce Name :</Text> {title}
           </Text>
+          <Text style={recycledStyles.postUsername}>{getProductText(itemType).toUpperCase() || "N/A"}</Text>
         </View>
 
         <View style={styles.followerContainer}>
@@ -185,6 +192,7 @@ export const CustomeMeatCard: React.FC<CustomeCardProps> = ({
   price = "$0.00",
   foodTypes = [],
   icon,
+  itemType = 3,
 }) => {
   const formattedFoodTypes = foodTypes.map((type) => foodOptions.find((option) => option.value === type)?.label || type).join(", ");
   return (
@@ -198,6 +206,7 @@ export const CustomeMeatCard: React.FC<CustomeCardProps> = ({
           <Text style={styles.followers}>
             <Text style={styles.groupName}>Meat Name :</Text> {title}
           </Text>
+          <Text style={recycledStyles.postUsername}>{getProductText(itemType).toUpperCase() || "N/A"}</Text>
         </View>
 
         <View style={styles.followerContainer}>
@@ -230,6 +239,8 @@ export const CustomeBevrageCard: React.FC<CustomeBevrageCardProps> = ({
   icon,
   files = [],
   isSmall = false,
+  quantity = "0",
+  itemType = 3,
 }) => {
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1}>
@@ -242,6 +253,7 @@ export const CustomeBevrageCard: React.FC<CustomeBevrageCardProps> = ({
           <Text style={styles.followers}>
             <Text style={styles.groupName}>Bevrages Name :</Text> {title}
           </Text>
+          <Text style={recycledStyles.postUsername}>{getProductText(itemType).toUpperCase() || "N/A"}</Text>
         </View>
 
         <View style={styles.followerContainer}>
@@ -254,6 +266,11 @@ export const CustomeBevrageCard: React.FC<CustomeBevrageCardProps> = ({
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>
             <Text style={styles.groupName}>Bevrages Description :</Text> {description}
+          </Text>
+        </View>
+        <View style={styles.followerContainer}>
+          <Text style={styles.followers}>
+            <Text style={styles.groupName}>Quantity: </Text> {quantity}
           </Text>
         </View>
         <View style={styles.followerContainer}>
@@ -282,7 +299,6 @@ export const CustomeMenuCard: React.FC<CustomeMenuCardProps> = ({
   isSmall = false,
   quantity = "0",
   productType = 3,
-  
 }) => {
   const formattedFoodTypes = foodTypes.map((type) => foodOptions.find((option) => option.value === type)?.label || type).join(", ");
   return (
@@ -295,7 +311,6 @@ export const CustomeMenuCard: React.FC<CustomeMenuCardProps> = ({
           </Text>
           <Text style={styles.followers}>
             <Text style={styles.groupName}> Name: </Text> {title}
-             
           </Text>
           <Text style={recycledStyles.postUsername}>{getProductText(productType).toUpperCase() || "N/A"}</Text>
         </View>
@@ -316,7 +331,6 @@ export const CustomeMenuCard: React.FC<CustomeMenuCardProps> = ({
           </Text>
         </View>
 
-        
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>
             <Text style={styles.groupName}>Quantity: </Text> {quantity}
