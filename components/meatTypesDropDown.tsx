@@ -9,10 +9,12 @@ import { RadioButton } from 'react-native-paper';
 export default function CheckBoxExample({ formik, valueName }: { formik: any; valueName: string }) {
   const foodOptions = [
     { label: "Vegan", value: "V" },
+    { label: "Vegeterian", value: "VG" },
     { label: "Dairy-Free", value: "DF" },
     { label: "Meat", value: "M" },
     { label: "Gluten-Free", value: "GF" },
     { label: "Nuts-Free", value: "NF" },
+    { label: "Halal", value: "H" },
   ];
 
   const toggleSelection = (value: string) => {
@@ -179,10 +181,12 @@ export function SidesTypesCheckbox({
 
   const sidesOptions = [
     { label: "Vegan", value: "V" },
+    { label: "Vegeterian", value: "VG" },
     { label: "Dairy-Free", value: "DF" },
     { label: "Meat", value: "M" },
     { label: "Gluten-Free", value: "GF" },
     { label: "Nuts-Free", value: "NF" },
+    { label: "Halal", value: "H" },
   ];
 
   const toggleSelection = (value: string) => {

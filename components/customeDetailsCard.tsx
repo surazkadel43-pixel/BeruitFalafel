@@ -48,10 +48,12 @@ interface CustomeMenuCardProps {
 // Food type options (Label mapping)
 const foodOptions = [
   { label: "Vegan", value: "V" },
-  { label: "Dairy-Free", value: "DF" },
-  { label: "Meat", value: "M" },
-  { label: "Gluten-Free", value: "GF" },
-  { label: "Nuts-Free", value: "NF" },
+    { label: "Vegeterian", value: "VG" },
+    { label: "Dairy-Free", value: "DF" },
+    { label: "Meat", value: "M" },
+    { label: "Gluten-Free", value: "GF" },
+    { label: "Nuts-Free", value: "NF" },
+    { label: "Halal", value: "H" },
 ];
 
 const drinkOptions = [

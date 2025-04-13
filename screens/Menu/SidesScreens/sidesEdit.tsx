@@ -279,7 +279,7 @@ const EditSides = ({ navigation }: { navigation: any }) => {
               <SidesTypesCheckbox formik={formik} valueName="sidesTypes" />
               <ItemsCheckbox formik={formik} valueName="items" items={items} />
               <SauceCheckbox formik={formik} valueName="sauces" items={sauces} />
-              <BevragesCheckbox formik={formik} valueName="bevrages" items={bevrages} />
+          
               <MeatsCheckbox formik={formik} valueName="meats" items={meats} />
 
               {inputBuilder("Enter your Side Description", "description", formik, {

@@ -43,7 +43,7 @@ const EditSchedule = ({ navigation }: { navigation: any }) => {
 
   const route = useRoute(); // ✅ Get the route object
   const { scheduleDetails } = (route.params as { scheduleDetails: any }) || {};
-
+  console.log(scheduleDetails);
   useEffect(() => {
     prepare();
   }, []);

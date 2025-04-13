@@ -13,15 +13,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ToastManager, { Toast } from "toastify-react-native";
+import { createSchedule } from "../../api/schedules";
 import { createOpeningHourSchema } from "../../api/validations";
 import { buttonBuilder } from "../../components/button";
 import { inputBuilder } from "../../components/input";
 import { CustomeRadioButtons, TimePickerField } from "../../components/meatTypesDropDown";
 import { createItemPropsStyles, createModalStyles, toastManagerProps } from "../../components/recycled-style";
 import showAlert from "../../components/showAlert";
-import "../../extension/extension";
-import { createSchedule } from "../../api/schedules";
 import { parseError } from "../../components/toasts";
+import "../../extension/extension";
 
 interface CreatePromotionModal {
   onClose: () => void;
@@ -49,7 +49,6 @@ const open: options[] = [
   { label: "No", value: 0 },
 ];
 
-
 const CreateScheduleModal: React.FC<CreatePromotionModal> = (props) => {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
 
@@ -74,7 +73,6 @@ const CreateScheduleModal: React.FC<CreatePromotionModal> = (props) => {
     onSubmit: async (values) => {
       setApiInUse(true);
 
-      
       const response = await createSchedule(
         parseInt(values.day) || 1,
         parseInt(values.type) || 1,
