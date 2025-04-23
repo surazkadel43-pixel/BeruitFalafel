@@ -19,11 +19,12 @@ export function buttonBuilder(text: string, onClick: any, disabled: boolean, add
       ]}
       {...additionalPressableProps} // Spread any additional props (like onPressIn, onPressOut, etc.)
     >
-      {additionalProps}
+     
       <Text style={buttonTextStyle}>{text}</Text>
     </Pressable>
   );
 }
+// {/* {additionalProps} */}
 
 const styles = StyleSheet.create({
   buttonContainer: {

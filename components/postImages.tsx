@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import ZoomImageModal from "./zoomImageModals";
 const { width } = Dimensions.get("window");
@@ -13,10 +13,21 @@ export const PostImages: React.FC<PostImageProps> = ({ files, isSmall }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [containerWidth, setContainerWidth] = useState(width); // default fallback
+  const flatListRef = useRef<FlatList>(null);
+  const onClose = (index: number) => {
+    setModalVisible(false);
+    if (index >= 0 && index < files.length) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToIndex({ index, animated: false });
+      }, 100);
+    }
+    setCurrentIndex(index);
+  };
 
   return (
     <View onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
       <FlatList
+        ref={flatListRef}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -35,16 +46,19 @@ export const PostImages: React.FC<PostImageProps> = ({ files, isSmall }) => {
                 paddingVertical: 10,
               }}
             >
-              <Image source={{ uri: item.presignedURL }} style={[isSmall ? styles.reducedImageSize : styles.image]} allowDownscaling={false} />
+              <Image
+                source={{ uri: item.presignedURL }}
+                style={[isSmall ? styles.reducedImageSize : styles.image]}
+                allowDownscaling={false}
+                // contentFit="fill"
+              />
             </View>
           </TouchableWithoutFeedback>
         )}
       />
 
-      {/* Zoom Image Modal
-      <ZoomImageModal visible={modalVisible} onClose={() => setModalVisible(false)} source={files[currentIndex]} /> */}
       {/* Zoom Image Modal */}
-      <ZoomImageModal visible={modalVisible} onClose={() => setModalVisible(false)} source={files[currentIndex]} files={files} index={currentIndex} />
+      <ZoomImageModal visible={modalVisible} onClose={onClose} source={files[currentIndex]} files={files} index={currentIndex} />
 
       {/* Pagination */}
       {files.length > 1 && (
@@ -72,8 +86,7 @@ const styles = StyleSheet.create({
   pagination: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 5,
-    marginBottom: 10,
+    marginTop: 8,
   },
   dot: {
     width: 8,

@@ -154,6 +154,13 @@ export const createProductSchema = Yup.object().shape({
   items: Yup.array().min(1, "Please select at least one item").required("Items are required"),
   sauces: Yup.array().min(1, "Please select at least one item").required("sauces are required"),
   meats: Yup.array().min(1, "Please select at least one item").required("meats are required"),
+  sides: Yup.array()
+    .max(1, "You can only select one side") // Allow max of 1 item
+    .optional(), // Make it optional
+
+    bevrages: Yup.array()
+    .max(1, "You can only select one beverage") // Allow max of 1 item
+    .optional(), // Make it optional
 
   image: Yup.mixed<File | ImagePickerAsset>().required("Image is required"),
 });
@@ -195,31 +202,22 @@ export const changePasswordSchema = Yup.object({
 
 export const createGenericItemSchema = Yup.object().shape({
   name: Yup.string()
-  .min(3, "Name must be at least 3 characters")
-  .required("Name is required")
-  .test(
-    "not-sides-or-beverages",
-    "Name cannot be 'Sides' or 'Beverages'",
-    (value) => !["sides", "beverages"].includes(value?.toLowerCase() ?? "")
-  ),
+    .min(3, "Name must be at least 3 characters")
+    .required("Name is required")
+    .test("not-sides-or-beverages", "Name cannot be 'Sides' or 'Beverages'", (value) => !["sides", "beverages"].includes(value?.toLowerCase() ?? "")),
 
   description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
   foodTypes: Yup.array().min(1, "Please select at least one option"),
 });
 
 export const createOpeningHourSchema = Yup.object().shape({
-  day: Yup.string()
-    .required("Day is required"),
+  day: Yup.string().required("Day is required"),
 
-  isOpen: Yup.string()
-    .required("Please specify if it's open"),
+  isOpen: Yup.string().required("Please specify if it's open"),
 
-  description: Yup.string()
-    .min(5, "Description must be at least 5 characters")
-    .required("Description is required"),
+  description: Yup.string().min(5, "Description must be at least 5 characters").required("Description is required"),
 
-  type: Yup.string()
-    .required("Type is required"),
+  type: Yup.string().required("Type is required"),
 
   openTime: Yup.string()
     .required("Opening time is required")

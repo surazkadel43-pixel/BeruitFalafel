@@ -1,12 +1,21 @@
 import { FontAwesome } from "@expo/vector-icons";
+import { Skeleton } from "moti/skeleton";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { getDayName } from "../utils/dayEnums";
+import { getProductText, getProductType, ItemType } from "../utils/enums";
 import { buttonBuilder } from "./button";
 import { PostImages } from "./postImages";
 import { recycledStyles } from "./recycled-style";
-
-import { getProductText, getProductType, ItemType } from "../utils/enums";
-import { getDayName } from "../utils/dayEnums";
+const SkeletonCommonProps = {
+  colorMode: "dark",
+  transition: {
+    type: "timing",
+    duration: 100,
+  },
+  marginBottom: 10,
+  // backgroundColor: '#D4D4D4',
+} as const;
 
 export const CustomeCard = ({
   itemId = "N/A",
@@ -179,7 +188,6 @@ export const CustomeMenuCard = ({
     <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
       <View style={styles.groupInfo}>
         <View style={styles.followerContainer}>
-          {/* <Text style={styles.groupName}>{itemId}</Text> */}
           <Text style={styles.groupName}>{title}</Text>
           <Text style={recycledStyles.postUsername}>{getProductType(productType).toUpperCase() || "N/A"}</Text>
         </View>
@@ -188,15 +196,23 @@ export const CustomeMenuCard = ({
           <FontAwesome name={icon} size={18} color="white" />
           <Text style={styles.followers}>Price: {price}</Text>
         </View>
-        {quantity && (
-          <View style={styles.followerContainer}>
-            <Text style={styles.followers}>Quantity: {quantity}</Text>
-          </View>
-        )}
+
+        <View>
+          {quantity ? (
+            <View style={styles.followerContainer}>
+              <Text style={styles.followers}>Quantity: {quantity}</Text>
+            </View>
+          ) : (
+            <View style={styles.followerContainer}>
+              <Text style={styles.followers}>Quantity: {quantity}</Text>
+            </View>
+          )}
+        </View>
 
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>{description}</Text>
         </View>
+
         <View style={styles.followerContainer}>
           <Text style={styles.followers}> Food Types: </Text>
           <Text style={[styles.followers, { fontWeight: "bold" }]}>{menuTypes.join(", ")}</Text>
@@ -208,6 +224,33 @@ export const CustomeMenuCard = ({
   );
 };
 
+export const CustomeSkelatonCard = ({ show = false }: { show: boolean }) => {
+  return (
+    <TouchableOpacity style={styles.groupCard} activeOpacity={1}>
+      <View style={styles.groupInfo}>
+        <Skeleton.Group show={show}>
+          <View style={{ marginBottom: 10 }}>
+            <Skeleton width="99%" height={40} radius="round" {...SkeletonCommonProps} />
+          </View>
+
+          <View style={{ marginBottom: 10 }}>
+            <Skeleton width="99%" height={30} radius="round" {...SkeletonCommonProps} />
+          </View>
+
+          <View style={{ marginBottom: 10 }}>
+            <Skeleton width="99%" height={32} radius="round" {...SkeletonCommonProps} />
+          </View>
+
+          <View style={{ marginBottom: 10 }}>
+            <Skeleton width="99%" height={32} radius="round" {...SkeletonCommonProps} />
+          </View>
+
+          <Skeleton width="99%" height={32} radius="round" {...SkeletonCommonProps}></Skeleton>
+        </Skeleton.Group>
+      </View>
+    </TouchableOpacity>
+  );
+};
 export const CustomeProfileCard = ({
   title,
   description,
@@ -263,6 +306,7 @@ export const CustomePromotionCard = ({
   itemType: ItemType;
 }) => {
   const { text, isFuture } = expiryDate.timeAgo();
+
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1} onPress={onPress}>
       <View style={styles.groupInfo}>
@@ -313,6 +357,7 @@ export const PromotionDetailsCard = ({
   itemType: ItemType;
 }) => {
   const { text, isFuture } = expiryDate.timeAgo();
+
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1}>
       <View style={styles.groupInfo}>
@@ -364,7 +409,6 @@ export const CustomeScheduleCard: React.FC<CustomeScheduleCardProps> = ({
   onEditPress,
   description = "",
 }) => {
- 
   return (
     <TouchableOpacity style={styles.groupCard} activeOpacity={1}>
       <View style={styles.groupInfo}>
@@ -388,10 +432,7 @@ export const CustomeScheduleCard: React.FC<CustomeScheduleCardProps> = ({
 
         <View style={styles.followerContainer}>
           <Text style={styles.followers}>
-            Is Open:{" "}
-            <Text style={recycledStyles.postUsername}>
-              {isOpen === 1 ? "Yes" : "No"}
-            </Text>
+            Is Open: <Text style={recycledStyles.postUsername}>{isOpen === 1 ? "Yes" : "No"}</Text>
           </Text>
         </View>
 

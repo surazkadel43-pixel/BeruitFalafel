@@ -769,7 +769,7 @@ export function CustomeRadioButtons({
 
         {/* Display selected item */}
         <Text style={styles.selectedText}>
-          Selected: {selectedValue || "None"}
+          Selected: {typesOptions.find((option) => option.value === Number(selectedValue))?.label || "None"}
         </Text>
       </List.Accordion>
 
@@ -887,6 +887,74 @@ export function TimePickerField({ formik, valueName, title = "Select Time" }: Da
       )}
 
       {/* Show validation error if touched and error exists */}
+      {formik.touched[valueName] && formik.errors[valueName] ? (
+        <Text style={styles.errorText}>{formik.errors[valueName]}</Text>
+      ) : null}
+    </View>
+  );
+}
+
+export function SidesRadioButton({
+  formik,
+  valueName,
+  expanded = false,
+  items = [],
+  lable= "",
+}: {
+  formik: any;
+  valueName: string;
+  expanded?: boolean;
+  items?: any[];
+  lable?: string;
+}) {
+  const [isExpanded, setIsExpanded] = useState(expanded);
+
+  const sidesOptions = items.map((item) => ({
+    label: item.name,
+    value: item.name, // Using name as value
+  }));
+
+  const selectedValue = formik.values[valueName];
+
+  const handleChange = (value: string) => {
+    formik.setFieldValue(valueName, value);
+  };
+
+  return (
+    <View style={styles.accordionContainer}>
+      <List.Accordion
+        title={lable || "Select Food Types"}
+        expanded={isExpanded}
+        onPress={() => setIsExpanded(!isExpanded)}
+        titleStyle={styles.accordionTitle} // Custom title style
+        left={(props) => <List.Icon {...props} icon="cow" color="white" />}
+        right={(props) => <List.Icon {...props} icon="chevron-down" color="white" />} // Custom right icon
+        style={styles.accordionBox} // Custom box styling
+      >
+        <RadioButton.Group onValueChange={handleChange} value={selectedValue}>
+          {sidesOptions.map((option) => (
+            <View key={option.value} style={styles.checkboxContainer}>
+              <RadioButton.Item
+                label={option.label} // Display string label
+                value={option.value} // Store the value as string
+                mode="android"
+                labelStyle={styles.checkboxLabel}
+                color="#ff9900"
+                uncheckedColor="#ccc"
+                position="leading"
+                style={{ paddingVertical: 1, marginVertical: 0 }}
+              />
+            </View>
+          ))}
+        </RadioButton.Group>
+
+        {/* ✅ Display selected item */}
+        <Text style={styles.selectedText}>
+          Selected: {selectedValue || "None"}
+        </Text>
+      </List.Accordion>
+
+      {/* ✅ Display error message if validation fails */}
       {formik.touched[valueName] && formik.errors[valueName] ? (
         <Text style={styles.errorText}>{formik.errors[valueName]}</Text>
       ) : null}

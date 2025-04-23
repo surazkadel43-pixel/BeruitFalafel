@@ -1,5 +1,5 @@
 export enum Days {
-  Sunday = 1,
+  Sunday = 0,
   Monday,
   Tuesday,
   Wednesday,
