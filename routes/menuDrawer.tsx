@@ -6,8 +6,6 @@ import NavigationHeader from "../components/navigationHeader";
 import { recycledStyles } from "../components/recycled-style";
 
 import BevrageStackNavigator from "./bevrageNavigation/bevrageStackNavigator";
-import CateringStackNavigator from "./cateringNavigation/cateringStackNavigator";
-import CateringSidesStackNavigator from "./cateringSideNavigation/sideStackNavigator";
 import GenericItemStackNavigator from "./genericNavigation/genericStackNavigator";
 import ItemStackNavigator from "./itemNavigation/itemStackNavigation";
 import MeatStackNavigator from "./meatNavigation/meatStackNavigator";
@@ -44,15 +42,7 @@ export default function MenuDrawer(navigation: any) {
           headerStyle: { backgroundColor: "skyblue" },
         }}
       />
-      <RootDrawerNavigator.Screen
-        name="CateringProduct"
-        component={CateringStackNavigator}
-        options={{
-          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
-          headerTitle: () => <NavigationHeader title="Catering" navigation={navigation} />,
-          headerStyle: { backgroundColor: "skyblue" },
-        }}
-      />
+
       <RootDrawerNavigator.Screen
         name="Item"
         component={ItemStackNavigator}
@@ -88,15 +78,6 @@ export default function MenuDrawer(navigation: any) {
         options={{
           drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
           headerTitle: () => <NavigationHeader title="Sides" navigation={navigation} />,
-          headerStyle: { backgroundColor: "skyblue" },
-        }}
-      />
-      <RootDrawerNavigator.Screen
-        name="CateringSides"
-        component={CateringSidesStackNavigator}
-        options={{
-          drawerIcon: ({ color, size }) => <MaterialIcons name="home" color="white" size={size} />,
-          headerTitle: () => <NavigationHeader title="Catering Sides" navigation={navigation} />,
           headerStyle: { backgroundColor: "skyblue" },
         }}
       />

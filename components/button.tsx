@@ -1,8 +1,14 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 import { recycledStyles } from "./recycled-style";
 
-export function buttonBuilder(text: string, onClick: any, disabled: boolean, additionalProps?: any, isActive?: boolean, additionalPressableProps?: any) {
-
+export function buttonBuilder(
+  text: string,
+  onClick: any,
+  disabled: boolean,
+  additionalProps?: any,
+  isActive?: boolean,
+  additionalPressableProps?: any
+) {
   // Extract textStyle from additionalPressableProps, if provided
   const buttonTextStyle = additionalPressableProps?.buttonText || styles.buttonText;
 
@@ -10,7 +16,6 @@ export function buttonBuilder(text: string, onClick: any, disabled: boolean, add
     <Pressable
       onPress={onClick}
       disabled={disabled}
-      
       style={[
         styles.buttonContainer,
         isActive && styles.buttonActive, // Active state styles (orange or any color for active buttons)
@@ -19,12 +24,12 @@ export function buttonBuilder(text: string, onClick: any, disabled: boolean, add
       ]}
       {...additionalPressableProps} // Spread any additional props (like onPressIn, onPressOut, etc.)
     >
-     
+      {additionalProps}
       <Text style={buttonTextStyle}>{text}</Text>
     </Pressable>
   );
 }
-// {/* {additionalProps} */}
+//
 
 const styles = StyleSheet.create({
   buttonContainer: {

@@ -19,12 +19,9 @@ export default function Welcome({ navigation }: any) {
   const [apiInUse, setApiInUse] = useState<boolean>(true);
 
   async function prepare() {
-    
     const savedCookie = await snatch("authCookie");
-   
 
-    
-    if (!savedCookie ) {
+    if (!savedCookie) {
       Toast.error("No cookies found.");
       setApiInUse(false);
       return;
@@ -34,7 +31,7 @@ export default function Welcome({ navigation }: any) {
 
     if (checkCookieRes.data.success === false) {
       await dispose("authCookie");
-      
+
       setApiInUse(false);
       Toast.error(parseError(checkCookieRes));
       return;
