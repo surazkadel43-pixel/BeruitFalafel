@@ -6,7 +6,7 @@ export default function Subcribed() {
   return (
     <SafeAreaView style={recycledStyles.safeAreaView}>
       <View style={styles.content}>
-        <Text style={recycledStyles.title}>Welcome to Reports</Text>
+        <Text style={recycledStyles.title}>Welcome to Reports </Text>
         <Text style={recycledStyles.normalText}>This page is for reports and enquiry and under construction</Text>
       </View>
     </SafeAreaView>
