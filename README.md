@@ -27,9 +27,10 @@ To run the Expo app with your local backend, follow these steps:
 4. In your code, update the backend URL:
 
 inside folder  api/communication.ts add this with your **IPv4 address**
+Backend is hosted in Goolge Cloud, So you can connect to backend either by this way
+const apiUrl = "https://beruitfalafelbackend.ts.r.appspot.com/";
 
-const apiUrl = "http://<Your.IP.Address>:8080/";
-
-// Make sure Your backeend server is running other wise you wont be able to navigate throught he app
+or If you want to connect Loccaly in You device use this way
+const apiUrl = "http://<Your.IP.Address>:8080/"; but for this make sure  Your backeend server is running in express js, other wise you wont be able to navigate throught he app
 
 // Note: Both your computer and the device running the Expo app must be on the same Wi-Fi network.
